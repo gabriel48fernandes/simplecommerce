@@ -1,5 +1,6 @@
 const container = document.getElementById("produtos");
 
+
 async function carregarProdutos() {
     try {
         const response = await fetch("/produtos");

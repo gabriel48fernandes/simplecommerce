@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - SimpleCommerce</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+    <h1>📦 Cadastro de Produto</h1>
+
+    <form id="form-produto">
+        <input type="text" id="nome" placeholder="Nome do produto" required />
+
+        <input type="number" id="preco" step="0.01" placeholder="Preço">
+
+
+        <input type="number" id="quantidade" placeholder="Quantidade em estoque" required />
+
+        <select id="categoria">
+            <option value="1">Eletrônicos</option>
+            <option value="2">Casa e Escritório</option>
+            <option value="3">Acessórios</option>
+            <option value="4">Utilidades</option>
+        </select>
+
+        <input type="file" id="imagem" accept="image/*" required />
+
+        <button type="submit">Cadastrar Produto</button>
+    </form>
+
+    <p id="status"></p>
+
+    <script type="module" src="admin.js"></script>
+</body>
+
+</html>
