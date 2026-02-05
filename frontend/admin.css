@@ -1,33 +1,156 @@
-body {
+* {
+  box-sizing: border-box;
   font-family: Arial, sans-serif;
-  background: #f5f5f5;
-  padding: 40px;
 }
 
-h1 {
+body {
+  margin: 0;
+  background: #0f172a;
+  color: #e5e7eb;
+}
+
+/* LAYOUT */
+.layout {
+  display: flex;
+  height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px;
+  background: #020617;
+  padding: 20px;
+}
+
+.logo {
+  color: #38bdf8;
+  margin-bottom: 30px;
+}
+
+.logo span {
+  color: #fff;
+}
+
+.sidebar nav a {
+  display: block;
+  padding: 12px;
+  color: #cbd5f5;
+  text-decoration: none;
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active {
+  background: #1e293b;
+  color: #fff;
+}
+
+/* CONTEÚDO */
+.content {
+  flex: 1;
+  padding: 30px;
+}
+
+/* TOPO */
+.topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
 }
 
-form {
-  background: #fff;
-  padding: 20px;
-  max-width: 400px;
-  border-radius: 8px;
-}
-
-input, select, button {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 12px;
-}
-
-button {
-  background: #0a7cff;
-  color: #fff;
+.topo button {
+  background: #2563eb;
   border: none;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 6px;
   cursor: pointer;
 }
 
-button:hover {
-  background: #055fd4;
+/* CARD */
+.card {
+  background: #020617;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+/* TABELA */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #1e293b;
+}
+
+th {
+  color: #94a3b8;
+}
+
+img {
+  width: 60px;
+  border-radius: 6px;
+}
+
+/* BOTÕES */
+td button {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+td button:first-child {
+  background: #facc15;
+}
+
+td button:last-child {
+  background: #dc2626;
+  color: white;
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: #020617;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+}
+
+.modal input,
+.modal select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: none;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn-cancelar {
+  background: #475569;
+  color: white;
+}
+
+.btn-salvar {
+  background: #22c55e;
+  color: white;
 }

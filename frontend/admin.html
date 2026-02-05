@@ -1,39 +1,81 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-    <meta charset="UTF-8">
-    <title>Admin - SimpleCommerce</title>
-    <link rel="stylesheet" href="admin.css">
+  <meta charset="UTF-8">
+  <title>Admin - SimpleCommerce</title>
+  <link rel="stylesheet" href="admin.css">
 </head>
-
 <body>
 
-    <h1>📦 Cadastro de Produto</h1>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2 class="logo">Simple<span>ADM</span></h2>
+
+    <nav>
+      <a href="#">📊 Dashboard</a>
+      <a href="#" class="active">📦 Produtos</a>
+      <a href="#">🧾 Pedidos</a>
+      <a href="#">👥 Clientes</a>
+      <a href="#">⚙️ Configurações</a>
+    </nav>
+  </aside>
+
+  <!-- CONTEÚDO -->
+  <main class="content">
+
+    <header class="topo">
+      <h1>Produtos</h1>
+      <button id="btnNovo">+ Novo Produto</button>
+    </header>
+
+    <section class="card">
+      <table id="tabela-produtos">
+        <thead>
+          <tr>
+            <th>Imagem</th>
+            <th>Nome</th>
+            <th>Preço</th>
+            <th>Qtd</th>
+            <th>Categoria</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+  </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h2 id="tituloModal">Cadastrar Produto</h2>
 
     <form id="form-produto">
-        <input type="text" id="nome" placeholder="Nome do produto" required />
+      <input type="text" id="nome" placeholder="Nome do produto" required />
+      <input type="number" id="preco" step="0.01" placeholder="Preço" required />
+      <input type="number" id="quantidade" placeholder="Quantidade" required />
 
-        <input type="number" id="preco" step="0.01" placeholder="Preço">
+      <select id="categoria">
+        <option value="1">Eletrônicos</option>
+        <option value="2">Casa e Escritório</option>
+        <option value="3">Acessórios</option>
+        <option value="4">Utilidades</option>
+      </select>
 
+      <input type="file" id="imagem" accept="image/*" />
 
-        <input type="number" id="quantidade" placeholder="Quantidade em estoque" required />
-
-        <select id="categoria">
-            <option value="1">Eletrônicos</option>
-            <option value="2">Casa e Escritório</option>
-            <option value="3">Acessórios</option>
-            <option value="4">Utilidades</option>
-        </select>
-
-        <input type="file" id="imagem" accept="image/*" required />
-
-        <button type="submit">Cadastrar Produto</button>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancelar" id="btnCancelar">Cancelar</button>
+        <button type="submit" class="btn-salvar">Salvar</button>
+      </div>
     </form>
+  </div>
+</div>
 
-    <p id="status"></p>
-
-    <script type="module" src="admin.js"></script>
+<script type="module" src="admin.js"></script>
 </body>
-
 </html>

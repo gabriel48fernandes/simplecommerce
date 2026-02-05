@@ -1,34 +1,37 @@
 const container = document.getElementById("produtos");
 
-
 async function carregarProdutos() {
-    try {
-        const response = await fetch("/produtos");
+  try {
+    const response = await fetch("/produtos");
 
-        if (!response.ok) {
-            throw new Error("Erro ao buscar produtos");
-        }
+    if (!response.ok) {
+      throw new Error("Erro ao buscar produtos");
+    }
 
-        const produtos = await response.json();
+    const produtos = await response.json();
 
-        produtos.forEach(produto => {
-            const card = document.createElement("div");
-            card.className = "card";
-
-            card.innerHTML = `
+    produtos.forEach(produto => {
+      const card = document.createElement("div");
+      card.className = "card";
+      console.log("produto.preco:", produto.preco);
+      let precoFormatado = Number(produto.preco).toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+      });
+      card.innerHTML = `
   <img src="${produto.imagem}" alt="${produto.nome}">
   <h3>${produto.nome}</h3>
-  <p class="preco">R$ ${produto.preco}</p>
+  <p class="preco">${precoFormatado}</p>
   <button>Ver produto</button>
 `;
 
 
-            container.appendChild(card);
-        });
+      container.appendChild(card);
+    });
 
-    } catch (error) {
-        console.error("Erro ao carregar produtos:", error);
-    }
+  } catch (error) {
+    console.error("Erro ao carregar produtos:", error);
+  }
 }
 
 async function carregarCategorias() {
