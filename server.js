@@ -7,7 +7,7 @@ import { pool } from "./db.js";
 
 import path from "path";
 import { fileURLToPath } from "url";
-
+import authRoutes from "./routes/auth.js";
 // =====================
 // CONFIG PATH (ESM)
 // =====================
@@ -24,6 +24,7 @@ const app = express();
 // =====================
 app.use(cors());
 app.use(express.json());
+app.use("/auth", authRoutes);
 
 // servir arquivos estáticos (FRONTEND)
 app.use(express.static(path.join(__dirname, "frontend")));

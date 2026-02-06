@@ -1,9 +1,18 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
+const token = localStorage.getItem("token");
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+if (!token || !usuario || usuario.role !== "admin") {
+  window.location.href = "/login.html";
+}
+
+
 const supabase = createClient(
   "https://fcknvwqerkyujhquugls.supabase.co",
   "sb_publishable_c-_9HXFPIQLd56o_2bixfw_oh-bMdXZ"
 );
+
 
 let produtoEditandoId = null;
 
@@ -36,6 +45,12 @@ function abrirModal(produto = null) {
     produtoEditandoId = null;
   }
 }
+
+function logout() {
+  localStorage.clear();
+  window.location.href = "/login.html";
+}
+
 
 function fecharModal() {
   modal.style.display = "none";
