@@ -1,11 +1,11 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-const token = localStorage.getItem("token");
-const usuario = JSON.parse(localStorage.getItem("usuario"));
+const auth = JSON.parse(localStorage.getItem("auth") || "null");
 
-if (!token || !usuario || usuario.role !== "admin") {
+if (!auth || !auth.token) {
   window.location.href = "/login.html";
 }
+
 
 
 const supabase = createClient(
@@ -27,9 +27,13 @@ const tituloModal = document.getElementById("tituloModal");
 ========================= */
 document.getElementById("btnNovo").onclick = () => abrirModal();
 document.getElementById("btnCancelar").onclick = fecharModal;
+document.getElementById("btnCancelarX").onclick = fecharModal;
+document.getElementById("modal").onclick = (e) => {
+  if (e.target === modal) fecharModal();
+};
 
 function abrirModal(produto = null) {
-  modal.style.display = "flex";
+  modal.classList.add("active");
 
   if (produto) {
     tituloModal.innerText = "Editar Produto";
@@ -46,14 +50,14 @@ function abrirModal(produto = null) {
   }
 }
 
-function logout() {
+document.getElementById("btnLogout").onclick = () => {
   localStorage.clear();
-  window.location.href = "/login.html";
-}
+  window.location.href = "/index.html";
+};
 
 
 function fecharModal() {
-  modal.style.display = "none";
+  modal.classList.remove("active");
   form.reset();
   produtoEditandoId = null;
 }

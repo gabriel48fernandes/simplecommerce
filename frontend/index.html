@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>SimpleCommerce</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SimpleCommerce - Sua Loja Online</title>
     <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -11,12 +12,16 @@
 
     <!-- HEADER -->
     <header class="header">
-        <div class="logo">SimpleCommerce</div>
+        <div class="logo-container">
+            <span class="logo-icon">🛍️</span>
+            <div class="logo">SimpleCommerce</div>
+        </div>
 
-        <input type="text" placeholder="Buscar produtos..." class="search" />
+        <input type="text" placeholder="🔍 Buscar produtos..." class="search" />
 
-        <div class="icons">
-            👤 🛒
+        <div class="icons" id="area-usuario">
+            <a href="/login.html" class="icon-link">👤</a>
+            <a href="#" class="icon-link">🛒</a>
         </div>
     </header>
 

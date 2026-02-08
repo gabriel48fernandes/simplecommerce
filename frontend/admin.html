@@ -1,83 +1,139 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin - SimpleCommerce</title>
   <link rel="stylesheet" href="admin.css">
 </head>
+
 <body>
 
-<div class="layout">
+  <div class="layout">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <h2 class="logo">Simple<span>ADM</span></h2>
-
-    <nav>
-      <a href="#">📊 Dashboard</a>
-      <a href="#" class="active">📦 Produtos</a>
-      <a href="#">🧾 Pedidos</a>
-      <a href="#">👥 Clientes</a>
-      <a href="#">⚙️ Configurações</a>
-    </nav>
-  </aside>
-
-  <!-- CONTEÚDO -->
-  <main class="content">
-
-    <header class="topo">
-      <h1>Produtos</h1>
-      <button id="btnNovo">+ Novo Produto</button>
-    </header>
-
-    <section class="card">
-      <table id="tabela-produtos">
-        <thead>
-          <tr>
-            <th>Imagem</th>
-            <th>Nome</th>
-            <th>Preço</th>
-            <th>Qtd</th>
-            <th>Categoria</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-  </main>
-</div>
-
-<!-- MODAL -->
-<div class="modal-overlay" id="modal">
-  <div class="modal">
-    <h2 id="tituloModal">Cadastrar Produto</h2>
-
-    <form id="form-produto">
-      <input type="text" id="nome" placeholder="Nome do produto" required />
-      <input type="number" id="preco" step="0.01" placeholder="Preço" required />
-      <input type="number" id="quantidade" placeholder="Quantidade" required />
-
-      <select id="categoria">
-        <option value="1">Eletrônicos</option>
-        <option value="2">Casa e Escritório</option>
-        <option value="3">Acessórios</option>
-        <option value="4">Utilidades</option>
-      </select>
-
-      <input type="file" id="imagem" accept="image/*" />
-
-      <div class="modal-actions">
-        <button type="button" class="btn-cancelar" id="btnCancelar">Cancelar</button>
-        <button type="submit" class="btn-salvar">Salvar</button>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="logo-admin">
+        <span class="logo-icon">🛍️</span>
+        <h2>Simple<span>ADM</span></h2>
       </div>
-      <button onclick="logout()">Sair</button>
 
-    </form>
+      <nav class="nav-menu">
+        <a href="#" class="nav-item">
+          <span class="icon">📊</span>
+          <span class="label">Dashboard</span>
+        </a>
+        <a href="#" class="nav-item active">
+          <span class="icon">📦</span>
+          <span class="label">Produtos</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="icon">🧾</span>
+          <span class="label">Pedidos</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="icon">👥</span>
+          <span class="label">Clientes</span>
+        </a>
+        <a href="#" class="nav-item">
+          <span class="icon">⚙️</span>
+          <span class="label">Configurações</span>
+        </a>
+        <hr class="nav-divider">
+        <a href="#" class="nav-item logout" id="btnLogout">
+          <span class="icon">🚪</span>
+          <span class="label">Sair</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- CONTEÚDO -->
+    <main class="content">
+
+      <header class="topo">
+        <div class="topo-left">
+          <h1>Gerenciar Produtos</h1>
+          <p class="breadcrumb">Dashboard / Produtos</p>
+        </div>
+        <button id="btnNovo" class="btn-novo">+ Novo Produto</button>
+      </header>
+
+      <section class="card-tabela">
+        <table id="tabela-produtos">
+          <thead>
+            <tr>
+              <th>Imagem</th>
+              <th>Nome</th>
+              <th>Preço</th>
+              <th>Qtd</th>
+              <th>Categoria</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+    </main>
   </div>
-</div>
 
-<script type="module" src="admin.js"></script>
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="tituloModal">Cadastrar Produto</h2>
+        <button class="modal-close" id="btnCancelarX">✕</button>
+      </div>
+
+      <form id="form-produto" class="modal-form">
+        <div class="form-group">
+          <label for="nome">Nome do Produto</label>
+          <input type="text" id="nome" placeholder="Digite o nome do produto" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="preco">Preço</label>
+            <input type="number" id="preco" step="0.01" placeholder="0.00" required />
+          </div>
+          <div class="form-group">
+            <label for="quantidade">Quantidade</label>
+            <input type="number" id="quantidade" placeholder="0" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="categoria">Categoria</label>
+          <select id="categoria">
+            <option value="1">Eletrônicos</option>
+            <option value="2">Casa e Escritório</option>
+            <option value="3">Acessórios</option>
+            <option value="4">Utilidades</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="imagem">Imagem do Produto</label>
+
+          <label for="imagem" class="upload-box">
+            <span>📁 Escolher arquivo</span>
+          </label>
+
+          <input type="file" id="imagem" name="imagem" accept="image/*" hidden>
+        </div>
+
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancelar" id="btnCancelar">Cancelar</button>
+          <button type="submit" class="btn-salvar">Salvar Produto</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <script type="module" src="admin.js"></script>
 </body>
+
 </html>
