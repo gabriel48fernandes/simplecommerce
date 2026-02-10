@@ -55,6 +55,10 @@ document.getElementById("btnLogout").onclick = () => {
   window.location.href = "/index.html";
 };
 
+document.getElementById("btnIrLoja").onclick = () => {
+  window.location.href = "/index.html";
+}
+
 
 function fecharModal() {
   modal.classList.remove("active");

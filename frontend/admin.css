@@ -58,6 +58,15 @@ body {
   font-weight: bold;
 }
 
+.logo-icon {
+    font-size: 28px;
+    animation: bounce 3s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
 .nav-menu {
   display: flex;
   flex-direction: column;
