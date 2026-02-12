@@ -39,16 +39,21 @@ function abrirModal(produto = null) {
     tituloModal.innerText = "Editar Produto";
     produtoEditandoId = produto.id;
 
-    nome.value = produto.nome;
-    preco.value = produto.preco;
-    quantidade.value = produto.quantidade;
-    categoria.value = produto.categoria_id;
+    document.getElementById("nome").value = produto.nome;
+    document.getElementById("preco").value = produto.preco;
+    document.getElementById("quantidade").value = produto.quantidade;
+    document.getElementById("categoria").value = produto.categoria_id;
+
+    document.getElementById("preco_promocional").value =
+      produto.preco_promocional || "";
+
   } else {
     tituloModal.innerText = "Cadastrar Produto";
     form.reset();
     produtoEditandoId = null;
   }
 }
+
 
 document.getElementById("btnLogout").onclick = () => {
   localStorage.clear();
@@ -91,6 +96,11 @@ form.addEventListener("submit", async (e) => {
 
   const nome = document.getElementById("nome").value;
   const preco = parseFloat(document.getElementById("preco").value);
+  const precoPromocionalInput = document.getElementById("preco_promocional").value;
+  const precoPromocional = precoPromocionalInput
+    ? parseFloat(precoPromocionalInput)
+    : null;
+
   const quantidade = Number(document.getElementById("quantidade").value);
   const categoria_id = Number(document.getElementById("categoria").value);
   const imagemFile = document.getElementById("imagem").files[0];
@@ -109,6 +119,7 @@ form.addEventListener("submit", async (e) => {
     body: JSON.stringify({
       nome,
       preco,
+      preco_promocional: precoPromocional || null,
       quantidade,
       categoria_id,
       imagem_url

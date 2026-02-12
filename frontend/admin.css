@@ -284,11 +284,21 @@ td button:last-child:hover {
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
   display: none;
-  align-items: center;
+
   justify-content: center;
+  align-items: flex-start; /* 🔥 muda aqui */
+
+  padding: 40px 20px;      /* 🔥 espaço superior */
+  overflow-y: auto;        /* 🔥 permite scroll */
+
   z-index: 1000;
   backdrop-filter: blur(2px);
 }
+
+.modal-overlay.active {
+  display: flex;
+}
+
 
 .modal-overlay.active {
   display: flex;
@@ -300,8 +310,13 @@ td button:last-child:hover {
   border-radius: 12px;
   width: 90%;
   max-width: 500px;
+
+  max-height: 90vh;   /* 🔥 importante */
+  overflow-y: auto;   /* 🔥 scroll interno */
+
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   animation: slideUp 0.3s ease;
+  
 }
 
 @keyframes slideUp {
@@ -322,7 +337,8 @@ td button:last-child:hover {
   padding: 25px;
   border-bottom: 1px solid #e0e0e0;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px 12px 0 0;
+  
+  
 }
 
 .modal-header h2 {

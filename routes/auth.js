@@ -13,7 +13,7 @@ router.post("/login", async (req, res) => {
 
     // 🔍 Busca usuário no banco
     const result = await pool.query(
-      "SELECT id, email, role FROM usuarios WHERE email = $1 AND senha = $2",
+      "SELECT id, nome, email, role FROM usuarios WHERE email = $1 AND senha = $2",
       [email, senha]
     );
 
@@ -22,17 +22,19 @@ router.post("/login", async (req, res) => {
     }
 
     const usuario = result.rows[0];
-    
+
     const token = Buffer.from(usuario.email).toString("base64");
 
     res.json({
       token,
       usuario: {
         id: usuario.id,
+        nome: usuario.nome,
         email: usuario.email,
-        role: usuario.role // 'admin' ou 'user'
+        role: usuario.role
       }
     });
+
 
   } catch (error) {
     console.error("Erro no login:", error);

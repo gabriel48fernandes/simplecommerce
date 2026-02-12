@@ -19,8 +19,13 @@ if (areaUsuario) {
       <span>🛒</span>
     `;
   } else {
+    // 🔥 Pega apenas o primeiro nome
+    const primeiroNome = auth.usuario.nome
+      ? auth.usuario.nome.split(" ")[0]
+      : auth.usuario.email;
+
     areaUsuario.innerHTML = `
-      <span>${auth.usuario.email}</span>
+      <span>Olá, ${primeiroNome} 👋</span>
       ${
         auth.usuario.role === "admin"
           ? `<a href="/admin.html" class="btn-admin">⚙ ADM</a>`
@@ -52,15 +57,51 @@ async function carregarProdutos() {
       const card = document.createElement("div");
       card.className = "card";
 
+      // Verifica se tem promoção
+      const temPromocao =
+        p.preco_promocional &&
+        Number(p.preco_promocional) < Number(p.preco);
+
+      let precoHTML = "";
+      let badgeHTML = "";
+
+      if (temPromocao) {
+        const desconto = Math.round(
+          ((p.preco - p.preco_promocional) / p.preco) * 100
+        );
+
+        badgeHTML = `<span class="badge">${desconto}% OFF</span>`;
+
+        precoHTML = `
+          <p class="preco-antigo">
+            ${Number(p.preco).toLocaleString("pt-BR", {
+              style: "currency",
+              currency: "BRL"
+            })}
+          </p>
+          <p class="preco-promocional">
+            ${Number(p.preco_promocional).toLocaleString("pt-BR", {
+              style: "currency",
+              currency: "BRL"
+            })}
+          </p>
+        `;
+      } else {
+        precoHTML = `
+          <p class="preco">
+            ${Number(p.preco).toLocaleString("pt-BR", {
+              style: "currency",
+              currency: "BRL"
+            })}
+          </p>
+        `;
+      }
+
       card.innerHTML = `
+        ${badgeHTML}
         <img src="${p.imagem}" />
         <h3>${p.nome}</h3>
-        <p class="preco">
-          ${Number(p.preco).toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL"
-          })}
-        </p>
+        ${precoHTML}
         <button>Ver produto</button>
       `;
 

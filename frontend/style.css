@@ -241,12 +241,14 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
     border: 2px solid transparent;
+    z-index: 1;
 }
 
 .card:hover {
     transform: translateY(-6px);
     box-shadow: 0 12px 24px rgba(102, 126, 234, 0.2);
     border-color: #667eea;
+    z-index: 2;
 }
 
 .card img {
@@ -297,6 +299,39 @@ body {
 .card button:active {
     transform: translateY(0);
 }
+
+.card {
+  position: relative;
+}
+
+.badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #ff3b3b;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 20px;
+  z-index: 10; /* 🔥 isso resolve */
+}
+
+
+.preco-antigo {
+  text-decoration: line-through;
+  color: gray;
+  font-size: 14px;
+  margin: 0;
+}
+
+.preco-promocional {
+  color: green;
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}
+
 
 /* ==================
    BENEFÍCIOS

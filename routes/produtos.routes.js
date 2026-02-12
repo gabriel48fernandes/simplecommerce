@@ -9,20 +9,22 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const query = `
-      SELECT DISTINCT ON (p.id)
-        p.id,
-        p.nome,
-        p.preco,
-        p.quantidade,
-        p.categoria_id,
-        c.nome AS categoria,
-        i.url AS imagem
-      FROM produtos p
-      JOIN categorias c ON c.id = p.categoria_id
-      LEFT JOIN imagens_produto i 
-        ON i.produto_id = p.id
-      ORDER BY p.id
-    `;
+  SELECT DISTINCT ON (p.id)
+    p.id,
+    p.nome,
+    p.preco,
+    p.preco_promocional,
+    p.quantidade,
+    p.categoria_id,
+    c.nome AS categoria,
+    i.url AS imagem
+  FROM produtos p
+  JOIN categorias c ON c.id = p.categoria_id
+  LEFT JOIN imagens_produto i 
+    ON i.produto_id = p.id
+  ORDER BY p.id
+`;
+
 
     const result = await pool.query(query);
     res.json(result.rows);
@@ -41,21 +43,23 @@ router.get("/:id", async (req, res) => {
     const { id } = req.params;
 
     const query = `
-      SELECT 
-        p.id,
-        p.nome,
-        p.preco,
-        p.quantidade,
-        p.categoria_id,
-        c.nome AS categoria,
-        i.url AS imagem
-      FROM produtos p
-      JOIN categorias c ON c.id = p.categoria_id
-      LEFT JOIN imagens_produto i 
-        ON i.produto_id = p.id
-      WHERE p.id = $1
-      LIMIT 1
-    `;
+  SELECT 
+    p.id,
+    p.nome,
+    p.preco,
+    p.preco_promocional,
+    p.quantidade,
+    p.categoria_id,
+    c.nome AS categoria,
+    i.url AS imagem
+  FROM produtos p
+  JOIN categorias c ON c.id = p.categoria_id
+  LEFT JOIN imagens_produto i 
+    ON i.produto_id = p.id
+  WHERE p.id = $1
+  LIMIT 1
+`;
+
 
     const result = await pool.query(query, [id]);
 
@@ -76,7 +80,8 @@ router.get("/:id", async (req, res) => {
 ========================= */
 router.post("/", async (req, res) => {
   try {
-    const { nome, preco, quantidade, categoria_id, imagem_url } = req.body;
+    const { nome, preco, preco_promocional, quantidade, categoria_id, imagem_url } = req.body;
+
 
     if (!nome || preco == null || quantidade == null || !categoria_id) {
       return res.status(400).json({
@@ -86,11 +91,13 @@ router.post("/", async (req, res) => {
 
     const produtoResult = await pool.query(
       `
-      INSERT INTO produtos (nome, preco, quantidade, categoria_id)
-      VALUES ($1, $2, $3, $4)
-      RETURNING id
+     INSERT INTO produtos (nome, preco, preco_promocional, quantidade, categoria_id)
+     VALUES ($1, $2, $3, $4, $5)
+     RETURNING id
+
       `,
-      [nome, preco, quantidade, categoria_id]
+      [nome, preco, preco_promocional || null, quantidade, categoria_id]
+
     );
 
     const produtoId = produtoResult.rows[0].id;
@@ -122,7 +129,7 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { nome, preco, quantidade, categoria_id, imagem_url } = req.body;
+    const { nome, preco, preco_promocional, quantidade, categoria_id, imagem_url } = req.body;
 
     if (!nome || preco == null || quantidade == null || !categoria_id) {
       return res.status(400).json({ erro: "Dados inválidos" });
@@ -132,12 +139,14 @@ router.put("/:id", async (req, res) => {
       `
       UPDATE produtos
       SET nome = $1,
-          preco = $2,
-          quantidade = $3,
-          categoria_id = $4
-      WHERE id = $5
+      preco = $2,
+      preco_promocional = $3,
+      quantidade = $4,
+      categoria_id = $5
+      WHERE id = $6
+
       `,
-      [nome, preco, quantidade, categoria_id, id]
+      [nome, preco, preco_promocional || null, quantidade, categoria_id, id]
     );
 
     if (imagem_url) {
