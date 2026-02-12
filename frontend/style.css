@@ -314,7 +314,7 @@ body {
   font-weight: 600;
   padding: 6px 10px;
   border-radius: 20px;
-  z-index: 10; /* 🔥 isso resolve */
+  z-index: 10;
 }
 
 
