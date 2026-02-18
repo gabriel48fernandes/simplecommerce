@@ -30,13 +30,6 @@ if (areaUsuario) {
       ${auth.usuario.role === "admin"
         ? `<a href="/admin.html" class="btn-admin">⚙ ADM</a>`
         : ""
-=======
-      <span>Olá, ${primeiroNome} 😊 bem vindo de volta</span>
-      ${
-        auth.usuario.role === "admin"
-          ? `<a href="/admin.html" class="btn-admin">⚙ ADM</a>`
-          : ""
->>>>>>> Stashed changes
       }
       <button id="logout">Sair</button>
       <span>🛒</span>
