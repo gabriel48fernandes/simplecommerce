@@ -25,7 +25,6 @@ if (areaUsuario) {
       : auth.usuario.email;
 
     areaUsuario.innerHTML = `
-<<<<<<< Updated upstream
       <span>Olá, ${primeiroNome} 👋</span>
       ${auth.usuario.role === "admin"
         ? `<a href="/admin.html" class="btn-admin">⚙ ADM</a>`
