@@ -26,10 +26,9 @@ if (areaUsuario) {
 
     areaUsuario.innerHTML = `
       <span>Olá, ${primeiroNome} 👋</span>
-      ${
-        auth.usuario.role === "admin"
-          ? `<a href="/admin.html" class="btn-admin">⚙ ADM</a>`
-          : ""
+      ${auth.usuario.role === "admin"
+        ? `<a href="/admin.html" class="btn-admin">⚙ ADM</a>`
+        : ""
       }
       <button id="logout">Sair</button>
       <span>🛒</span>
@@ -58,41 +57,36 @@ async function carregarProdutos() {
       card.className = "card";
 
       // Verifica se tem promoção
-      const temPromocao =
-        p.preco_promocional &&
-        Number(p.preco_promocional) < Number(p.preco);
+
+      const temPromocao = p.tem_promocao;
 
       let precoHTML = "";
       let badgeHTML = "";
 
       if (temPromocao) {
-        const desconto = Math.round(
-          ((p.preco - p.preco_promocional) / p.preco) * 100
-        );
-
-        badgeHTML = `<span class="badge">${desconto}% OFF</span>`;
-
+        badgeHTML = `<span class="badge">${p.percentual_desconto}% OFF</span>`;
+        
         precoHTML = `
           <p class="preco-antigo">
             ${Number(p.preco).toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL"
-            })}
+          style: "currency",
+          currency: "BRL"
+        })}
           </p>
           <p class="preco-promocional">
             ${Number(p.preco_promocional).toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL"
-            })}
+          style: "currency",
+          currency: "BRL"
+        })}
           </p>
         `;
       } else {
         precoHTML = `
           <p class="preco">
             ${Number(p.preco).toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL"
-            })}
+          style: "currency",
+          currency: "BRL"
+        })}
           </p>
         `;
       }

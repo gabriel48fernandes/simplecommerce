@@ -25,9 +25,28 @@ router.get("/", async (req, res) => {
   ORDER BY p.id
 `;
 
-
     const result = await pool.query(query);
-    res.json(result.rows);
+
+    const produtos = result.rows.map(p => {
+      const preco = Number(p.preco);
+      const precoPromocional = Number(p.preco_promocional);
+
+      const temPromocao =
+        precoPromocional && precoPromocional < preco;
+
+      const percentualDesconto = temPromocao
+        ? Math.round(((preco - precoPromocional) / preco) * 100)
+        : null;
+
+      return {
+        ...p,
+        tem_promocao: temPromocao,
+        percentual_desconto: percentualDesconto
+      };
+    });
+
+    res.json(produtos);
+
 
   } catch (err) {
     console.error(err);
@@ -67,7 +86,24 @@ router.get("/:id", async (req, res) => {
       return res.status(404).json({ erro: "Produto não encontrado" });
     }
 
-    res.json(result.rows[0]);
+    const p = result.rows[0];
+
+    const preco = Number(p.preco);
+    const precoPromocional = Number(p.preco_promocional);
+
+    const temPromocao =
+      precoPromocional && precoPromocional < preco;
+
+    const percentualDesconto = temPromocao
+      ? Math.round(((preco - precoPromocional) / preco) * 100)
+      : null;
+
+    res.json({
+      ...p,
+      tem_promocao: temPromocao,
+      percentual_desconto: percentualDesconto
+    });
+
 
   } catch (err) {
     console.error(err);
