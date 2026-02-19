@@ -35,10 +35,13 @@ router.post("/register", async (req, res) => {
       [nome, email, senhaHash]
     );
 
+    const usuario = result.rows[0];
+    const token = Buffer.from(usuario.email).toString("base64");
     res.status(201).json({
-      mensagem: "Usuário criado com sucesso",
-      usuario: result.rows[0]
+      token,
+      usuario
     });
+
 
   } catch (err) {
     console.error("Erro no registro:", err);

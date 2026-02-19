@@ -24,11 +24,16 @@ form.addEventListener("submit", async (e) => {
       return;
     }
 
-    mensagem.textContent = "Conta criada com sucesso! Redirecionando...";
+    // 🔥 Salva token e usuário
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("usuario", JSON.stringify(data.usuario));
+
+    mensagem.style.color = "green";
+    mensagem.textContent = "Conta criada! Redirecionando...";
 
     setTimeout(() => {
-      window.location.href = "login.html";
-    }, 2000);
+      window.location.href = "index.html";
+    }, 1000);
 
   } catch (err) {
     mensagem.textContent = "Erro ao cadastrar.";
