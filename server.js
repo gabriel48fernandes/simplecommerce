@@ -1,13 +1,22 @@
-// 🔥 SEMPRE PRIMEIRO
+// =====================
+// ENV (sempre primeiro)
+// =====================
 import "dotenv/config";
 
+// =====================
+// IMPORTS
+// =====================
 import express from "express";
 import cors from "cors";
-import { pool } from "./db.js";
-
 import path from "path";
 import { fileURLToPath } from "url";
+
+import { pool } from "./db.js";
 import authRoutes from "./routes/auth.js";
+import produtosRoutes from "./routes/produtos.routes.js";
+import categoriasRoutes from "./routes/categorias.routes.js";
+import carrinhoRoutes from "./routes/carrinho.routes.js";
+
 // =====================
 // CONFIG PATH (ESM)
 // =====================
@@ -24,25 +33,30 @@ const app = express();
 // =====================
 app.use(cors());
 app.use(express.json());
-app.use("/auth", authRoutes);
 
-// servir arquivos estáticos (FRONTEND)
+// =====================
+// STATIC (FRONTEND)
+// =====================
 app.use(express.static(path.join(__dirname, "frontend")));
 
 // =====================
-// IMPORTAR ROTAS
+// ROTAS API
 // =====================
-import produtosRoutes from "./routes/produtos.routes.js";
-import categoriasRoutes from "./routes/categorias.routes.js";
+app.use("/auth", authRoutes);
+app.use("/produtos", produtosRoutes);
+app.use("/categorias", categoriasRoutes);
+app.use("/carrinho", carrinhoRoutes);
 
 // =====================
-// ROTAS PRINCIPAIS
+// ROTA PRINCIPAL
 // =====================
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "index.html"));
 });
 
-// Teste DB
+// =====================
+// TESTE DB
+// =====================
 app.get("/test-db", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
@@ -57,20 +71,6 @@ app.get("/test-db", async (req, res) => {
     });
   }
 });
-
-// Debug env
-app.get("/debug-env", (req, res) => {
-  res.json({
-    NODE_ENV: process.env.NODE_ENV,
-    DATABASE_URL_STARTS_WITH: process.env.DATABASE_URL?.slice(0, 30),
-  });
-});
-
-// =====================
-// ROTAS DO SISTEMA
-// =====================
-app.use("/produtos", produtosRoutes);
-app.use("/categorias", categoriasRoutes);
 
 // =====================
 // START SERVER

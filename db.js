@@ -1,16 +1,16 @@
-import pkg from "pg";
-const { Pool } = pkg;
+import pg from "pg";
+
+const { Pool } = pg;
 
 const isProduction = process.env.NODE_ENV === "production";
 
-const pool = new Pool(
+export const pool = new Pool(
   isProduction
     ? {
         connectionString: process.env.DATABASE_URL,
         ssl: {
           rejectUnauthorized: false,
         },
-        family: 4, // 🔥 ESSENCIAL
       }
     : {
         host: process.env.PGHOST,
@@ -25,5 +25,3 @@ console.log("🔥 DB CONFIG:", {
   nodeEnv: process.env.NODE_ENV,
   usandoDatabaseUrl: isProduction,
 });
-
-export { pool };

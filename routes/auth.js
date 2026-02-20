@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 const router = express.Router();
 
 /* =========================
-   REGISTRO DE USUÁRIO
+   REGISTRO
 ========================= */
 router.post("/register", async (req, res) => {
   try {
@@ -15,7 +15,6 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ erro: "Todos os campos são obrigatórios" });
     }
 
-    // Verifica se email já existe
     const emailExiste = await pool.query(
       "SELECT id FROM usuarios WHERE email = $1",
       [email]
@@ -25,7 +24,6 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ erro: "Email já cadastrado" });
     }
 
-    // 🔐 Cria hash da senha
     const senhaHash = await bcrypt.hash(senha, 10);
 
     const result = await pool.query(
@@ -36,12 +34,10 @@ router.post("/register", async (req, res) => {
     );
 
     const usuario = result.rows[0];
-    const token = Buffer.from(usuario.email).toString("base64");
-    res.status(201).json({
-      token,
-      usuario
-    });
 
+    const token = Buffer.from(`${usuario.id}:${usuario.email}`).toString("base64");
+
+    res.status(201).json({ token, usuario });
 
   } catch (err) {
     console.error("Erro no registro:", err);
@@ -61,9 +57,8 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ erro: "Email e senha obrigatórios" });
     }
 
-    // 🔍 Busca usuário pelo email
     const result = await pool.query(
-      "SELECT id, nome, email, senha, role FROM usuarios WHERE email = $1",
+      "SELECT * FROM usuarios WHERE email = $1",
       [email]
     );
 
@@ -73,14 +68,13 @@ router.post("/login", async (req, res) => {
 
     const usuario = result.rows[0];
 
-    // 🔐 Compara senha digitada com hash
     const senhaValida = await bcrypt.compare(senha, usuario.senha);
 
     if (!senhaValida) {
       return res.status(401).json({ erro: "Login inválido" });
     }
 
-    const token = Buffer.from(usuario.email).toString("base64");
+    const token = Buffer.from(`${usuario.id}:${usuario.email}`).toString("base64");
 
     res.json({
       token,

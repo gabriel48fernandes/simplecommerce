@@ -92,7 +92,7 @@ router.get("/:id", async (req, res) => {
     const precoPromocional = Number(p.preco_promocional);
 
     const temPromocao =
-      precoPromocional && precoPromocional < preco;
+      precoPromocional !== null && precoPromocional < preco;
 
     const percentualDesconto = temPromocao
       ? Math.round(((preco - precoPromocional) / preco) * 100)
