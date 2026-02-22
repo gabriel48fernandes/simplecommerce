@@ -31,7 +31,8 @@ async function carregarCarrinho() {
     }
 
     itens.forEach(item => {
-      total += Number(item.preco);
+      // multiply price by quantity for total
+      total += Number(item.preco) * Number(item.quantidade);
 
       lista.innerHTML += `
         <div class="item-carrinho">
@@ -43,7 +44,7 @@ async function carregarCarrinho() {
               ${Number(item.preco).toLocaleString("pt-BR", {
                 style: "currency",
                 currency: "BRL"
-              })}
+              })} x ${item.quantidade}
             </p>
           </div>
 
@@ -76,7 +77,7 @@ async function carregarCarrinho() {
 // ============================
 async function removerItem(id) {
   try {
-    await fetch(`/carrinho/remove/${id}`, {
+    await fetch(`/carrinho/item/${id}`, {
       method: "DELETE"
     });
 

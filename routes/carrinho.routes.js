@@ -73,7 +73,7 @@ router.get("/:usuario_id", async (req, res) => {
     const carrinho_id = carrinho.rows[0].id;
 
     const itens = await pool.query(`
-      SELECT 
+      SELECT DISTINCT ON (ci.id)
         ci.id,
         ci.quantidade,
         p.nome,
@@ -84,6 +84,7 @@ router.get("/:usuario_id", async (req, res) => {
       JOIN produtos p ON ci.produto_id = p.id
       LEFT JOIN imagens_produto i ON i.produto_id = p.id
       WHERE ci.carrinho_id = $1
+      ORDER BY ci.id
     `, [carrinho_id]);
 
     res.json(itens.rows);
@@ -98,7 +99,7 @@ router.get("/:usuario_id", async (req, res) => {
 /* =========================
    REMOVER ITEM
 ========================= */
-router.delete("/item/:id", async (req, res) => {
+async function removerItem(req, res) {
   try {
     const { id } = req.params;
 
@@ -113,6 +114,11 @@ router.delete("/item/:id", async (req, res) => {
     console.error(err);
     res.status(500).json({ erro: "Erro ao remover item" });
   }
-});
+}
+
+router.delete("/item/:id", removerItem);
+
+// legacy path used by older frontend versions
+router.delete("/remove/:id", removerItem);
 
 export default router;
