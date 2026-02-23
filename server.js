@@ -10,12 +10,13 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
-
 import { pool } from "./db.js";
 import authRoutes from "./routes/auth.js";
 import produtosRoutes from "./routes/produtos.routes.js";
 import categoriasRoutes from "./routes/categorias.routes.js";
 import carrinhoRoutes from "./routes/carrinho.routes.js";
+import pedidosRoutes from "./routes/pedidos.routes.js";
+
 
 // =====================
 // CONFIG PATH (ESM)
@@ -46,6 +47,7 @@ app.use("/auth", authRoutes);
 app.use("/produtos", produtosRoutes);
 app.use("/categorias", categoriasRoutes);
 app.use("/carrinho", carrinhoRoutes);
+app.use("/pedidos", pedidosRoutes);
 
 // =====================
 // ROTA PRINCIPAL

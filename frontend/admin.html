@@ -24,15 +24,15 @@
           <span class="icon">📊</span>
           <span class="label">Dashboard</span>
         </a>
-        <a href="#" class="nav-item active">
+        <a href="#" class="nav-item active" id="menuProdutos">
           <span class="icon">📦</span>
           <span class="label">Produtos</span>
         </a>
-        <a href="#" class="nav-item">
+        <a href="#" class="nav-item" id="menuPedidos">
           <span class="icon">🧾</span>
           <span class="label">Pedidos</span>
         </a>
-        <a href="#" class="nav-item">
+        <a href="#" class="nav-item" id="menuClientes">
           <span class="icon">👥</span>
           <span class="label">Clientes</span>
         </a>
@@ -58,13 +58,14 @@
 
       <header class="topo">
         <div class="topo-left">
-          <h1>Gerenciar Produtos</h1>
-          <p class="breadcrumb">Dashboard / Produtos</p>
+          <h1 id="tituloPagina">Gerenciar Produtos</h1>
+          <p class="breadcrumb" id="breadcrumb">Dashboard / Produtos</p>
         </div>
         <button id="btnNovo" class="btn-novo">+ Novo Produto</button>
       </header>
 
-      <section class="card-tabela">
+      <!-- PRODUTOS -->
+      <section class="card-tabela" id="secProdutos">
         <table id="tabela-produtos">
           <thead>
             <tr>
@@ -77,6 +78,37 @@
             </tr>
           </thead>
           <tbody></tbody>
+        </table>
+      </section>
+
+      <!-- CLIENTES -->
+      <section class="card-tabela" id="secClientes" style="display:none;">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>Email</th>
+              <th>Tipo</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-clientes"></tbody>
+        </table>
+      </section>
+
+      <!-- PEDIDOS -->
+      <section class="card-tabela" id="secPedidos" style="display:none;">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Cliente</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Data</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-pedidos"></tbody>
         </table>
       </section>
 

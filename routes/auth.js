@@ -91,5 +91,18 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ erro: "Erro interno no servidor" });
   }
 });
+router.get("/clientes", async (req, res) => {
+  try {
+    const clientes = await pool.query(`
+      SELECT id, nome, email, role
+      FROM usuarios
+      ORDER BY id
+    `);
+
+    res.json(clientes.rows);
+  } catch (err) {
+    res.status(500).json({ erro: "Erro ao buscar clientes" });
+  }
+});
 
 export default router;

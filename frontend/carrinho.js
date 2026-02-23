@@ -90,8 +90,27 @@ async function removerItem(id) {
 // ============================
 // FINALIZAR COMPRA (placeholder)
 // ============================
-function finalizarCompra() {
-  alert("Em breve integração com pagamento 💳");
+async function finalizarCompra() {
+  const auth = JSON.parse(localStorage.getItem("auth"));
+
+  const res = await fetch("/pedidos/finalizar", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      usuario_id: auth.usuario.id
+    })
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    alert("Pedido realizado com sucesso 🎉");
+    window.location.reload();
+  } else {
+    alert(data.erro);
+  }
 }
 
 // ============================
