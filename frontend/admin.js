@@ -29,10 +29,19 @@ const tabelaBody = document.querySelector("#tabela-produtos tbody");
 const secProdutos = document.querySelector("#tabela-produtos").closest("section");
 const secClientes = document.getElementById("secClientes");
 const secPedidos = document.getElementById("secPedidos");
+const modalPedido = document.getElementById("modalPedido");
+const conteudoPedido = document.getElementById("conteudoPedido");
 
 /* =========================
    NAVEGAÇÃO MENU
 ========================= */
+document.getElementById("fecharPedidoX").onclick = fecharModalPedido;
+document.getElementById("btnFecharPedido").onclick = fecharModalPedido;
+
+function fecharModalPedido() {
+  modalPedido.classList.remove("active");
+}
+
 document.getElementById("menuProdutos").onclick = () => {
   mostrarSecao("produtos");
 };
@@ -251,12 +260,106 @@ async function carregarPedidos() {
         <td>${p.id}</td>
         <td>${p.nome}</td>
         <td>${formatarPreco(p.total)}</td>
-        <td>${p.status}</td>
+        <td>${badgeStatus(p.status)}</td>
         <td>${new Date(p.criado_em).toLocaleDateString()}</td>
+        <td>
+          <button onclick="verPedido(${p.id})">
+            👁 Ver
+          </button>
+        </td>
       </tr>
     `;
   });
 }
+function badgeStatus(status) {
+
+  const cores = {
+    pendente: "#999",
+    pago: "#2196F3",
+    enviado: "#FF9800",
+    entregue: "#4CAF50"
+  };
+
+  return `
+    <span style="
+      padding:4px 10px;
+      border-radius:20px;
+      color:white;
+      font-size:12px;
+      background:${cores[status]};
+    ">
+      ${status}
+    </span>
+  `;
+}
+window.verPedido = async (pedidoId) => {
+
+  const res = await fetch(`/pedidos/${pedidoId}`);
+  const itens = await res.json();
+
+  if (!Array.isArray(itens)) {
+    alert("Erro ao carregar pedido");
+    return;
+  }
+
+  let html = "";
+
+  itens.forEach(item => {
+    html += `
+      <div style="display:flex; gap:15px; margin-bottom:15px;">
+        ${item.imagem 
+          ? `<img src="${item.imagem}" width="60"/>`
+          : `<div style="width:60px;height:60px;background:#eee;"></div>`
+        }
+        <div>
+          <strong>${item.nome}</strong>
+          <p>Qtd: ${item.quantidade}</p>
+          <p>${formatarPreco(item.preco)}</p>
+        </div>
+      </div>
+      <hr>
+    `;
+  });
+
+  html += `
+    <div style="margin-top:20px;">
+      <label>Status:</label>
+      <select id="novoStatus">
+        <option value="pendente">Pendente</option>
+        <option value="pago">Pago</option>
+        <option value="enviado">Enviado</option>
+        <option value="entregue">Entregue</option>
+      </select>
+      <button onclick="atualizarStatus(${pedidoId})">
+        Atualizar
+      </button>
+    </div>
+  `;
+
+  conteudoPedido.innerHTML = html;
+  modalPedido.classList.add("active");
+};
+
+window.atualizarStatus = async (pedidoId) => {
+
+  const novoStatus = document.getElementById("novoStatus").value;
+
+  const res = await fetch(`/pedidos/${pedidoId}/status`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status: novoStatus })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert(data.erro);
+    return;
+  }
+
+  fecharModalPedido();
+  carregarPedidos();
+};
 
 /* =========================
    INIT

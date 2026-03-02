@@ -92,4 +92,96 @@ router.get("/", async (req, res) => {
   }
 });
 
+// ==========================
+// DETALHES DO PEDIDO
+// ==========================
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const resultado = await pool.query(`
+      SELECT 
+        pi.quantidade,
+        pi.preco,
+        p.nome,
+        (
+          SELECT url 
+          FROM imagens_produto 
+          WHERE produto_id = p.id 
+          LIMIT 1
+        ) AS imagem
+      FROM pedido_itens pi
+      JOIN produtos p ON p.id = pi.produto_id
+      WHERE pi.pedido_id = $1
+    `, [id]);
+
+    res.json(resultado.rows);
+
+  } catch (err) {
+    console.error("ERRO DETALHES PEDIDO:", err);
+    res.status(500).json({ erro: err.message });
+  }
+});
+
+// ==========================
+// ATUALIZAR STATUS
+// ==========================
+router.put("/:id/status", async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  const fluxo = ["pendente", "pago", "enviado", "entregue"];
+
+  try {
+    // pegar status atual
+    const pedidoAtual = await pool.query(
+      "SELECT status FROM pedidos WHERE id = $1",
+      [id]
+    );
+
+    if (pedidoAtual.rows.length === 0) {
+      return res.status(404).json({ erro: "Pedido não encontrado" });
+    }
+
+    const statusAtual = pedidoAtual.rows[0].status;
+
+    const indexAtual = fluxo.indexOf(statusAtual);
+    const indexNovo = fluxo.indexOf(status);
+
+    if (indexNovo !== indexAtual + 1) {
+      return res.status(400).json({
+        erro: "Fluxo inválido. Siga a ordem correta."
+      });
+    }
+
+    // SE virar pago → baixar estoque
+    if (status === "pago") {
+
+      const itens = await pool.query(`
+        SELECT produto_id, quantidade
+        FROM pedido_itens
+        WHERE pedido_id = $1
+      `, [id]);
+
+      for (let item of itens.rows) {
+        await pool.query(`
+          UPDATE produtos
+          SET quantidade = quantidade - $1
+          WHERE id = $2
+        `, [item.quantidade, item.produto_id]);
+      }
+    }
+
+    await pool.query(
+      "UPDATE pedidos SET status = $1 WHERE id = $2",
+      [status, id]
+    );
+
+    res.json({ mensagem: "Status atualizado com sucesso" });
+
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
+});
+
 export default router;
