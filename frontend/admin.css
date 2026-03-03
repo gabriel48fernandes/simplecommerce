@@ -185,6 +185,26 @@ body {
 .btn-novo:active {
   transform: translateY(0);
 }
+.search-admin {
+  height: 45px;
+  width: 500px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 12px;
+  outline: none;
+  
+  font-size: 14px;
+  color: white;
+
+  background: linear-gradient(135deg, #6a5acd, #7b68ee);
+  
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.search-admin::placeholder {
+  color: rgba(255, 255, 255, 0.8);
+}
+
 
 /* ==================
    CARD & TABELA

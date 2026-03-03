@@ -4,28 +4,39 @@ import { pool } from "../db.js";
 const router = express.Router();
 
 /* =========================
-   GET /produtos (LISTAR)
+   GET /produtos (LISTAR + BUSCA)
 ========================= */
 router.get("/", async (req, res) => {
   try {
-    const query = `
-  SELECT DISTINCT ON (p.id)
-    p.id,
-    p.nome,
-    p.preco,
-    p.preco_promocional,
-    p.quantidade,
-    p.categoria_id,
-    c.nome AS categoria,
-    i.url AS imagem
-  FROM produtos p
-  JOIN categorias c ON c.id = p.categoria_id
-  LEFT JOIN imagens_produto i 
-    ON i.produto_id = p.id
-  ORDER BY p.id
-`;
 
-    const result = await pool.query(query);
+    const { search } = req.query;
+
+    let query = `
+      SELECT DISTINCT ON (p.id)
+        p.id,
+        p.nome,
+        p.preco,
+        p.preco_promocional,
+        p.quantidade,
+        p.categoria_id,
+        c.nome AS categoria,
+        i.url AS imagem
+      FROM produtos p
+      JOIN categorias c ON c.id = p.categoria_id
+      LEFT JOIN imagens_produto i 
+        ON i.produto_id = p.id
+    `;
+
+    const values = [];
+
+    if (search) {
+      query += ` WHERE p.nome ILIKE $1 `;
+      values.push(`%${search}%`);
+    }
+
+    query += ` ORDER BY p.id`;
+
+    const result = await pool.query(query, values);
 
     const produtos = result.rows.map(p => {
       const preco = Number(p.preco);
@@ -47,13 +58,11 @@ router.get("/", async (req, res) => {
 
     res.json(produtos);
 
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ erro: "Erro ao buscar produtos" });
   }
 });
-
 /* =========================
    GET /produtos/:id
 ========================= */

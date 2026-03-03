@@ -28,10 +28,9 @@ if (areaUsuario) {
 
       <a href="/carrinho.html" class="icon-link">🛒</a>
 
-      ${
-        auth.usuario.role === "admin"
-          ? `<a href="/admin.html" class="btn-admin">⚙ ADM</a>`
-          : ""
+      ${auth.usuario.role === "admin"
+        ? `<a href="/admin.html" class="btn-admin">⚙ ADM</a>`
+        : ""
       }
 
       <button id="logout">Sair</button>
@@ -47,9 +46,9 @@ if (areaUsuario) {
 // ============================
 // PRODUTOS
 // ============================
-async function carregarProdutos() {
+async function carregarProdutos(search = "") {
   try {
-    const res = await fetch("/produtos");
+    const res = await fetch(`/produtos?search=${search}`)
     const produtos = await res.json();
 
     if (!container) return;
@@ -70,24 +69,24 @@ async function carregarProdutos() {
         precoHTML = `
           <p class="preco-antigo">
             ${Number(p.preco).toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL"
-            })}
+          style: "currency",
+          currency: "BRL"
+        })}
           </p>
           <p class="preco-promocional">
             ${Number(p.preco_promocional).toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL"
-            })}
+          style: "currency",
+          currency: "BRL"
+        })}
           </p>
         `;
       } else {
         precoHTML = `
           <p class="preco">
             ${Number(p.preco).toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL"
-            })}
+          style: "currency",
+          currency: "BRL"
+        })}
           </p>
         `;
       }
@@ -111,6 +110,11 @@ async function carregarProdutos() {
     console.error("Erro ao carregar produtos:", err);
   }
 }
+const inputBusca = document.getElementById("buscaProduto");
+
+inputBusca.addEventListener("input", function () {
+  carregarProdutos(inputBusca.value);
+});
 
 // ============================
 // ADICIONAR AO CARRINHO (BACKEND)

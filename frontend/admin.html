@@ -61,6 +61,7 @@
           <h1 id="tituloPagina">Gerenciar Produtos</h1>
           <p class="breadcrumb" id="breadcrumb">Dashboard / Produtos</p>
         </div>
+       <div id="headerSearchContainer"></div>
         <button id="btnNovo" class="btn-novo">+ Novo Produto</button>
       </header>
 
@@ -176,22 +177,22 @@
     </div>
   </div>
   <!-- MODAL PEDIDO -->
-<div class="modal-overlay" id="modalPedido">
-  <div class="modal">
-    <div class="modal-header">
-      <h2 id="tituloPedido">Pedido</h2>
-      <button class="modal-close" id="fecharPedidoX">✕</button>
-    </div>
+  <div class="modal-overlay" id="modalPedido">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="tituloPedido">Pedido</h2>
+        <button class="modal-close" id="fecharPedidoX">✕</button>
+      </div>
 
-    <div id="conteudoPedido" style="padding:20px;"></div>
+      <div id="conteudoPedido" style="padding:20px;"></div>
 
-    <div style="padding:20px; text-align:right;">
-      <button id="btnFecharPedido" class="btn-cancelar">
-        Fechar
-      </button>
+      <div style="padding:20px; text-align:right;">
+        <button id="btnFecharPedido" class="btn-cancelar">
+          Fechar
+        </button>
+      </div>
     </div>
   </div>
-</div>
 
   <script type="module" src="admin.js"></script>
 </body>
