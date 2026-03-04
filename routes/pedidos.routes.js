@@ -79,15 +79,33 @@ router.post("/finalizar", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
+  const { search } = req.query;
+
   try {
-    const pedidos = await pool.query(`
+    let query = `
       SELECT p.id, u.nome, p.total, p.status, p.criado_em
       FROM pedidos p
       JOIN usuarios u ON u.id = p.usuario_id
-      ORDER BY p.id DESC
-    `);
+    `;
+
+    const valores = [];
+
+    if (search) {
+      query += `
+        WHERE 
+          u.nome ILIKE $1
+          OR CAST(p.id AS TEXT) ILIKE $1
+          OR p.status ILIKE $1
+      `;
+      valores.push(`%${search}%`);
+    }
+
+    query += " ORDER BY p.id DESC";
+
+    const pedidos = await pool.query(query, valores);
 
     res.json(pedidos.rows);
+
   } catch (err) {
     res.status(500).json({ erro: "Erro ao buscar pedidos" });
   }
@@ -100,7 +118,27 @@ router.get("/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
-    const resultado = await pool.query(`
+    // 1️⃣ Buscar dados do pedido + cliente
+    const pedidoResult = await pool.query(`
+      SELECT 
+        p.id,
+        p.total,
+        p.status,
+        p.criado_em,
+        u.nome
+      FROM pedidos p
+      JOIN usuarios u ON u.id = p.usuario_id
+      WHERE p.id = $1
+    `, [id]);
+
+    if (pedidoResult.rows.length === 0) {
+      return res.status(404).json({ erro: "Pedido não encontrado" });
+    }
+
+    const pedido = pedidoResult.rows[0];
+
+    // 2️⃣ Buscar itens do pedido
+    const itensResult = await pool.query(`
       SELECT 
         pi.quantidade,
         pi.preco,
@@ -116,7 +154,11 @@ router.get("/:id", async (req, res) => {
       WHERE pi.pedido_id = $1
     `, [id]);
 
-    res.json(resultado.rows);
+    // 3️⃣ Retornar tudo junto
+    res.json({
+      ...pedido,
+      itens: itensResult.rows
+    });
 
   } catch (err) {
     console.error("ERRO DETALHES PEDIDO:", err);

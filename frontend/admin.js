@@ -9,31 +9,34 @@ if (!auth || !auth.token) {
 }
 
 /* =========================
-   SUPABASE
-========================= */
-const supabase = createClient(
-  "https://fcknvwqerkyujhquugls.supabase.co",
-  "sb_publishable_c-_9HXFPIQLd56o_2bixfw_oh-bMdXZ"
-)
-
-/* =========================
    ELEMENTOS
 ========================= */
 let produtoEditandoId = null
 
 const modal = document.getElementById("modal")
+const modalPedido = document.getElementById("modalPedido")
+const conteudoPedido = document.getElementById("conteudoPedido")
+
 const form = document.getElementById("form-produto")
 const tabelaBody = document.querySelector("#tabela-produtos tbody")
 
 const secProdutos = document.getElementById("secProdutos")
 const secClientes = document.getElementById("secClientes")
 const secPedidos = document.getElementById("secPedidos")
-
-const modalPedido = document.getElementById("modalPedido")
-const conteudoPedido = document.getElementById("conteudoPedido")
+const secDashboard = document.getElementById("secDashboard");
 
 /* =========================
-   HEADER BUSCA DINÂMICA
+   UTIL
+========================= */
+function formatarPreco(valor) {
+  return Number(valor).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  })
+}
+
+/* =========================
+   BUSCA DINÂMICA HEADER
 ========================= */
 function atualizarBusca(tipo) {
   const container = document.getElementById("headerSearchContainer")
@@ -57,8 +60,6 @@ function atualizarBusca(tipo) {
     funcao = carregarPedidos
   }
 
-  if (!funcao) return
-
   container.innerHTML = `
     <input 
       type="text"
@@ -74,8 +75,94 @@ function atualizarBusca(tipo) {
     })
 }
 
+const menuDashboard = document.getElementById("menuDashboard");
+
+document.getElementById("menuDashboard").onclick = () => {
+  mostrarSecao("dashboard")
+  carregarDadosDashboard()
+}
+
+function esconderTodas() {
+  secDashboard.style.display = "none";
+  secProdutos.style.display = "none";
+  secClientes.style.display = "none";
+  secPedidos.style.display = "none";
+}
+
+async function carregarDadosDashboard() {
+  const response = await fetch("http://localhost:3000/dashboard");
+  const data = await response.json();
+
+  document.getElementById("totalPedidos").innerText = data.totalPedidos;
+  document.getElementById("faturamentoTotal").innerText =
+    "R$ " + data.faturamentoTotal.toFixed(2);
+  document.getElementById("faturamentoMes").innerText =
+    "R$ " + data.faturamentoMes.toFixed(2);
+  document.getElementById("totalClientes").innerText = data.totalClientes;
+  document.getElementById("estoqueBaixo").innerText = data.estoqueBaixo;
+  document.getElementById("ticketMedio").innerText =
+    "R$ " + data.ticketMedio.toFixed(2);
+
+  criarGrafico(data);
+}
+
+async function mostrarDashboard() {
+
+  esconderTodas();
+  secDashboard.style.display = "block";
+
+  document.getElementById("tituloPagina").innerText = "Dashboard";
+  document.getElementById("breadcrumb").innerText = "Dashboard / Visão Geral";
+
+  document.getElementById("btnNovo").style.display = "none";
+  document.getElementById("headerSearchContainer").innerHTML = "";
+
+  await carregarDadosDashboard();
+}
+function criarGrafico(data) {
+  const ctx = document.getElementById("graficoVendas");
+
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: ["Faturamento Total", "Faturamento Mês"],
+      datasets: [{
+        label: "R$",
+        data: [data.faturamentoTotal, data.faturamentoMes]
+      }]
+    }
+  });
+}
+
+function badgeStatus(status) {
+  const cores = {
+    pendente: "#999",
+    pago: "#2196F3",
+    enviado: "#FF9800",
+    entregue: "#4CAF50"
+  }
+
+  return `
+    <span style="
+      padding:4px 10px;
+      border-radius:20px;
+      color:white;
+      font-size:12px;
+      background:${cores[status] || "#777"};
+    ">
+      ${status}
+    </span>
+  `
+}
+
+function proximoStatus(atual) {
+  const fluxo = ["pendente", "pago", "enviado", "entregue"]
+  const index = fluxo.indexOf(atual)
+  return fluxo[index + 1] || null
+}
+
 /* =========================
-   NAVEGAÇÃO MENU
+   MENU
 ========================= */
 document.getElementById("menuProdutos").onclick = () => {
   mostrarSecao("produtos")
@@ -96,17 +183,38 @@ document.getElementById("menuPedidos").onclick = () => {
 }
 
 function mostrarSecao(secao) {
-  secProdutos.style.display = "none"
-  secClientes.style.display = "none"
-  secPedidos.style.display = "none"
 
-  if (secao === "produtos") secProdutos.style.display = "block"
-  if (secao === "clientes") secClientes.style.display = "block"
-  if (secao === "pedidos") secPedidos.style.display = "block"
+  // Esconde todas primeiro
+  secDashboard.style.display = "none";
+  secProdutos.style.display = "none";
+  secClientes.style.display = "none";
+  secPedidos.style.display = "none";
+
+  // Mostra apenas a escolhida
+  if (secao === "dashboard") {
+    secDashboard.style.display = "block";
+
+    document.getElementById("btnNovo").style.display = "none";
+    document.getElementById("headerSearchContainer").innerHTML = "";
+  }
+
+  if (secao === "produtos") {
+    secProdutos.style.display = "block";
+    document.getElementById("btnNovo").style.display = "inline-block";
+  }
+
+  if (secao === "clientes") {
+    secClientes.style.display = "block";
+    document.getElementById("btnNovo").style.display = "none";
+  }
+
+  if (secao === "pedidos") {
+    secPedidos.style.display = "block";
+    document.getElementById("btnNovo").style.display = "none";
+  }
 }
-
 /* =========================
-   LOGOUT / LOJA
+   LOGOUT
 ========================= */
 document.getElementById("btnLogout").onclick = () => {
   localStorage.clear()
@@ -156,12 +264,13 @@ function fecharModal() {
 form.addEventListener("submit", async (e) => {
   e.preventDefault()
 
-  const nome = document.getElementById("nome").value
-  const preco = parseFloat(document.getElementById("preco").value)
-  const precoPromocionalInput = document.getElementById("preco_promocional").value
-  const preco_promocional = precoPromocionalInput ? parseFloat(precoPromocionalInput) : null
-  const quantidade = Number(document.getElementById("quantidade").value)
-  const categoria_id = Number(document.getElementById("categoria").value)
+  const data = {
+    nome: nome.value,
+    preco: parseFloat(preco.value),
+    preco_promocional: preco_promocional.value ? parseFloat(preco_promocional.value) : null,
+    quantidade: Number(quantidade.value),
+    categoria_id: Number(categoria.value)
+  }
 
   const metodo = produtoEditandoId ? "PUT" : "POST"
   const url = produtoEditandoId ? `/produtos/${produtoEditandoId}` : "/produtos"
@@ -169,13 +278,7 @@ form.addEventListener("submit", async (e) => {
   await fetch(url, {
     method: metodo,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      nome,
-      preco,
-      preco_promocional,
-      quantidade,
-      categoria_id
-    })
+    body: JSON.stringify(data)
   })
 
   fecharModal()
@@ -187,7 +290,6 @@ form.addEventListener("submit", async (e) => {
 ========================= */
 async function carregarProdutos(search = "") {
   tabelaBody.innerHTML = ""
-
   const res = await fetch(`/produtos?search=${search}`)
   const produtos = await res.json()
 
@@ -208,13 +310,6 @@ async function carregarProdutos(search = "") {
   })
 }
 
-function formatarPreco(valor) {
-  return Number(valor).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL"
-  })
-}
-
 window.editar = (produto) => abrirModal(produto)
 
 window.excluir = async (id) => {
@@ -227,7 +322,7 @@ window.excluir = async (id) => {
    CLIENTES
 ========================= */
 async function carregarClientes(search = "") {
-  const res = await fetch(`/auth/clientes?search=${search}`)
+  const res = await fetch(`/usuarios?search=${search}`)
   const clientes = await res.json()
 
   const tabela = document.getElementById("tabela-clientes")
@@ -261,7 +356,7 @@ async function carregarPedidos(search = "") {
         <td>${p.id}</td>
         <td>${p.nome}</td>
         <td>${formatarPreco(p.total)}</td>
-        <td>${p.status}</td>
+        <td>${badgeStatus(p.status)}</td>
         <td>${new Date(p.criado_em).toLocaleDateString()}</td>
         <td>
           <button onclick="verPedido(${p.id})">👁 Ver</button>
@@ -269,6 +364,61 @@ async function carregarPedidos(search = "") {
       </tr>
     `
   })
+}
+
+/* =========================
+   MODAL PEDIDO
+========================= */
+window.verPedido = async (id) => {
+  const res = await fetch(`/pedidos/${id}`)
+  const pedido = await res.json()
+
+  modalPedido.classList.add("active")
+
+  const proximo = proximoStatus(pedido.status)
+
+  conteudoPedido.innerHTML = `
+    <p><strong>ID:</strong> ${pedido.id}</p>
+    <p><strong>Cliente:</strong> ${pedido.nome}</p>
+    <p><strong>Total:</strong> ${formatarPreco(pedido.total)}</p>
+    <p><strong>Status:</strong> ${badgeStatus(pedido.status)}</p>
+    <p><strong>Data:</strong> ${new Date(pedido.criado_em).toLocaleString()}</p>
+    <hr>
+    ${pedido.itens.map(i => `
+      <div style="margin-bottom:10px;">
+        ${i.nome} — ${i.quantidade}x ${formatarPreco(i.preco)}
+      </div>
+    `).join("")}
+    <br>
+    ${proximo ? `<button onclick="atualizarStatus(${pedido.id}, '${proximo}')">
+      Avançar para ${proximo}
+    </button>` : ""}
+  `
+}
+
+window.atualizarStatus = async (id, status) => {
+  await fetch(`/pedidos/${id}/status`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status })
+  })
+
+  verPedido(id)
+  carregarPedidos()
+}
+
+document.getElementById("btnFecharPedido").onclick = () => {
+  modalPedido.classList.remove("active")
+}
+
+document.getElementById("fecharPedidoX").onclick = () => {
+  modalPedido.classList.remove("active")
+}
+
+modalPedido.onclick = (e) => {
+  if (e.target === modalPedido) {
+    modalPedido.classList.remove("active")
+  }
 }
 
 /* =========================

@@ -16,6 +16,8 @@ import produtosRoutes from "./routes/produtos.routes.js";
 import categoriasRoutes from "./routes/categorias.routes.js";
 import carrinhoRoutes from "./routes/carrinho.routes.js";
 import pedidosRoutes from "./routes/pedidos.routes.js";
+import usuariosRoutes from "./routes/usuarios.routes.js";
+import dashboardRoutes from "./routes/dashboard.routes.js";
 
 
 // =====================
@@ -48,6 +50,9 @@ app.use("/produtos", produtosRoutes);
 app.use("/categorias", categoriasRoutes);
 app.use("/carrinho", carrinhoRoutes);
 app.use("/pedidos", pedidosRoutes);
+app.use("/usuarios", usuariosRoutes);
+app.use("/dashboard", dashboardRoutes);
+app.use("/admin", authRoutes); // Reutiliza rotas de auth para admin
 
 // =====================
 // ROTA PRINCIPAL
