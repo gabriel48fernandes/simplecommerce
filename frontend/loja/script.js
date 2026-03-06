@@ -15,8 +15,8 @@ try {
 if (areaUsuario) {
   if (!auth) {
     areaUsuario.innerHTML = `
-      <a href="/login.html" class="icon-link">👤</a>
-      <a href="/carrinho.html" class="icon-link">🛒</a>
+      <a href="/loja/login.html" class="icon-link">👤</a>
+      <a href="/loja/carrinho.html" class="icon-link">🛒</a>
     `;
   } else {
     const primeiroNome = auth.usuario.nome
@@ -26,10 +26,10 @@ if (areaUsuario) {
     areaUsuario.innerHTML = `
       <span>Olá, ${primeiroNome} 👋</span>
 
-      <a href="/carrinho.html" class="icon-link">🛒</a>
+      <a href="/loja/carrinho.html" class="icon-link">🛒</a>
 
       ${auth.usuario.role === "admin"
-        ? `<a href="/admin.html" class="btn-admin">⚙ ADM</a>`
+        ? `<a href="/admin/admin.html" class="btn-admin">⚙ ADM</a>`
         : ""
       }
 
@@ -93,7 +93,7 @@ async function carregarProdutos(search = "") {
 
       card.innerHTML = `
         ${badgeHTML}
-        <img src="${p.imagem}" />
+        <img src="${p.imagem || 'https://via.placeholder.com/200x150/cccccc/666666?text=Sem+Imagem'}" alt="${p.nome}" onerror="this.src='https://via.placeholder.com/200x150/cccccc/666666?text=Sem+Imagem'" />
         <h3>${p.nome}</h3>
         ${precoHTML}
 
@@ -123,7 +123,7 @@ async function adicionarAoCarrinho(produto_id) {
   const auth = JSON.parse(localStorage.getItem("auth"));
 
   if (!auth) {
-    window.location.href = "/login.html";
+    window.location.href = "/loja/login.html";
     return;
   }
 

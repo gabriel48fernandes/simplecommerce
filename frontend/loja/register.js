@@ -24,15 +24,18 @@ form.addEventListener("submit", async (e) => {
       return;
     }
 
-    // 🔥 Salva token e usuário
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("usuario", JSON.stringify(data.usuario));
+    // 🔥 Salva no formato correto (igual ao login)
+    localStorage.setItem("auth", JSON.stringify({
+      token: data.token,
+      usuario: data.usuario
+    }));
 
     mensagem.style.color = "green";
-    mensagem.textContent = "Conta criada! Redirecionando...";
+    mensagem.textContent = "Conta criada! Bem-vindo!";
 
+    // 🔥 Recarrega a página automaticamente (usuário já está logado)
     setTimeout(() => {
-      window.location.href = "index.html";
+      window.location.reload();
     }, 1000);
 
   } catch (err) {

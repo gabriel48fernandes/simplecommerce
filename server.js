@@ -58,7 +58,7 @@ app.use("/admin", authRoutes); // Reutiliza rotas de auth para admin
 // ROTA PRINCIPAL
 // =====================
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "index.html"));
+  res.sendFile(path.join(__dirname, "frontend", "loja", "index.html"));
 });
 
 // =====================
