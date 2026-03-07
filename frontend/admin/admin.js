@@ -62,6 +62,7 @@ function atualizarBusca(tipo) {
 document.getElementById("menuDashboard").onclick = () => {
   mostrarSecao("dashboard")
   mostrarDashboard()
+  carregarDadosDashboard()
 }
 
 document.getElementById("menuProdutos").onclick = () => {
