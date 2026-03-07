@@ -8,7 +8,7 @@ import { carregarPedidos, inicializarPedidos } from "./pedidos.js"
 ========================= */
 const auth = JSON.parse(localStorage.getItem("auth") || "null")
 if (!auth || !auth.token) {
-  window.location.href = "/loja/login.html"
+  window.location.href = "/login.html"
 }
 
 /* =========================
