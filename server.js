@@ -40,7 +40,8 @@ app.use(express.json());
 // =====================
 // STATIC (FRONTEND)
 // =====================
-app.use(express.static(path.join(__dirname, "frontend")));
+app.use(express.static(path.join(__dirname, "frontend/loja")));
+app.use("/admin", express.static(path.join(__dirname, "frontend/admin")));
 
 // =====================
 // ROTAS API
