@@ -15,8 +15,8 @@ try {
 if (areaUsuario) {
   if (!auth) {
     areaUsuario.innerHTML = `
-      <a href="login.html" class="icon-link">👤</a>
-      <a href="carrinho.html" class="icon-link">🛒</a>
+      <a href="/login.html" class="icon-link">👤</a>
+      <a href="/carrinho.html" class="icon-link">🛒</a>
     `;
   } else {
     const primeiroNome = auth.usuario.nome
@@ -26,7 +26,7 @@ if (areaUsuario) {
     areaUsuario.innerHTML = `
       <span>Olá, ${primeiroNome} 👋</span>
 
-      <a href="carrinho.html" class="icon-link">🛒</a>
+      <a href="/loja/carrinho.html" class="icon-link">🛒</a>
 
       ${auth.usuario.role === "admin"
         ? `<a href="/admin/admin.html" class="btn-admin">⚙ ADM</a>`
