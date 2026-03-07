@@ -8,7 +8,7 @@ async function carregarCarrinho() {
   const auth = JSON.parse(localStorage.getItem("auth"));
 
   if (!auth) {
-    window.location.href = "/loja/login.html";
+    window.location.href = "/login.html";
     return;
   }
 
