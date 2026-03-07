@@ -92,16 +92,23 @@ async function carregarProdutos(search = "") {
       }
 
       card.innerHTML = `
+       <a class="card-link" href="produto.html?id=${p.id}">
+
         ${badgeHTML}
-        <img src="${p.imagem || 'https://via.placeholder.com/200x150/cccccc/666666?text=Sem+Imagem'}" alt="${p.nome}" onerror="this.src='https://via.placeholder.com/200x150/cccccc/666666?text=Sem+Imagem'" />
-        <h3>${p.nome}</h3>
-        ${precoHTML}
 
-        <button>Ver produto</button>
+       <img src="${p.imagem || 'https://via.placeholder.com/200x150/cccccc/666666?text=Sem+Imagem'}"
+       alt="${p.nome}"
+       onerror="this.src='https://via.placeholder.com/200x150/cccccc/666666?text=Sem+Imagem'" />
 
-        <button onclick="adicionarAoCarrinho(${p.id})">
-          🛒 Adicionar
-        </button>
+       <h3>${p.nome}</h3>
+
+       ${precoHTML}
+
+      </a>
+
+      <button onclick="adicionarAoCarrinho(${p.id})">
+      🛒 Adicionar
+      </button>
       `;
 
       container.appendChild(card);
