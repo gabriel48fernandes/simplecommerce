@@ -83,7 +83,7 @@ app.get("/test-db", async (req, res) => {
 // =====================
 // FALLBACK (para rotas não encontradas)
 // =====================
-app.get("*", (req, res) => {
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "loja", "index.html"));
 });
 
