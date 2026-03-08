@@ -1,115 +1,72 @@
-// =============================
-// PEGAR ID DO PRODUTO DA URL
-// =============================
-const params = new URLSearchParams(window.location.search)
-const id = params.get("id")
-
-// =============================
-// CARREGAR PRODUTO
-// =============================
 async function carregarProduto() {
 
-  if (!id) {
-    alert("Produto não encontrado")
-    window.location.href = "/"
-    return
-  }
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
 
-  try {
+if (!id) return;
 
-    const res = await fetch(`/produtos/${id}`)
+try {
 
-    if (!res.ok) {
-      throw new Error("Produto não encontrado")
-    }
+const res = await fetch(`/produtos/${id}`);
+const produto = await res.json();
 
-    const produto = await res.json()
+mostrarProduto(produto);
 
-    // NOME
-    document.getElementById("nomeProduto").innerText = produto.nome
+} catch (err) {
 
-    // IMAGEM
-    document.getElementById("imgProduto").src = produto.imagem
-
-    // DESCRIÇÃO
-    document.getElementById("descricaoProduto").innerText =
-      produto.descricao || "Sem descrição"
-
-    // PREÇO
-    if (produto.preco_promocional) {
-
-      document.getElementById("precoOriginal").innerHTML =
-        `<s>R$ ${produto.preco}</s>`
-
-      document.getElementById("precoPromocional").innerText =
-        `R$ ${produto.preco_promocional}`
-
-    } else {
-
-      document.getElementById("precoPromocional").innerText =
-        `R$ ${produto.preco}`
-
-    }
-
-  } catch (error) {
-
-    console.error(error)
-    alert("Erro ao carregar produto")
-
-  }
+console.error("Erro ao carregar produto:", err);
 
 }
 
-// =============================
-// BOTÃO ADICIONAR AO CARRINHO
-// =============================
-async function adicionarCarrinho() {
+}
 
-  const auth = JSON.parse(localStorage.getItem("auth"))
 
-  if (!auth) {
-    window.location.href = "/login.html"
-    return
-  }
+function mostrarProduto(produto){
 
-  try {
+document.getElementById("nomeProduto").innerText = produto.nome;
 
-    const res = await fetch("/carrinho", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${auth.token}`
-      },
-      body: JSON.stringify({
-        produto_id: id,
-        quantidade: 1
-      })
-    })
+document.getElementById("precoProduto").innerText =
+Number(produto.preco).toLocaleString("pt-BR", {
+style: "currency",
+currency: "BRL"
+});
 
-    if (!res.ok) {
-      throw new Error("Erro ao adicionar ao carrinho")
-    }
+document.getElementById("descricaoProduto").innerText =
+produto.descricao || "Sem descrição";
 
-    alert("Produto adicionado ao carrinho")
+document.getElementById("estoqueProduto").innerText =
+produto.estoque;
 
-  } catch (error) {
 
-    console.error(error)
-    alert("Erro ao adicionar produto")
+/* IMAGEM PRINCIPAL */
 
-  }
+const imagemPrincipal =
+document.getElementById("imagemPrincipal");
+
+imagemPrincipal.src =
+produto.imagem || "https://via.placeholder.com/400";
+
+
+/* MINIATURA */
+
+const miniaturas =
+document.getElementById("miniaturas");
+
+miniaturas.innerHTML = "";
+
+const img = document.createElement("img");
+
+img.src =
+produto.imagem || "https://via.placeholder.com/100";
+
+img.onclick = () => {
+
+imagemPrincipal.src = img.src;
+
+};
+
+miniaturas.appendChild(img);
 
 }
 
-// =============================
-// EVENTO DO BOTÃO
-// =============================
-document
-  .getElementById("btnComprar")
-  .addEventListener("click", adicionarCarrinho)
-
-
-// =============================
-// INICIAR PÁGINA
-// =============================
-carregarProduto()
+carregarProduto();
