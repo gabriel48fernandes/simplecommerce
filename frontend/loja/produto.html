@@ -15,7 +15,7 @@
 
 <header>
 <h1>SimpleCommerce</h1>
-<a href="/">← Voltar</a>
+<a class="voltar" href="/">← Voltar para a loja</a>
 </header>
 
 <main class="produto">
@@ -25,7 +25,7 @@
 <div class="miniaturas" id="miniaturas"></div>
 
 <div class="imagem-principal">
-<img id="imagemPrincipal">
+<img id="imagemPrincipal" alt="imagem pricipal do produto">
 </div>
 
 </div>
@@ -38,7 +38,7 @@
 <p id="precoProduto"></p>
 
 <p>
-Estoque: <span id="estoqueProduto"></span>
+Estoque: <span id="estoqueProduto" class="estoque"></span>
 </p>
 
 <button id="btnComprar">
@@ -57,7 +57,7 @@ Adicionar ao carrinho
 <p id="descricaoProduto"></p>
 
 </section>
-
+<script src="script.js"></script>
 <script src="produto.js"></script>
 
 </body>

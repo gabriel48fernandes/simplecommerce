@@ -119,9 +119,11 @@ async function carregarProdutos(search = "") {
 }
 const inputBusca = document.getElementById("buscaProduto");
 
-inputBusca.addEventListener("input", function () {
-  carregarProdutos(inputBusca.value);
-});
+if (inputBusca) {
+  inputBusca.addEventListener("input", function () {
+    carregarProdutos(inputBusca.value);
+  });
+}
 
 // ============================
 // ADICIONAR AO CARRINHO (BACKEND)
