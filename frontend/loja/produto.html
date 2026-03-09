@@ -8,15 +8,20 @@
 
 <link rel="stylesheet" href="style.css">
 
+    <header class="header">
+        <div class="logo-container">
+            <span class="logo-icon">🛍️</span>
+            <div class="logo">SimpleCommerce</div>
+        </div>
 
-</head>
+        <input type="text" id="buscaProduto" placeholder="🔍 Buscar produtos..." class="search" />
 
-<body>
-
-<header>
-<h1>SimpleCommerce</h1>
-<a class="voltar" href="/">← Voltar para a loja</a>
-</header>
+        <div class="icons" id="area-usuario">
+        </div>
+    </header>
+    <div class="container-voltar">
+        <a class="voltar" href="javascript:history.back()">← Voltar para a loja </a>
+    </div>
 
 <main class="produto">
 
@@ -35,19 +40,34 @@
 
 <h1 id="nomeProduto"></h1>
 
+<div class="avaliacao">⭐⭐⭐⭐⭐<span>(124 avaliações)</span>
+</div>
+
 <p id="precoProduto"></p>
 
 <p>
 Estoque: <span id="estoqueProduto" class="estoque"></span>
 </p>
 
-<button id="btnComprar">
-Adicionar ao carrinho
+<div class="quantidade-container">
+
+<button id="diminuirQtd">-</button>
+<input type="number" id="quantidadeProduto" value="1" min="1">
+<button id="aumentarQtd">+</button>
+
+</div>
+
+<button id="btnAdicionarCarrinho" class="btn-add-carrinho">
+🛒 Adicionar ao carrinho
 </button>
 
 </div>
 
 </main>
+
+<div id="toastCarrinho" class="toast-carrinho">
+  ✔ Produto adicionado ao carrinho
+</div>
 
 
 <section class="descricao">

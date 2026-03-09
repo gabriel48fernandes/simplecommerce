@@ -8,7 +8,8 @@ const router = express.Router();
 ========================= */
 router.post("/add", async (req, res) => {
   try {
-    const { usuario_id, produto_id } = req.body;
+
+    const { usuario_id, produto_id, quantidade = 1 } = req.body;
 
     if (!usuario_id || !produto_id) {
       return res.status(400).json({ erro: "Dados inválidos" });
@@ -34,15 +35,19 @@ router.post("/add", async (req, res) => {
     );
 
     if (itemExiste.rows.length > 0) {
+
       await pool.query(
-        "UPDATE carrinho_itens SET quantidade = quantidade + 1 WHERE id = $1",
-        [itemExiste.rows[0].id]
+        "UPDATE carrinho_itens SET quantidade = quantidade + $1 WHERE id = $2",
+        [quantidade, itemExiste.rows[0].id]
       );
+
     } else {
+
       await pool.query(
-        "INSERT INTO carrinho_itens (carrinho_id, produto_id, quantidade) VALUES ($1, $2, 1)",
-        [carrinho_id, produto_id]
+        "INSERT INTO carrinho_itens (carrinho_id, produto_id, quantidade) VALUES ($1, $2, $3)",
+        [carrinho_id, produto_id, quantidade]
       );
+
     }
 
     res.json({ mensagem: "Produto adicionado ao carrinho" });
@@ -50,6 +55,34 @@ router.post("/add", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ erro: "Erro ao adicionar ao carrinho" });
+  }
+});
+
+// ============================
+// CONTADOR DE ITENS NO CARRINHO
+// ============================
+router.get("/count/:usuario_id", async (req, res) => {
+  try {
+
+    const { usuario_id } = req.params;
+
+    const result = await pool.query(`
+      SELECT COALESCE(SUM(ci.quantidade),0) AS total
+      FROM carrinhos c
+      JOIN carrinho_itens ci 
+        ON ci.carrinho_id = c.id
+      WHERE c.usuario_id = $1
+    `, [usuario_id]);
+
+    res.json({
+      total: Number(result.rows[0].total)
+    });
+
+  } catch (err) {
+
+    console.error(err);
+    res.status(500).json({ erro: "erro ao contar carrinho" });
+
   }
 });
 

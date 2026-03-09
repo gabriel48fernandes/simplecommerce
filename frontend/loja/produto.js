@@ -27,25 +27,68 @@ function mostrarProduto(produto) {
   const precoEl = document.getElementById("precoProduto");
   const descricaoEl = document.getElementById("descricaoProduto");
   const estoqueEl = document.getElementById("estoqueProduto");
+  const botao = document.getElementById("btnAdicionarCarrinho");
+  const inputQtd = document.getElementById("quantidadeProduto");
+
+  const estoque = Number(produto.quantidade) || 0;
+
+  /* BOTÃO DISPONIBILIDADE */
+
+  if (botao && estoque <= 0) {
+
+    botao.disabled = true;
+    botao.innerText = "Produto indisponível";
+
+  }
+
+  /* LIMITAR QUANTIDADE */
+
+  if (inputQtd) {
+    inputQtd.max = estoque;
+  }
+
+  /* NOME */
 
   if (nomeEl) {
     nomeEl.innerText = produto.nome;
   }
 
+  /* PREÇO */
+
   if (precoEl) {
-    precoEl.innerText = Number(produto.preco).toLocaleString("pt-BR", {
+
+    const preco = Number(produto.preco);
+
+    precoEl.innerText = preco.toLocaleString("pt-BR", {
       style: "currency",
       currency: "BRL"
     });
+
+    /* PARCELAMENTO */
+
+    const parcelas = document.createElement("p");
+
+    const valorParcela = preco / 12;
+
+    parcelas.innerHTML =
+      `ou 12x de <strong>${valorParcela.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+      })}</strong> <span class="sem-juros">sem juros</span>`;
+
+    precoEl.after(parcelas);
+
   }
+
+  /* DESCRIÇÃO */
 
   if (descricaoEl) {
     descricaoEl.innerText = produto.descricao || "Sem descrição";
   }
 
-  if (estoqueEl) {
+  /* ESTOQUE */
 
-    const estoque = Number(produto.quantidade) || 0;
+  if (estoqueEl) {
 
     if (estoque > 0) {
 
@@ -99,4 +142,59 @@ function mostrarProduto(produto) {
 
 }
 
-  carregarProduto();
+
+/* BOTÃO ADICIONAR CARRINHO */
+
+const btnAdicionarCarrinho = document.getElementById("btnAdicionarCarrinho");
+
+if (btnAdicionarCarrinho) {
+
+  btnAdicionarCarrinho.addEventListener("click", () => {
+
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    const qtd = Number(document.getElementById("quantidadeProduto").value) || 1;
+
+    adicionarAoCarrinho(id, btnAdicionarCarrinho, qtd);
+
+  });
+
+}
+
+
+/* CONTROLE DE QUANTIDADE */
+
+const inputQtd = document.getElementById("quantidadeProduto");
+const btnMais = document.getElementById("aumentarQtd");
+const btnMenos = document.getElementById("diminuirQtd");
+
+if (btnMais) {
+
+  btnMais.onclick = () => {
+
+    const max = Number(inputQtd.max) || 1;
+    const atual = Number(inputQtd.value);
+
+    if (atual < max) {
+      inputQtd.value = atual + 1;
+    }
+
+  };
+
+}
+
+if (btnMenos) {
+
+  btnMenos.onclick = () => {
+
+    if (inputQtd.value > 1) {
+      inputQtd.value = Number(inputQtd.value) - 1;
+    }
+
+  };
+
+}
+
+
+carregarProduto();

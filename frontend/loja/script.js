@@ -26,8 +26,9 @@ if (areaUsuario) {
     areaUsuario.innerHTML = `
       <span>Olá, ${primeiroNome} 👋</span>
 
-      <a href="carrinho.html" class="icon-link">🛒</a>
-
+      <a href="carrinho.html" class="icon-link" id="iconeCarrinho">
+      🛒 <span id="contadorCarrinho">0</span>
+      </a>
       ${auth.usuario.role === "admin"
         ? `<a href="/admin/admin.html" class="btn-admin">⚙ ADM</a>`
         : ""
@@ -35,12 +36,67 @@ if (areaUsuario) {
 
       <button id="logout">Sair</button>
     `;
+    atualizarContadorCarrinho();
 
     document.getElementById("logout").onclick = () => {
       localStorage.removeItem("auth");
       window.location.reload();
     };
   }
+}
+
+function animarProdutoCarrinho(imagemProduto) {
+
+  const carrinho = document.getElementById("iconeCarrinho");
+  const img = imagemProduto.cloneNode(true);
+
+  const rect = imagemProduto.getBoundingClientRect();
+  const carrinhoRect = carrinho.getBoundingClientRect();
+
+  img.style.position = "fixed";
+  img.style.left = rect.left + "px";
+  img.style.top = rect.top + "px";
+  img.style.width = "80px";
+  img.style.zIndex = "9999";
+  img.style.transition = "all 0.8s ease";
+
+  document.body.appendChild(img);
+
+  setTimeout(() => {
+
+    img.style.left = carrinhoRect.left + "px";
+    img.style.top = carrinhoRect.top + "px";
+    img.style.width = "20px";
+    img.style.opacity = "0.5";
+
+  }, 50);
+
+  setTimeout(() => {
+    img.remove();
+  }, 800);
+
+}
+
+async function atualizarContadorCarrinho() {
+
+  const auth = JSON.parse(localStorage.getItem("auth"));
+  if (!auth) return;
+
+  try {
+
+    const res = await fetch(`/carrinho/count/${auth.usuario.id}`);
+    const data = await res.json();
+
+    const contador = document.getElementById("contadorCarrinho");
+
+    if (contador) {
+      contador.innerText = data.total;
+    }
+
+  } catch (err) {
+    console.error("Erro ao atualizar carrinho", err);
+  }
+
 }
 
 // ============================
@@ -106,7 +162,7 @@ async function carregarProdutos(search = "") {
 
       </a>
 
-      <button onclick="adicionarAoCarrinho(${p.id})">
+      <button onclick="adicionarAoCarrinho(${p.id} , this)">
       🛒 Adicionar
       </button>
       `;
@@ -128,7 +184,8 @@ if (inputBusca) {
 // ============================
 // ADICIONAR AO CARRINHO (BACKEND)
 // ============================
-async function adicionarAoCarrinho(produto_id) {
+async function adicionarAoCarrinho(produto_id, botao, quantidade = 1) {
+
   const auth = JSON.parse(localStorage.getItem("auth"));
 
   if (!auth) {
@@ -137,6 +194,7 @@ async function adicionarAoCarrinho(produto_id) {
   }
 
   try {
+
     const res = await fetch("/carrinho/add", {
       method: "POST",
       headers: {
@@ -144,7 +202,8 @@ async function adicionarAoCarrinho(produto_id) {
       },
       body: JSON.stringify({
         usuario_id: auth.usuario.id,
-        produto_id
+        produto_id,
+        quantidade   // ✅ agora envia quantidade
       })
     });
 
@@ -152,11 +211,49 @@ async function adicionarAoCarrinho(produto_id) {
       throw new Error("Erro ao adicionar no carrinho");
     }
 
-    alert("Produto adicionado ao carrinho 🛒");
+    /* animação apenas se existir botão/card */
+    let imagem = null;
+
+    if (botao) {
+
+      const card = botao.closest(".card");
+
+      if (card) {
+        imagem = card.querySelector("img");
+      }
+
+    }
+
+    if (!imagem) {
+      imagem = document.getElementById("imagemPrincipal");
+    }
+
+    if (imagem) {
+      animarProdutoCarrinho(imagem);
+    }
+
+    atualizarContadorCarrinho();
+    mostrarToastCarrinho();
+
   } catch (error) {
     console.error("Erro:", error);
     alert("Erro ao adicionar ao carrinho");
   }
+}
+function mostrarToastCarrinho(){
+
+  const toast = document.getElementById("toastCarrinho");
+
+  if(!toast) return;
+
+  toast.classList.add("mostrar");
+
+  setTimeout(()=>{
+
+    toast.classList.remove("mostrar");
+
+  },2500);
+
 }
 
 // ============================
