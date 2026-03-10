@@ -2,29 +2,49 @@
 <html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Carrinho</title>
-    <link rel="stylesheet" href="carrinho.css">
+<meta charset="UTF-8">
+<title>Carrinho</title>
+<link rel="stylesheet" href="carrinho.css">
 </head>
 
 <body>
-    <div class="carrinho-container">
-        <h1>🛒 Meu Carrinho</h1>
 
-        <div id="lista-carrinho"></div>
+<div class="carrinho-container">
 
-        <div class="carrinho-footer">
-            <div class="total" id="total-carrinho">
-                Total: R$ 0,00
-            </div>
+<h1>🛒 Meu Carrinho</h1>
 
-            <button class="btn-finalizar" onclick="finalizarCompra()">
-                Finalizar Compra
-            </button>
-        </div>
-    </div>
+<div id="lista-carrinho"></div>
 
-    <script src="carrinho.js"></script>
+<div class="frete-box">
+
+<h3>Calcular frete</h3>
+
+<input type="text" id="cep" placeholder="Digite seu CEP">
+
+<button onclick="calcularFrete()">
+Calcular
+</button>
+
+<!-- opções de frete vão aparecer aqui -->
+<div id="opcoes-frete"></div>
+
+</div>
+
+<div class="carrinho-footer">
+
+<div class="total" id="total-carrinho">
+Total: R$ 0,00
+</div>
+
+<button class="btn-finalizar" onclick="finalizarCompra()">
+Finalizar Compra
+</button>
+
+</div>
+
+</div>
+
+<script src="carrinho.js"></script>
+
 </body>
-
 </html>

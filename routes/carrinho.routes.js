@@ -58,6 +58,30 @@ router.post("/add", async (req, res) => {
   }
 });
 
+router.put("/item/:id/quantidade", async (req, res) => {
+
+  try {
+
+    const { id } = req.params;
+    const { delta } = req.body;
+
+    await pool.query(`
+      UPDATE carrinho_itens
+      SET quantidade = GREATEST(1, quantidade + $1)
+      WHERE id = $2
+    `,[delta, id]);
+
+    res.json({ mensagem:"Quantidade atualizada" });
+
+  } catch(err){
+
+    console.error(err);
+    res.status(500).json({ erro:"Erro ao atualizar quantidade" });
+
+  }
+
+});
+
 // ============================
 // CONTADOR DE ITENS NO CARRINHO
 // ============================
