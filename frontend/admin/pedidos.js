@@ -51,22 +51,35 @@ window.verPedidoModal = async (id) => {
   const proximo = proximoStatus(pedido.status)
 
   conteudoPedido.innerHTML = `
-    <p><strong>ID:</strong> ${pedido.id}</p>
-    <p><strong>Cliente:</strong> ${pedido.nome}</p>
-    <p><strong>Total:</strong> ${formatarPreco(pedido.total)}</p>
-    <p><strong>Status:</strong> ${badgeStatus(pedido.status)}</p>
-    <p><strong>Data:</strong> ${new Date(pedido.criado_em).toLocaleString()}</p>
-    <hr>
-    ${pedido.itens.map(i => `
-      <div style="margin-bottom:10px;">
-        ${i.nome} — ${i.quantidade}x ${formatarPreco(i.preco)}
-      </div>
-    `).join("")}
-    <br>
-    ${proximo ? `<button onclick="window.atualizarStatusPedido(${pedido.id}, '${proximo}')">
-      Avançar para ${proximo}
-    </button>` : ""}
-  `
+  <h3>Pedido #${pedido.id}</h3>
+
+  <p><strong>Cliente:</strong> ${pedido.nome}</p>
+  <p><strong>Status:</strong> ${badgeStatus(pedido.status)}</p>
+  <p><strong>Data:</strong> ${new Date(pedido.criado_em).toLocaleString()}</p>
+
+  <hr>
+
+  <h4>Entrega</h4>
+
+  <p><strong>Transportadora:</strong> ${pedido.transportadora ?? "-"}</p>
+  <p><strong>Prazo:</strong> ${pedido.prazo ?? "-"} dias</p>
+  <p><strong>CEP:</strong> ${pedido.cep ?? "-"}</p>
+  <p><strong>Frete:</strong> ${formatarPreco(pedido.frete ?? 0)}</p>
+
+  <hr>
+
+  <h4>Itens</h4>
+
+  ${pedido.itens.map(i => `
+    <div>
+      ${i.nome} — ${i.quantidade}x ${formatarPreco(i.preco)}
+    </div>
+  `).join("")}
+
+  <hr>
+
+  <p><strong>Total:</strong> ${formatarPreco(pedido.total)}</p>
+`
 }
 
 window.atualizarStatusPedido = async (id, status) => {

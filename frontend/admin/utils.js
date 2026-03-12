@@ -1,8 +1,11 @@
 export function formatarPreco(valor) {
-  return Number(valor).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL"
-  })
+  return Number(valor)
+    .toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    })
+    // remove espaços entre R$ e valor (ex: `R$ 1.000,00` → `R$1.000,00`)
+    .replace(/\s+/g, "");
 }
 
 export function badgeStatus(status) {

@@ -19,6 +19,7 @@ import pedidosRoutes from "./routes/pedidos.routes.js";
 import usuariosRoutes from "./routes/usuarios.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
 import freteRoutes from "./routes/frete.js";
+import pagamentoRoutes from "./routes/pagamento.routes.js";
 
 
 // =====================
@@ -56,6 +57,7 @@ app.use("/usuarios", usuariosRoutes);
 app.use("/dashboard", dashboardRoutes);
 app.use("/admin", authRoutes); // Reutiliza rotas de auth para admin
 app.use("/frete", freteRoutes);
+app.use("/pagamento", pagamentoRoutes);
 
 // =====================
 // ROTA PRINCIPAL

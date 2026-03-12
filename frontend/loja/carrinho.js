@@ -1,6 +1,10 @@
 const lista = document.getElementById("lista-carrinho");
 const totalElemento = document.getElementById("total-carrinho");
-
+let pedidoAtual = null;
+let freteSelecionado = 0;
+let subtotalCarrinho = 0;
+let transportadoraSelecionada = "";
+let prazoSelecionado = 0;
 // ============================
 // CARREGAR CARRINHO
 // ============================
@@ -36,7 +40,6 @@ async function carregarCarrinho() {
       `;
 
       totalElemento.innerText = "Total: R$ 0,00";
-
       return;
     }
 
@@ -60,9 +63,9 @@ async function carregarCarrinho() {
 
             <p class="item-preco">
               ${preco.toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL"
-              })}
+        style: "currency",
+        currency: "BRL"
+      })}
             </p>
 
             <div class="item-quantidade">
@@ -81,9 +84,9 @@ async function carregarCarrinho() {
 
             <p class="item-subtotal">
               ${subtotal.toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL"
-              })}
+        style: "currency",
+        currency: "BRL"
+      })}
             </p>
 
             <button 
@@ -100,12 +103,10 @@ async function carregarCarrinho() {
 
     });
 
-    totalElemento.innerText =
-      "Total: " +
-      total.toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL"
-      });
+    // salva subtotal
+    subtotalCarrinho = total;
+
+    atualizarTotal();
 
   } catch (error) {
 
@@ -117,8 +118,10 @@ async function carregarCarrinho() {
   }
 
 }
-let frete = 0;
 
+// ============================
+// CALCULAR FRETE
+// ============================
 async function calcularFrete() {
 
   const cep = document.getElementById("cep").value;
@@ -134,30 +137,50 @@ async function calcularFrete() {
   const opcoes = await res.json();
 
   const div = document.getElementById("opcoes-frete");
+
+  if (!div) return;
+
   div.innerHTML = "";
 
   opcoes.forEach(opcao => {
 
-    div.innerHTML += `
-      <div class="frete-opcao">
+    const preco = parseFloat(opcao.preco);
 
-        <strong>${opcao.transportadora}</strong>
-        <br>
+    const elemento = document.createElement("div");
 
-        ${opcao.servico}
-        <br>
+    elemento.classList.add("frete-opcao");
 
-        R$ ${opcao.preco}
-        <br>
-
-        ${opcao.prazo} dias
-
-      </div>
+    elemento.innerHTML = `
+      <strong>${opcao.transportadora}</strong><br>
+      ${opcao.servico}<br>
+      ${preco.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    })}<br>
+      ${opcao.prazo} dias
     `;
+
+    elemento.onclick = () => {
+
+      freteSelecionado = preco;
+      transportadoraSelecionada = opcao.transportadora;
+      prazoSelecionado = opcao.prazo;
+
+      atualizarTotal();
+
+      document.querySelectorAll(".frete-opcao")
+        .forEach(el => el.classList.remove("frete-ativo"));
+
+      elemento.classList.add("frete-ativo");
+
+    };
+
+    div.appendChild(elemento);
 
   });
 
 }
+
 // ============================
 // ALTERAR QUANTIDADE
 // ============================
@@ -205,65 +228,144 @@ async function removerItem(id) {
   }
 
 }
+
+// ============================
+// ATUALIZAR TOTAL
+// ============================
 function atualizarTotal() {
 
-  const totalTexto = totalElemento.innerText
-    .replace("Total: R$", "")
-    .replace(".", "")
-    .replace(",", ".");
+  const total = subtotalCarrinho + freteSelecionado;
 
-  const totalCarrinho = parseFloat(totalTexto);
+  const totalElement = document.getElementById("total-carrinho");
 
-  const totalFinal = totalCarrinho + frete;
-
-  totalElemento.innerText =
-    "Total: " +
-    totalFinal.toLocaleString("pt-BR", {
+  totalElement.innerText =
+    `Total: ${total.toLocaleString("pt-BR", {
       style: "currency",
       currency: "BRL"
-    });
+    })}`;
+}
+
+// ============================
+// INICIAR PAGAMENTO
+// ============================
+async function iniciarPagamento() {
+
+  const forma = document.getElementById("formaPagamento").value;
+
+  const pedido = await finalizarCompra();
+
+  if (!pedido) return;
+
+  pedidoAtual = pedido.pedido_id;
+
+  if (forma === "pix") {
+
+    await gerarPix(pedidoAtual, pedido.total);
+
+  } else {
+
+    alert("Pedido realizado com sucesso!");
+    window.location.href = "/meus-pedidos.html";
+
+  }
+
+}
+// ============================
+// CONFIRMAR PAGAMENTO PIX
+// ============================
+async function confirmarPagamentoPix() {
+
+  if (!pedidoAtual) {
+    alert("Pedido não encontrado");
+    return;
+  }
+
+  const res = await fetch(`/pedidos/confirmar-pagamento/${pedidoAtual}`, {
+    method: "PUT"
+  });
+
+  const data = await res.json();
+
+  alert("Pagamento confirmado!");
+
+  window.location.href = "/meus-pedidos.html";
 
 }
 
 // ============================
 // FINALIZAR COMPRA
 // ============================
+
 async function finalizarCompra() {
 
   const auth = JSON.parse(localStorage.getItem("auth"));
+  const cep = document.getElementById("cep").value;
+  const formaPagamento = document.getElementById("formaPagamento").value;
 
-  try {
-
-    const res = await fetch("/pedidos/finalizar", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        usuario_id: auth.usuario.id
-      })
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-
-      alert("Pedido realizado com sucesso 🎉");
-
-      window.location.reload();
-
-    } else {
-
-      alert(data.erro);
-
-    }
-
-  } catch (error) {
-
-    console.error("Erro ao finalizar pedido:", error);
-
+  if (!auth) {
+    window.location.href = "/login.html";
+    return;
   }
 
+  const res = await fetch("/pedidos/finalizar", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      usuario_id: auth.usuario.id,
+      frete: freteSelecionado,
+      transportadora: transportadoraSelecionada,
+      prazo: prazoSelecionado,
+      cep: cep,
+      forma_pagamento: formaPagamento,
+      status_pagamento: "pendente"
+    })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert(data.erro);
+    return null;
+  }
+
+  return data;
+
+}
+
+
+// ============================
+// GERAR PIX
+// ============================
+
+
+async function gerarPix(pedidoId, valor) {
+  const res = await fetch("/pagamento/pix", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      pedido_id: pedidoId,
+      valor: valor,
+    }),
+  });
+
+  const data = await res.json();
+
+  document.getElementById("pagamento-pix").style.display = "block";
+  document.getElementById("pix-qrcode").src =
+    `data:image/png;base64,${data.qr_code_base64}`;
+
+  document.getElementById("pix-copia-cola").value = data.qr_code;
+}
+
+function copiarPix() {
+  const copiaCola = document.getElementById("pix-copia-cola");
+  copiaCola.select();
+  document.execCommand("copy");
+  alert("Código PIX copiado!");
 }
 
 // ============================

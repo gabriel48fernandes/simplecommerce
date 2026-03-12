@@ -2,49 +2,83 @@
 <html lang="pt-br">
 
 <head>
-<meta charset="UTF-8">
-<title>Carrinho</title>
-<link rel="stylesheet" href="carrinho.css">
+  <meta charset="UTF-8">
+  <title>Carrinho</title>
+  <link rel="stylesheet" href="carrinho.css">
 </head>
 
 <body>
 
-<div class="carrinho-container">
+  <div class="carrinho-container">
 
-<h1>🛒 Meu Carrinho</h1>
+    <h1>🛒 Meu Carrinho</h1>
 
-<div id="lista-carrinho"></div>
+    <div id="lista-carrinho"></div>
 
-<div class="frete-box">
+    <div class="frete-box">
 
-<h3>Calcular frete</h3>
+      <h3>Calcular frete</h3>
 
-<input type="text" id="cep" placeholder="Digite seu CEP">
+      <input type="text" id="cep" placeholder="Digite seu CEP">
 
-<button onclick="calcularFrete()">
-Calcular
-</button>
+      <button onclick="calcularFrete()">
+        Calcular
+      </button>
 
-<!-- opções de frete vão aparecer aqui -->
-<div id="opcoes-frete"></div>
+      <!-- opções de frete vão aparecer aqui -->
+      <div id="opcoes-frete"></div>
 
-</div>
+    </div>
 
-<div class="carrinho-footer">
+    <div class="carrinho-footer">
 
-<div class="total" id="total-carrinho">
-Total: R$ 0,00
-</div>
+      <div class="total" id="total-carrinho">
+        Total: R$ 0,00
+      </div>
 
-<button class="btn-finalizar" onclick="finalizarCompra()">
-Finalizar Compra
-</button>
+      <h3>Forma de pagamento</h3>
 
-</div>
+      <select id="formaPagamento">
+        <option value="pix">PIX</option>
+        <option value="cartao">Cartão</option>
+        <option value="boleto">Boleto</option>
+      </select>
 
-</div>
+      <!-- ALTERAMOS AQUI -->
+      <button onclick="iniciarPagamento()">
+        Seguir para pagamento
+      </button>
 
-<script src="carrinho.js"></script>
+    </div>
+
+    <!-- AREA PIX -->
+
+    <div id="pagamento-pix" style="display:none; margin-top:30px;">
+
+      <h2>Pagamento via PIX</h2>
+
+      <p>Escaneie o QR Code para pagar:</p>
+
+      <img id="pix-qrcode" width="200" />
+
+      <textarea id="pix-copia-cola" style="width:100%; height:80px; margin-top:10px;" readonly></textarea>
+
+      <button onclick="copiarPix()">
+        Copiar código PIX
+      </button>
+
+      <br><br>
+
+      <button class="btn-confirmar-pix" onclick="confirmarPagamentoPix()">
+        Já paguei
+      </button>
+
+    </div>
+
+  </div>
+
+  <script src="carrinho.js"></script>
 
 </body>
+
 </html>
