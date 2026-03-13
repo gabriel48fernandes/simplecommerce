@@ -250,6 +250,14 @@ function atualizarTotal() {
 // ============================
 async function iniciarPagamento() {
 
+  if (freteSelecionado === 0) {
+
+  alert("Calcule e selecione um frete primeiro.");
+
+  return;
+
+}
+
   const forma = document.getElementById("formaPagamento").value;
 
   const pedido = await finalizarCompra();
@@ -273,25 +281,21 @@ async function iniciarPagamento() {
 // ============================
 // CONFIRMAR PAGAMENTO PIX
 // ============================
+
+
 async function confirmarPagamentoPix() {
 
-  if (!pedidoAtual) {
-    alert("Pedido não encontrado");
-    return;
-  }
+  console.log("pedidoAtual:", pedidoAtual);
 
   const res = await fetch(`/pedidos/confirmar-pagamento/${pedidoAtual}`, {
     method: "PUT"
   });
 
-  const data = await res.json();
+  const text = await res.text();
 
-  alert("Pagamento confirmado!");
-
-  window.location.href = "/meus-pedidos.html";
+  console.log("Resposta do servidor:", text);
 
 }
-
 // ============================
 // FINALIZAR COMPRA
 // ============================
@@ -341,6 +345,7 @@ async function finalizarCompra() {
 
 
 async function gerarPix(pedidoId, valor) {
+
   const res = await fetch("/pagamento/pix", {
     method: "POST",
     headers: {
@@ -354,18 +359,17 @@ async function gerarPix(pedidoId, valor) {
 
   const data = await res.json();
 
-  document.getElementById("pagamento-pix").style.display = "block";
+  document.getElementById("pagamento-pix").style.display = "flex";
+
   document.getElementById("pix-qrcode").src =
     `data:image/png;base64,${data.qr_code_base64}`;
 
   document.getElementById("pix-copia-cola").value = data.qr_code;
-}
 
-function copiarPix() {
-  const copiaCola = document.getElementById("pix-copia-cola");
-  copiaCola.select();
-  document.execCommand("copy");
-  alert("Código PIX copiado!");
+  document.querySelector(".frete-box").style.display = "none";
+  document.querySelector(".carrinho-footer").style.display = "none";
+  document.getElementById("lista-carrinho").style.display = "none";
+
 }
 
 // ============================

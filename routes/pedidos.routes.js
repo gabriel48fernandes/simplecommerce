@@ -173,11 +173,15 @@ router.post("/finalizar", async (req, res) => {
 
     }
 
-    // 7️⃣ Limpar carrinho
-    await pool.query(
-      "DELETE FROM carrinho_itens WHERE carrinho_id = $1",
-      [carrinho.id]
-    );
+    // 7️⃣ Limpar carrinho somente se pagamento confirmado
+    if (status_pagamento === "pago") {
+
+      await pool.query(
+        "DELETE FROM carrinho_itens WHERE carrinho_id = $1",
+        [carrinho.id]
+      );
+
+    }
 
     res.json({
       mensagem: "Pedido criado com sucesso",
@@ -300,7 +304,10 @@ router.put("/:id/status", async (req, res) => {
 
   }
 
-  // ==========================
+});
+
+
+// ==========================
 // CONFIRMAR PAGAMENTO PIX
 // ==========================
 router.put("/confirmar-pagamento/:id", async (req, res) => {
@@ -334,7 +341,4 @@ router.put("/confirmar-pagamento/:id", async (req, res) => {
   }
 
 });
-
-});
-
 export default router;

@@ -53,27 +53,33 @@
 
     <!-- AREA PIX -->
 
-    <div id="pagamento-pix" style="display:none; margin-top:30px;">
+    <div id="pagamento-pix" class="pix-area" style="display:none;">
 
-      <h2>Pagamento via PIX</h2>
+  <div class="pix-card">
 
-      <p>Escaneie o QR Code para pagar:</p>
+    <h2>Pagamento via PIX</h2>
 
-      <img id="pix-qrcode" width="200" />
+    <p>Escaneie o QR Code com seu banco</p>
 
-      <textarea id="pix-copia-cola" style="width:100%; height:80px; margin-top:10px;" readonly></textarea>
+    <img id="pix-qrcode" />
 
-      <button onclick="copiarPix()">
-        Copiar código PIX
+    <textarea id="pix-copia-cola" class="pix-copia" readonly></textarea>
+
+    <div class="pix-botoes">
+
+      <button class="btn-pix btn-copiar" onclick="copiarPix()">
+        Copiar código
       </button>
 
-      <br><br>
-
-      <button class="btn-confirmar-pix" onclick="confirmarPagamentoPix()">
+      <button class="btn-pix btn-confirmar" onclick="confirmarPagamentoPix()">
         Já paguei
       </button>
 
     </div>
+
+  </div>
+
+</div>
 
   </div>
 
