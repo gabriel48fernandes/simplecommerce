@@ -2,58 +2,83 @@
 <html lang="pt-br">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Carrinho</title>
-  <link rel="stylesheet" href="carrinho.css">
+<meta charset="UTF-8">
+<title>Carrinho</title>
+
+<link rel="stylesheet" href="carrinho.css">
+
 </head>
 
 <body>
 
-  <div class="carrinho-container">
+<!-- OVERLAY -->
+<div id="cartOverlay" onclick="fecharCarrinho()"></div>
 
-    <h1>🛒 Meu Carrinho</h1>
+<!-- CARRINHO LATERAL -->
+<div id="cartDrawer">
 
-    <div id="lista-carrinho"></div>
+  <!-- HEADER -->
+  <div class="cartHeader">
 
-    <div class="frete-box">
+    <h2>🛒 Meu Carrinho</h2>
 
-      <h3>Calcular frete</h3>
+    <button onclick="fecharCarrinho()">
+      ✕
+    </button>
 
-      <input type="text" id="cep" placeholder="Digite seu CEP">
+  </div>
 
-      <button onclick="calcularFrete()">
-        Calcular
-      </button>
+  <!-- LISTA PRODUTOS -->
+  <div id="lista-carrinho"></div>
 
-      <!-- opções de frete vão aparecer aqui -->
-      <div id="opcoes-frete"></div>
+  <!-- FRETE -->
+  <div class="frete-box">
 
+    <h3>Calcular frete</h3>
+
+    <input
+      type="text"
+      id="cep"
+      placeholder="Digite seu CEP"
+    >
+
+    <button onclick="calcularFrete()">
+      Calcular
+    </button>
+
+    <div id="opcoes-frete"></div>
+
+  </div>
+
+  <!-- TOTAL + PAGAMENTO -->
+  <div class="carrinho-footer">
+
+    <div class="total" id="total-carrinho">
+      Total: R$ 0,00
     </div>
 
-    <div class="carrinho-footer">
+    <h3>Forma de pagamento</h3>
 
-      <div class="total" id="total-carrinho">
-        Total: R$ 0,00
-      </div>
+    <select id="formaPagamento">
 
-      <h3>Forma de pagamento</h3>
+      <option value="pix">PIX</option>
+      <option value="cartao">Cartão</option>
+      <option value="boleto">Boleto</option>
 
-      <select id="formaPagamento">
-        <option value="pix">PIX</option>
-        <option value="cartao">Cartão</option>
-        <option value="boleto">Boleto</option>
-      </select>
+    </select>
 
-      <!-- ALTERAMOS AQUI -->
-      <button onclick="iniciarPagamento()">
-        Seguir para pagamento
-      </button>
+    <button type="button" onclick="iniciarPagamento()">
+      Seguir para pagamento
+    </button>
 
-    </div>
+  </div>
 
-    <!-- AREA PIX -->
+</div>
 
-    <div id="pagamento-pix" class="pix-area" style="display:none;">
+
+<!-- AREA PIX -->
+
+<div id="pagamento-pix" class="pix-area" style="display:none;">
 
   <div class="pix-card">
 
@@ -61,17 +86,27 @@
 
     <p>Escaneie o QR Code com seu banco</p>
 
-    <img id="pix-qrcode" />
+    <img id="pix-qrcode">
 
-    <textarea id="pix-copia-cola" class="pix-copia" readonly></textarea>
+    <textarea
+      id="pix-copia-cola"
+      class="pix-copia"
+      readonly
+    ></textarea>
 
     <div class="pix-botoes">
 
-      <button class="btn-pix btn-copiar" onclick="copiarPix()">
+      <button
+        class="btn-pix btn-copiar"
+        onclick="copiarPix()"
+      >
         Copiar código
       </button>
 
-      <button class="btn-pix btn-confirmar" onclick="confirmarPagamentoPix()">
+      <button
+        class="btn-pix btn-confirmar"
+        onclick="confirmarPagamentoPix()"
+      >
         Já paguei
       </button>
 
@@ -81,10 +116,10 @@
 
 </div>
 
-  </div>
 
-  <script src="carrinho.js"></script>
+<!-- SCRIPTS -->
+<script src="/script.js"></script>
+<script src="/carrinho.js"></script>
 
 </body>
-
 </html>

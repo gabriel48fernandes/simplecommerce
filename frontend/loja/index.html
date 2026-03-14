@@ -5,7 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SimpleCommerce - Sua Loja Online</title>
-    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="carrinho.css" />
 </head>
 
 <body>
@@ -48,7 +49,58 @@
     <div id="toastCarrinho" class="toast-carrinho">
         ✔ Produto adicionado ao carrinho
     </div>
+
+    <!-- Carrinho lateral -->
+    <div id="cartOverlay" class="cart-overlay" onclick="fecharCarrinho()"></div>
+
+    <div id="cartDrawer" class="cart-drawer">
+
+        <div class="cart-header">
+            <h2>🛒 Carrinho</h2>
+            <button onclick="fecharCarrinho()">✖</button>
+        </div>
+
+        <div id="lista-carrinho"></div>
+
+        <div class="frete-box">
+          <h3>Calcule o frete</h3>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <input type="text" id="cep" placeholder="Digite o CEP" maxlength="9" />
+            <button onclick="calcularFrete()">Calcular</button>
+          </div>
+          <div id="opcoes-frete"></div>
+        </div>
+
+        <div class="frete-box">
+          <h3>Forma de pagamento</h3>
+          <select id="formaPagamento">
+            <option value="pix">PIX</option>
+            <option value="boleto">Boleto</option>
+            <option value="cartao">Cartão</option>
+          </select>
+        </div>
+
+        <div id="pagamento-pix" class="pix-area" style="display:none;">
+          <div class="pix-card">
+            <h3>PIX</h3>
+            <img id="pix-qrcode" src="" alt="QR Code PIX" />
+            <input id="pix-copia-cola" class="pix-copia" readonly />
+            <div class="pix-botoes">
+              <button class="btn-pix btn-copiar" onclick="navigator.clipboard.writeText(document.getElementById('pix-copia-cola').value).then(() => alert('Copiado!'))">Copiar</button>
+              <button class="btn-pix btn-confirmar" onclick="confirmarPagamentoPix()">Já paguei</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cart-footer">
+            <div id="total-carrinho">Total: R$ 0,00</div>
+            <button type="button" onclick="iniciarPagamento()">Finalizar compra</button>
+        </div>
+
+    </div>
+    <script src="/carrinho.js"></script>
     <script src="/script.js"></script>
+    
 </body>
 
 </html>

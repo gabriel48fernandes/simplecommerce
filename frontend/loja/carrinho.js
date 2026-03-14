@@ -1,16 +1,40 @@
-const lista = document.getElementById("lista-carrinho");
-const totalElemento = document.getElementById("total-carrinho");
 let pedidoAtual = null;
 let freteSelecionado = 0;
 let subtotalCarrinho = 0;
 let transportadoraSelecionada = "";
 let prazoSelecionado = 0;
+
+function abrirCarrinho() {
+  const overlay = document.getElementById("cartOverlay");
+  const drawer = document.getElementById("cartDrawer");
+
+  if (overlay) overlay.classList.add("open");
+  if (drawer) drawer.classList.add("open");
+
+  carregarCarrinho();
+}
+
+function fecharCarrinho() {
+  const overlay = document.getElementById("cartOverlay");
+  const drawer = document.getElementById("cartDrawer");
+
+  if (overlay) overlay.classList.remove("open");
+  if (drawer) drawer.classList.remove("open");
+}
+
 // ============================
 // CARREGAR CARRINHO
 // ============================
 async function carregarCarrinho() {
 
+  const lista = document.getElementById("lista-carrinho");
+  const totalElemento = document.getElementById("total-carrinho");
   const auth = JSON.parse(localStorage.getItem("auth"));
+
+  if (!lista || !totalElemento) {
+    console.log("carrinho ainda nao existe na pagina")
+    return;
+  }
 
   if (!auth) {
     window.location.href = "/login.html";
@@ -249,35 +273,58 @@ function atualizarTotal() {
 // INICIAR PAGAMENTO
 // ============================
 async function iniciarPagamento() {
+  console.log("iniciarPagamento() chamado");
+  try {
+    if (freteSelecionado === 0) {
+      const continuar = confirm(
+        "Você não selecionou frete. Deseja continuar sem frete?"
+      );
+      if (!continuar) return;
+    }
 
-  if (freteSelecionado === 0) {
+    const formaEl = document.getElementById("formaPagamento");
+    const forma = formaEl ? formaEl.value : "pix";
 
-  alert("Calcule e selecione um frete primeiro.");
+    const pedido = await finalizarCompra();
 
-  return;
+    if (!pedido) return;
 
-}
+    pedidoAtual = pedido.pedido_id;
 
-  const forma = document.getElementById("formaPagamento").value;
+    if (forma === "pix") {
+      if (!pedido.total || Number.isNaN(Number(pedido.total))) {
+        alert("Não foi possível calcular o valor do pedido para gerar o PIX.");
+        return;
+      }
 
-  const pedido = await finalizarCompra();
+      await gerarPix(pedidoAtual, pedido.total);
 
-  if (!pedido) return;
-
-  pedidoAtual = pedido.pedido_id;
-
-  if (forma === "pix") {
-
-    await gerarPix(pedidoAtual, pedido.total);
-
-  } else {
-
-    alert("Pedido realizado com sucesso!");
-    window.location.href = "/meus-pedidos.html";
-
+    } else {
+      alert("Pedido realizado com sucesso!");
+      window.location.href = "/meus-pedidos.html";
+    }
+  } catch (error) {
+    console.error("Erro ao iniciar pagamento:", error);
+    alert("Erro ao iniciar pagamento. Veja o console para mais detalhes.");
   }
-
 }
+
+function initCarrinhoDrawer() {
+  const formaEl = document.getElementById("formaPagamento");
+  const pixArea = document.getElementById("pagamento-pix");
+
+  if (!formaEl || !pixArea) return;
+
+  formaEl.addEventListener("change", () => {
+    pixArea.style.display = formaEl.value === "pix" ? "flex" : "none";
+  });
+}
+
+// ============================
+// INIT
+// ============================
+
+initCarrinhoDrawer();
 // ============================
 // CONFIRMAR PAGAMENTO PIX
 // ============================
@@ -345,34 +392,46 @@ async function finalizarCompra() {
 
 
 async function gerarPix(pedidoId, valor) {
+  try {
+    const res = await fetch("/pagamento/pix", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        pedido_id: pedidoId,
+        valor: valor,
+      }),
+    });
 
-  const res = await fetch("/pagamento/pix", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      pedido_id: pedidoId,
-      valor: valor,
-    }),
-  });
+    if (!res.ok) {
+      const data = await res.json().catch(() => null);
+      const erro = data?.erro || "Não foi possível gerar o PIX";
+      throw new Error(erro);
+    }
 
-  const data = await res.json();
+    const data = await res.json();
 
-  document.getElementById("pagamento-pix").style.display = "flex";
+    const pixArea = document.getElementById("pagamento-pix");
+    const qrImg = document.getElementById("pix-qrcode");
+    const copiaCola = document.getElementById("pix-copia-cola");
 
-  document.getElementById("pix-qrcode").src =
-    `data:image/png;base64,${data.qr_code_base64}`;
+    if (pixArea) pixArea.style.display = "flex";
+    if (qrImg) qrImg.src = `data:image/png;base64,${data.qr_code_base64}`;
+    if (copiaCola) copiaCola.value = data.qr_code;
 
-  document.getElementById("pix-copia-cola").value = data.qr_code;
+    document.querySelectorAll(".frete-box").forEach(el => (el.style.display = "none"));
+    const cartFooter = document.querySelector(".cart-footer");
+    if (cartFooter) cartFooter.style.display = "none";
+    const lista = document.getElementById("lista-carrinho");
+    if (lista) lista.style.display = "none";
 
-  document.querySelector(".frete-box").style.display = "none";
-  document.querySelector(".carrinho-footer").style.display = "none";
-  document.getElementById("lista-carrinho").style.display = "none";
-
+  } catch (error) {
+    console.error("Erro ao gerar PIX:", error);
+    alert("Não foi possível gerar o PIX. Veja o console para mais detalhes.");
+  }
 }
 
 // ============================
 // INIT
 // ============================
-carregarCarrinho();

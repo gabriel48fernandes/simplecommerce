@@ -64,6 +64,10 @@ router.post("/finalizar", async (req, res) => {
     status_pagamento
   } = req.body;
 
+  if (!cep) {
+    return res.status(400).json({ erro: "CEP é obrigatório" });
+  }
+
   try {
 
     // 1️⃣ Buscar carrinho
@@ -314,20 +318,96 @@ router.put("/confirmar-pagamento/:id", async (req, res) => {
 
   const id = Number(req.params.id);
 
+  if (!Number.isInteger(id)) {
+    return res.status(400).json({ erro: "ID inválido" });
+  }
+
   try {
 
-    await pool.query(
-      "UPDATE pedidos SET status_pagamento = 'pago' WHERE id = $1",
+    // 1️⃣ Buscar pedido
+    const pedidoResult = await pool.query(
+      "SELECT * FROM pedidos WHERE id = $1",
       [id]
     );
 
-    await pool.query(
-      "UPDATE pedidos SET status = 'pago' WHERE id = $1",
+    if (pedidoResult.rows.length === 0) {
+      return res.status(404).json({ erro: "Pedido não encontrado" });
+    }
+
+    const pedido = pedidoResult.rows[0];
+
+    // 2️⃣ Evitar confirmar duas vezes
+    if (pedido.status_pagamento === "pago") {
+      return res.json({
+        mensagem: "Pagamento já confirmado anteriormente"
+      });
+    }
+
+    // 3️⃣ Buscar itens do pedido
+    const itensResult = await pool.query(
+      `
+      SELECT produto_id, quantidade
+      FROM pedido_itens
+      WHERE pedido_id = $1
+      `,
       [id]
     );
+
+    const itens = itensResult.rows;
+
+    // 4️⃣ Baixar estoque
+    for (const item of itens) {
+
+      const produto = await pool.query(
+        "SELECT quantidade FROM produtos WHERE id = $1",
+        [item.produto_id]
+      );
+
+      if (produto.rows[0].quantidade < item.quantidade) {
+        return res.status(400).json({
+          erro: "Estoque insuficiente para um dos produtos"
+        });
+      }
+
+      await pool.query(
+        `
+        UPDATE produtos
+        SET quantidade = quantidade - $1
+        WHERE id = $2
+        `,
+        [item.quantidade, item.produto_id]
+      );
+
+    }
+
+    // 5️⃣ Marcar pedido como pago
+    await pool.query(
+      `
+      UPDATE pedidos
+      SET status_pagamento = 'pago',
+          status = 'pago'
+      WHERE id = $1
+      `,
+      [id]
+    );
+
+    // 6️⃣ Buscar carrinho do usuário
+    const carrinhoResult = await pool.query(
+      "SELECT id FROM carrinhos WHERE usuario_id = $1",
+      [pedido.usuario_id]
+    );
+
+    if (carrinhoResult.rows.length > 0) {
+
+      await pool.query(
+        "DELETE FROM carrinho_itens WHERE carrinho_id = $1",
+        [carrinhoResult.rows[0].id]
+      );
+
+    }
 
     res.json({
-      mensagem: "Pagamento confirmado"
+      mensagem: "Pagamento confirmado com sucesso"
     });
 
   } catch (error) {

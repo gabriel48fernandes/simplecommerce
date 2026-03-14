@@ -13,12 +13,19 @@ try {
 }
 
 if (areaUsuario) {
+
   if (!auth) {
+
     areaUsuario.innerHTML = `
       <a href="/login.html" class="icon-link">👤</a>
-      <a href="/carrinho.html" class="icon-link">🛒</a>
+
+      <button class="icon-link" onclick="abrirCarrinho()">
+        🛒
+      </button>
     `;
+
   } else {
+
     const primeiroNome = auth.usuario.nome
       ? auth.usuario.nome.split(" ")[0]
       : auth.usuario.email;
@@ -26,9 +33,10 @@ if (areaUsuario) {
     areaUsuario.innerHTML = `
       <span>Olá, ${primeiroNome} 👋</span>
 
-      <a href="carrinho.html" class="icon-link" id="iconeCarrinho">
-      🛒 <span id="contadorCarrinho">0</span>
-      </a>
+      <button class="icon-link" id="iconeCarrinho" onclick="abrirCarrinho()">
+        🛒 <span id="contadorCarrinho">0</span>
+      </button>
+
       ${auth.usuario.role === "admin"
         ? `<a href="/admin/admin.html" class="btn-admin">⚙ ADM</a>`
         : ""
@@ -36,13 +44,16 @@ if (areaUsuario) {
 
       <button id="logout">Sair</button>
     `;
+
     atualizarContadorCarrinho();
 
     document.getElementById("logout").onclick = () => {
       localStorage.removeItem("auth");
       window.location.reload();
     };
+
   }
+
 }
 
 function animarProdutoCarrinho(imagemProduto) {
@@ -240,19 +251,19 @@ async function adicionarAoCarrinho(produto_id, botao, quantidade = 1) {
     alert("Erro ao adicionar ao carrinho");
   }
 }
-function mostrarToastCarrinho(){
+function mostrarToastCarrinho() {
 
   const toast = document.getElementById("toastCarrinho");
 
-  if(!toast) return;
+  if (!toast) return;
 
   toast.classList.add("mostrar");
 
-  setTimeout(()=>{
+  setTimeout(() => {
 
     toast.classList.remove("mostrar");
 
-  },2500);
+  }, 2500);
 
 }
 
