@@ -289,6 +289,12 @@ async function iniciarPagamento() {
 
     if (!pedido) return;
 
+    document.getElementById("toastPedido").classList.add("mostrar");
+    setTimeout(() => {
+      document.getElementById("toastPedido").classList.remove("mostrar");
+    }, 3000);
+
+
     pedidoAtual = pedido.pedido_id;
 
     if (forma === "pix") {

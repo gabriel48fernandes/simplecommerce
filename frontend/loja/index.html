@@ -73,8 +73,12 @@
         <div>💳 Pix e Cartão</div>
         <div>🔁 Troca Facilitada</div>
     </section>
+    <!-- Toast de notificação -->
     <div id="toastCarrinho" class="toast-carrinho">
         ✔ Produto adicionado ao carrinho
+    </div>
+    <div id="toastPedido" class="toast-carrinho">
+        📦 pedido criado! Segue com o pagamento.
     </div>
 
     <!-- Carrinho lateral -->
@@ -112,6 +116,7 @@
                 <h3>PIX</h3>
                 <img id="pix-qrcode" src="" alt="QR Code PIX" />
                 <input id="pix-copia-cola" class="pix-copia" readonly />
+                <p id="status-pagamento">⏳ Aguardando pagamento...</p>
                 <div class="pix-botoes">
                     <button class="btn-pix btn-copiar"
                         onclick="navigator.clipboard.writeText(document.getElementById('pix-copia-cola').value).then(() => alert('Copiado!'))">Copiar</button>

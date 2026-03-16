@@ -7,9 +7,13 @@ router.post("/pix", async (req, res) => {
 
   const { pedido_id, valor } = req.body;
 
-  const accessToken = process.env.MP_ACCESS_TOKEN;
+  const accessTokenRaw = process.env.MP_ACCESS_TOKEN || "";
+  const accessToken = accessTokenRaw.trim();
+
   if (!accessToken) {
-    console.error("MP_ACCESS_TOKEN não está definido. Verifique suas variáveis de ambiente.");
+    console.error(
+      "MP_ACCESS_TOKEN não está definido ou está vazio. Verifique suas variáveis de ambiente. (raw length=", accessTokenRaw.length, ")"
+    );
     return res.status(500).json({ erro: "MP_ACCESS_TOKEN não configurado" });
   }
 
