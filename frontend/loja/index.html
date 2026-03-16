@@ -24,20 +24,47 @@
         </div>
     </header>
 
-    <!-- BANNER -->
-    <section class="banner">
-        <h2>Promoções da semana</h2>
-        <p>Descontos exclusivos em diversos produtos</p>
-        <button>Ver ofertas</button>
-    </section>
+    <div class="container">
 
-    <div id="categorias" class="categorias-container"></div>
+        <!-- BANNER -->
+        <section class="banner-container">
 
+            <div class="carousel">
 
-    <!-- PRODUTOS -->
-    <section class="produtos-container" id="produtos">
-        <!-- cards dinâmicos -->
-    </section>
+                <div class="slide active">
+                    <img src="https://plus.unsplash.com/premium_photo-1699855177060-7202c67834b9?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt="Promoção">
+                    <button class="banner-btn">Ver ofertas</button>
+                </div>
+
+                <div class="slide">
+                    <img src="https://plus.unsplash.com/premium_photo-1677995700883-30df169c7517?q=80&w=1223&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt="Promoção">
+                    <button class="banner-btn">Ver ofertas</button>
+                </div>
+
+                <div class="slide">
+                    <img src="https://images.unsplash.com/photo-1607082349566-187342175e2f?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt="Promoção">
+                    <button class="banner-btn">Ver ofertas</button>
+                </div>
+
+            </div>
+
+            <div class="carousel-indicators">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+
+        </section>
+
+        <div id="categorias" class="categorias-container"></div>
+
+        <!-- PRODUTOS -->
+        <section class="produtos-container" id="produtos"></section>
+
+    </div>
 
     <!-- BENEFÍCIOS -->
     <section class="beneficios">
@@ -63,33 +90,34 @@
         <div id="lista-carrinho"></div>
 
         <div class="frete-box">
-          <h3>Calcule o frete</h3>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-            <input type="text" id="cep" placeholder="Digite o CEP" maxlength="9" />
-            <button onclick="calcularFrete()">Calcular</button>
-          </div>
-          <div id="opcoes-frete"></div>
+            <h3>Calcule o frete</h3>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                <input type="text" id="cep" placeholder="Digite o CEP" maxlength="9" />
+                <button onclick="calcularFrete()">Calcular</button>
+            </div>
+            <div id="opcoes-frete"></div>
         </div>
 
         <div class="frete-box">
-          <h3>Forma de pagamento</h3>
-          <select id="formaPagamento">
-            <option value="pix">PIX</option>
-            <option value="boleto">Boleto</option>
-            <option value="cartao">Cartão</option>
-          </select>
+            <h3>Forma de pagamento</h3>
+            <select id="formaPagamento">
+                <option value="pix">PIX</option>
+                <option value="boleto">Boleto</option>
+                <option value="cartao">Cartão</option>
+            </select>
         </div>
 
         <div id="pagamento-pix" class="pix-area" style="display:none;">
-          <div class="pix-card">
-            <h3>PIX</h3>
-            <img id="pix-qrcode" src="" alt="QR Code PIX" />
-            <input id="pix-copia-cola" class="pix-copia" readonly />
-            <div class="pix-botoes">
-              <button class="btn-pix btn-copiar" onclick="navigator.clipboard.writeText(document.getElementById('pix-copia-cola').value).then(() => alert('Copiado!'))">Copiar</button>
-              <button class="btn-pix btn-confirmar" onclick="confirmarPagamentoPix()">Já paguei</button>
+            <div class="pix-card">
+                <h3>PIX</h3>
+                <img id="pix-qrcode" src="" alt="QR Code PIX" />
+                <input id="pix-copia-cola" class="pix-copia" readonly />
+                <div class="pix-botoes">
+                    <button class="btn-pix btn-copiar"
+                        onclick="navigator.clipboard.writeText(document.getElementById('pix-copia-cola').value).then(() => alert('Copiado!'))">Copiar</button>
+                    <button class="btn-pix btn-confirmar" onclick="confirmarPagamentoPix()">Já paguei</button>
+                </div>
             </div>
-          </div>
         </div>
 
         <div class="cart-footer">
@@ -100,7 +128,7 @@
     </div>
     <script src="/carrinho.js"></script>
     <script src="/script.js"></script>
-    
+
 </body>
 
 </html>
