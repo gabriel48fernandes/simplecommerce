@@ -3,15 +3,21 @@ import { MercadoPagoConfig, Payment } from "mercadopago";
 
 const router = express.Router();
 
-const mpConfig = new MercadoPagoConfig({
-  accessToken: process.env.MP_ACCESS_TOKEN,
-});
-
-const paymentClient = new Payment(mpConfig);
-
 router.post("/pix", async (req, res) => {
 
   const { pedido_id, valor } = req.body;
+
+  const accessToken = process.env.MP_ACCESS_TOKEN;
+  if (!accessToken) {
+    console.error("MP_ACCESS_TOKEN não está definido. Verifique suas variáveis de ambiente.");
+    return res.status(500).json({ erro: "MP_ACCESS_TOKEN não configurado" });
+  }
+
+  const paymentClient = new Payment(
+    new MercadoPagoConfig({
+      accessToken,
+    })
+  );
 
   try {
 
@@ -42,10 +48,16 @@ router.post("/pix", async (req, res) => {
 
   } catch (err) {
 
-    console.error("Erro ao gerar PIX:", err);
+    console.error("Erro ao gerar PIX:", err?.message || err, err?.response?.data || "");
+
+    const message =
+      err?.response?.data?.message ||
+      err?.response?.data?.error ||
+      err?.message ||
+      "Erro ao gerar PIX";
 
     res.status(500).json({
-      erro: "Erro ao gerar PIX"
+      erro: message,
     });
 
   }
