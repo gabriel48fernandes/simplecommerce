@@ -1,4 +1,4 @@
-import { formatarPreco } from "./utils.js"
+import { formatarPreco, api } from "./utils.js"
 
 let produtoEditandoId = null
 
@@ -46,7 +46,9 @@ async function salvarProduto(e) {
   const data = {
     nome: document.getElementById("nome").value,
     preco: parseFloat(document.getElementById("preco").value),
-    preco_promocional: document.getElementById("preco_promocional").value ? parseFloat(document.getElementById("preco_promocional").value) : null,
+    preco_promocional: document.getElementById("preco_promocional").value
+      ? parseFloat(document.getElementById("preco_promocional").value)
+      : null,
     quantidade: Number(document.getElementById("quantidade").value),
     categoria_id: Number(document.getElementById("categoria").value)
   }
@@ -54,11 +56,15 @@ async function salvarProduto(e) {
   const metodo = produtoEditandoId ? "PUT" : "POST"
   const url = produtoEditandoId ? `/produtos/${produtoEditandoId}` : "/produtos"
 
-  await fetch(url, {
+  const res = await api(url, {
     method: metodo,
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
   })
+
+  if (!res.ok) {
+    alert("Erro ao salvar produto")
+    return
+  }
 
   fecharModal()
   carregarProdutos()
@@ -66,13 +72,19 @@ async function salvarProduto(e) {
 
 export async function carregarProdutos(search = "") {
   tabelaBody.innerHTML = ""
+
   const res = await fetch(`/produtos?search=${search}`)
   const produtos = await res.json()
 
   produtos.forEach(p => {
     tabelaBody.innerHTML += `
       <tr>
-        <td><img src="${p.imagem || 'https://via.placeholder.com/50x50/cccccc/666666?text=?'}" width="50" alt="${p.nome}" onerror="this.src='https://via.placeholder.com/50x50/cccccc/666666?text=?'"/></td>
+        <td>
+          <img src="${p.imagem || 'https://via.placeholder.com/50x50/cccccc/666666?text=?'}" 
+               width="50" 
+               alt="${p.nome}" 
+               onerror="this.src='https://via.placeholder.com/50x50/cccccc/666666?text=?'"/>
+        </td>
         <td>${p.nome}</td>
         <td>${formatarPreco(p.preco)}</td>
         <td>${p.quantidade}</td>
@@ -90,6 +102,15 @@ window.editarProduto = (produto) => abrirModal(produto)
 
 window.excluirProduto = async (id) => {
   if (!confirm("Excluir produto?")) return
-  await fetch(`/produtos/${id}`, { method: "DELETE" })
+
+  const res = await api(`/produtos/${id}`, {
+    method: "DELETE"
+  })
+
+  if (!res.ok) {
+    alert("Erro ao excluir produto")
+    return
+  }
+
   carregarProdutos()
 }

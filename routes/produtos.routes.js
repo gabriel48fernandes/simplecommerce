@@ -1,5 +1,6 @@
 import express from "express";
 import { pool } from "../db.js";
+import { autenticarToken, apenasAdmin } from "./auth.js";
 
 const router = express.Router();
 
@@ -231,7 +232,7 @@ router.put("/:id", async (req, res) => {
 /* =========================
    DELETE /produtos/:id
 ========================= */
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", autenticarToken, apenasAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 
