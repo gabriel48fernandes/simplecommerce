@@ -1,6 +1,6 @@
 import express from "express";
 import { pool } from "../db.js";
-import { autenticarToken, apenasAdmin } from "./auth.js";
+import { autenticarToken, apenasAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -124,7 +124,7 @@ router.get("/:id", async (req, res) => {
 /* =========================
    POST /produtos (CRIAR)
 ========================= */
-router.post("/", async (req, res) => {
+router.post("/", autenticarToken, apenasAdmin, async (req, res) => {
   try {
     const { nome, preco, preco_promocional, quantidade, categoria_id, imagem_url } = req.body;
 
@@ -172,7 +172,7 @@ router.post("/", async (req, res) => {
 /* =========================
    PUT /produtos/:id (EDITAR)
 ========================= */
-router.put("/:id", async (req, res) => {
+router.put("/:id", autenticarToken, apenasAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { nome, preco, preco_promocional, quantidade, categoria_id, imagem_url } = req.body;

@@ -43,7 +43,7 @@ async function carregarCarrinho() {
 
   try {
 
-    const res = await fetch(`/carrinho/${auth.usuario.id}`);
+    const res = await api(`/carrinho/${auth.usuario.id}`);
 
     if (!res.ok) {
       throw new Error("Erro ao buscar carrinho");
@@ -150,11 +150,8 @@ async function calcularFrete() {
 
   const cep = document.getElementById("cep").value;
 
-  const res = await fetch("/frete/calcular", {
+  const res = await api("/frete/calcular", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
     body: JSON.stringify({ cepDestino: cep })
   });
 
@@ -212,11 +209,8 @@ async function alterarQtd(id, delta) {
 
   try {
 
-    await fetch(`/carrinho/item/${id}/quantidade`, {
+    await api(`/carrinho/item/${id}/quantidade`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
       body: JSON.stringify({
         delta: delta
       })
@@ -239,7 +233,7 @@ async function removerItem(id) {
 
   try {
 
-    await fetch(`/carrinho/item/${id}`, {
+    await api(`/carrinho/item/${id}`, {
       method: "DELETE"
     });
 
@@ -340,7 +334,7 @@ async function confirmarPagamentoPix() {
 
   console.log("pedidoAtual:", pedidoAtual);
 
-  const res = await fetch(`/pedidos/confirmar-pagamento/${pedidoAtual}`, {
+  const res = await api(`/pedidos/confirmar-pagamento/${pedidoAtual}`, {
     method: "PUT"
   });
 
@@ -364,11 +358,8 @@ async function finalizarCompra() {
     return;
   }
 
-  const res = await fetch("/pedidos/finalizar", {
+  const res = await api("/pedidos/finalizar", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
     body: JSON.stringify({
       usuario_id: auth.usuario.id,
       frete: freteSelecionado,
@@ -399,11 +390,8 @@ async function finalizarCompra() {
 
 async function gerarPix(pedidoId, valor) {
   try {
-    const res = await fetch("/pagamento/pix", {
+    const res = await api("/pagamento/pix", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({
         pedido_id: pedidoId,
         valor: valor,

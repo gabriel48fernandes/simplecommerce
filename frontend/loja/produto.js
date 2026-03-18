@@ -7,7 +7,7 @@ async function carregarProduto() {
 
   try {
 
-    const res = await fetch(`/produtos/${id}`);
+    const res = await api(`/produtos/${id}`);
     const produto = await res.json();
 
     mostrarProduto(produto);
@@ -109,7 +109,11 @@ function mostrarProduto(produto) {
   const imagemPrincipal = document.getElementById("imagemPrincipal");
 
   if (imagemPrincipal) {
-    imagemPrincipal.src = produto.imagem || "https://via.placeholder.com/400";
+    imagemPrincipal.src = produto.imagem || window.SEM_IMAGEM_FALLBACK;
+    imagemPrincipal.onerror = function () {
+      this.onerror = null;
+      this.src = window.SEM_IMAGEM_FALLBACK;
+    };
   }
 
   /* MINIATURAS */
@@ -126,7 +130,11 @@ function mostrarProduto(produto) {
 
     const img = document.createElement("img");
 
-    img.src = src || "https://via.placeholder.com/100";
+    img.src = src || window.SEM_IMAGEM_FALLBACK;
+    img.onerror = function () {
+      this.onerror = null;
+      this.src = window.SEM_IMAGEM_FALLBACK;
+    };
 
     img.addEventListener("click", () => {
       imagemPrincipal.src = img.src;

@@ -1,9 +1,10 @@
 import express from "express";
 import { MercadoPagoConfig, Payment } from "mercadopago";
+import { autenticarToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.post("/pix", async (req, res) => {
+router.post("/pix", autenticarToken, async (req, res) => {
 
   const { pedido_id, valor } = req.body;
 

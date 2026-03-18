@@ -1,5 +1,7 @@
+import { api } from "./utils.js"
+
 export async function carregarClientes(search = "") {
-  const res = await fetch(`/usuarios?search=${search}`)
+  const res = await api(`/usuarios?search=${search}`)
   const clientes = await res.json()
 
   const tabela = document.getElementById("tabela-clientes")

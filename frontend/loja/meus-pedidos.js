@@ -2,7 +2,7 @@ async function carregarPedidos() {
 
   const auth = JSON.parse(localStorage.getItem("auth"));
 
-  const res = await fetch(`/pedidos/usuario/${auth.usuario.id}`);
+  const res = await api(`/pedidos/usuario/${auth.usuario.id}`);
 
   const pedidos = await res.json();
 

@@ -40,6 +40,20 @@ function fecharModal() {
   produtoEditandoId = null
 }
 
+async function getSelectedImageDataUrl() {
+  const input = document.getElementById("imagem");
+  if (!input || !input.files || input.files.length === 0) return null;
+
+  const file = input.files[0];
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 async function salvarProduto(e) {
   e.preventDefault()
 
@@ -51,6 +65,11 @@ async function salvarProduto(e) {
       : null,
     quantidade: Number(document.getElementById("quantidade").value),
     categoria_id: Number(document.getElementById("categoria").value)
+  }
+
+  const imagemUrl = await getSelectedImageDataUrl();
+  if (imagemUrl) {
+    data.imagem_url = imagemUrl;
   }
 
   const metodo = produtoEditandoId ? "PUT" : "POST"
@@ -73,17 +92,17 @@ async function salvarProduto(e) {
 export async function carregarProdutos(search = "") {
   tabelaBody.innerHTML = ""
 
-  const res = await fetch(`/produtos?search=${search}`)
+  const res = await api(`/produtos?search=${search}`)
   const produtos = await res.json()
 
   produtos.forEach(p => {
     tabelaBody.innerHTML += `
       <tr>
         <td>
-          <img src="${p.imagem || 'https://via.placeholder.com/50x50/cccccc/666666?text=?'}" 
+          <img src="${p.imagem || 'data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2250%22%20height=%2250%22%3E%3Crect%20width=%2250%22%20height=%2250%22%20fill=%22%23cccccc%22/%3E%3Ctext%20x=%2225%22%20y=%2230%22%20text-anchor=%22middle%22%20fill=%22%23666666%22%20font-size=%2214%22%3E%3F%3C/text%3E%3C/svg%3E'}" 
                width="50" 
                alt="${p.nome}" 
-               onerror="this.src='https://via.placeholder.com/50x50/cccccc/666666?text=?'"/>
+               onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2250%22%20height=%2250%22%3E%3Crect%20width=%2250%22%20height=%2250%22%20fill=%22%23cccccc%22/%3E%3Ctext%20x=%2225%22%20y=%2230%22%20text-anchor=%22middle%22%20fill=%22%23666666%22%20font-size=%2214%22%3E%3F%3C/text%3E%3C/svg%3E'"/>
         </td>
         <td>${p.nome}</td>
         <td>${formatarPreco(p.preco)}</td>

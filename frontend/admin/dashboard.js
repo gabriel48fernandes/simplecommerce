@@ -1,9 +1,9 @@
-import { formatarPreco } from "./utils.js"
+import { formatarPreco, api } from "./utils.js"
 
 let graficosInstanciados = {}
 
 export async function carregarDadosDashboard() {
-  const response = await fetch("/dashboard")
+  const response = await api("/dashboard")
   const data = await response.json()
 
   document.getElementById("totalPedidos").innerText = data.totalPedidos

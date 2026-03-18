@@ -55,7 +55,6 @@ app.use("/carrinho", carrinhoRoutes);
 app.use("/pedidos", pedidosRoutes);
 app.use("/usuarios", usuariosRoutes);
 app.use("/dashboard", dashboardRoutes);
-app.use("/admin", authRoutes); // Reutiliza rotas de auth para admin
 app.use("/frete", freteRoutes);
 app.use("/pagamento", pagamentoRoutes);
 

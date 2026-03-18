@@ -1,17 +1,20 @@
 import express from "express";
 import { pool } from "../db.js";
+import { autenticarToken } from "../middleware/auth.js";
 
 const router = express.Router();
+
+router.use(autenticarToken);
 
 /* =========================
    ADICIONAR AO CARRINHO
 ========================= */
 router.post("/add", async (req, res) => {
   try {
+    const usuario_id = req.usuario.id;
+    const { produto_id, quantidade = 1 } = req.body;
 
-    const { usuario_id, produto_id, quantidade = 1 } = req.body;
-
-    if (!usuario_id || !produto_id) {
+    if (!produto_id) {
       return res.status(400).json({ erro: "Dados inválidos" });
     }
 
@@ -35,19 +38,15 @@ router.post("/add", async (req, res) => {
     );
 
     if (itemExiste.rows.length > 0) {
-
       await pool.query(
         "UPDATE carrinho_itens SET quantidade = quantidade + $1 WHERE id = $2",
         [quantidade, itemExiste.rows[0].id]
       );
-
     } else {
-
       await pool.query(
         "INSERT INTO carrinho_itens (carrinho_id, produto_id, quantidade) VALUES ($1, $2, $3)",
         [carrinho_id, produto_id, quantidade]
       );
-
     }
 
     res.json({ mensagem: "Produto adicionado ao carrinho" });
@@ -66,10 +65,13 @@ router.put("/item/:id/quantidade", async (req, res) => {
     const { delta } = req.body;
 
     await pool.query(`
-      UPDATE carrinho_itens
-      SET quantidade = GREATEST(1, quantidade + $1)
-      WHERE id = $2
-    `,[delta, id]);
+      UPDATE carrinho_itens ci
+      SET quantidade = GREATEST(1, ci.quantidade + $1)
+      FROM carrinhos c
+      WHERE ci.carrinho_id = c.id
+        AND c.usuario_id = $2
+        AND ci.id = $3
+    `,[delta, req.usuario.id, id]);
 
     res.json({ mensagem:"Quantidade atualizada" });
 
@@ -89,6 +91,10 @@ router.get("/count/:usuario_id", async (req, res) => {
   try {
 
     const { usuario_id } = req.params;
+
+    if (req.usuario.role !== "admin" && Number(usuario_id) !== req.usuario.id) {
+      return res.status(403).json({ erro: "Acesso negado" });
+    }
 
     const result = await pool.query(`
       SELECT COALESCE(SUM(ci.quantidade),0) AS total
@@ -117,6 +123,10 @@ router.get("/count/:usuario_id", async (req, res) => {
 router.get("/:usuario_id", async (req, res) => {
   try {
     const { usuario_id } = req.params;
+
+    if (req.usuario.role !== "admin" && Number(usuario_id) !== req.usuario.id) {
+      return res.status(403).json({ erro: "Acesso negado" });
+    }
 
     const carrinho = await pool.query(
       "SELECT id FROM carrinhos WHERE usuario_id = $1",
@@ -160,10 +170,23 @@ async function removerItem(req, res) {
   try {
     const { id } = req.params;
 
-    await pool.query(
-      "DELETE FROM carrinho_itens WHERE id = $1",
-      [id]
-    );
+    if (req.usuario.role === "admin") {
+      await pool.query(
+        "DELETE FROM carrinho_itens WHERE id = $1",
+        [id]
+      );
+    } else {
+      await pool.query(
+        `
+        DELETE FROM carrinho_itens ci
+        USING carrinhos c
+        WHERE ci.carrinho_id = c.id
+          AND ci.id = $1
+          AND c.usuario_id = $2
+        `,
+        [id, req.usuario.id]
+      );
+    }
 
     res.json({ mensagem: "Item removido" });
 

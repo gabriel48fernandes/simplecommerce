@@ -1,8 +1,9 @@
 import express from "express";
+import { autenticarToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.post("/calcular", async (req, res) => {
+router.post("/calcular", autenticarToken, async (req, res) => {
     try {
         const { cepDestino } = req.body;
         console.log("TOKEN:", process.env.MELHOR_ENVIO_TOKEN);

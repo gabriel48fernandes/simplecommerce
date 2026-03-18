@@ -1,4 +1,4 @@
-import { formatarPreco, badgeStatus, proximoStatus } from "./utils.js"
+import { formatarPreco, badgeStatus, proximoStatus, api } from "./utils.js"
 
 const modalPedido = document.getElementById("modalPedido")
 const conteudoPedido = document.getElementById("conteudoPedido")
@@ -20,7 +20,7 @@ export function inicializarPedidos() {
 }
 
 export async function carregarPedidos(search = "") {
-  const res = await fetch(`/pedidos?search=${search}`)
+  const res = await api(`/pedidos?search=${search}`)
   const pedidos = await res.json()
 
   const tabela = document.getElementById("tabela-pedidos")
@@ -43,7 +43,7 @@ export async function carregarPedidos(search = "") {
 }
 
 window.verPedidoModal = async (id) => {
-  const res = await fetch(`/pedidos/${id}`)
+  const res = await api(`/pedidos/${id}`)
   const pedido = await res.json()
 
   modalPedido.classList.add("active")
@@ -83,9 +83,8 @@ window.verPedidoModal = async (id) => {
 }
 
 window.atualizarStatusPedido = async (id, status) => {
-  await fetch(`/pedidos/${id}/status`, {
+  await api(`/pedidos/${id}/status`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status })
   })
 

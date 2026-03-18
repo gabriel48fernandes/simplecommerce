@@ -1,6 +1,13 @@
 import express from "express";
 import { pool } from "../db.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { autenticarToken, apenasAdmin } from "../middleware/auth.js";
+
+if (!process.env.JWT_SECRET) {
+  console.error("JWT_SECRET não definido no .env");
+  process.exit(1);
+}
 
 const router = express.Router();
 
@@ -35,7 +42,16 @@ router.post("/register", async (req, res) => {
 
     const usuario = result.rows[0];
 
-    const token = Buffer.from(`${usuario.id}:${usuario.email}`).toString("base64");
+    const token = jwt.sign(
+      {
+        id: usuario.id,
+        nome: usuario.nome,
+        email: usuario.email,
+        role: usuario.role
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "8h" }
+    );
 
     res.status(201).json({ token, usuario });
 
@@ -74,7 +90,16 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ erro: "Login inválido" });
     }
 
-    const token = Buffer.from(`${usuario.id}:${usuario.email}`).toString("base64");
+    const token = jwt.sign(
+      {
+        id: usuario.id,
+        nome: usuario.nome,
+        email: usuario.email,
+        role: usuario.role
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "8h" }
+    );
 
     res.json({
       token,
@@ -91,7 +116,7 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ erro: "Erro interno no servidor" });
   }
 });
-router.get("/clientes", async (req, res) => {
+router.get("/clientes", autenticarToken, apenasAdmin, async (req, res) => {
   try {
     const clientes = await pool.query(`
       SELECT id, nome, email, role

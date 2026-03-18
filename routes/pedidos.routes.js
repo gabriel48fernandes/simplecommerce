@@ -1,13 +1,15 @@
 import express from "express";
 import { pool } from "../db.js";
+import { autenticarToken, apenasAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
+router.use(autenticarToken);
 
 // ==========================
 // LISTAR PEDIDOS (ADMIN)
 // ==========================
-router.get("/", async (req, res) => {
+router.get("/", apenasAdmin, async (req, res) => {
 
   const { search = "" } = req.query;
 
@@ -55,7 +57,7 @@ router.get("/", async (req, res) => {
 router.post("/finalizar", async (req, res) => {
 
   const {
-    usuario_id,
+    usuario_id: usuarioIdBody,
     frete,
     transportadora,
     prazo,
@@ -63,6 +65,10 @@ router.post("/finalizar", async (req, res) => {
     forma_pagamento,
     status_pagamento
   } = req.body;
+
+  const usuario_id = (req.usuario.role === "admin" && usuarioIdBody)
+    ? usuarioIdBody
+    : req.usuario.id;
 
   if (!cep) {
     return res.status(400).json({ erro: "CEP é obrigatório" });
@@ -222,6 +228,7 @@ router.get("/:id", async (req, res) => {
     const pedidoResult = await pool.query(`
       SELECT
         p.id,
+        p.usuario_id,
         p.total,
         p.frete,
         p.transportadora,
@@ -242,6 +249,10 @@ router.get("/:id", async (req, res) => {
     }
 
     const pedido = pedidoResult.rows[0];
+
+    if (req.usuario.role !== "admin" && pedido.usuario_id !== req.usuario.id) {
+      return res.status(403).json({ erro: "Acesso negado" });
+    }
 
     const itensResult = await pool.query(`
       SELECT
@@ -280,7 +291,7 @@ router.get("/:id", async (req, res) => {
 // ==========================
 // ATUALIZAR STATUS
 // ==========================
-router.put("/:id/status", async (req, res) => {
+router.put("/:id/status", apenasAdmin, async (req, res) => {
 
   const id = Number(req.params.id);
   const { status } = req.body;
@@ -314,7 +325,7 @@ router.put("/:id/status", async (req, res) => {
 // ==========================
 // CONFIRMAR PAGAMENTO PIX
 // ==========================
-router.put("/confirmar-pagamento/:id", async (req, res) => {
+router.put("/confirmar-pagamento/:id", apenasAdmin, async (req, res) => {
 
   const id = Number(req.params.id);
 

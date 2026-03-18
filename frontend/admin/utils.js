@@ -35,12 +35,26 @@ export function proximoStatus(atual) {
   return fluxo[index + 1] || null
 }
 export function api(url, options = {}) {
+  const auth = JSON.parse(localStorage.getItem("auth"));
+  const token = auth?.token;
+
+  const headers = {
+    "Content-Type": "application/json",
+    ...options.headers
+  };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
   return fetch(url, {
     ...options,
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + localStorage.getItem("token"),
-      ...options.headers
+    headers
+  }).then(res => {
+    if (res.status === 401 || res.status === 403) {
+      localStorage.removeItem("auth");
+      window.location.href = "/login.html";
     }
-  })
+    return res;
+  });
 }

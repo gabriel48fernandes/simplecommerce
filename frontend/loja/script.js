@@ -124,7 +124,7 @@ async function atualizarContadorCarrinho() {
 
   try {
 
-    const res = await fetch(`/carrinho/count/${auth.usuario.id}`);
+    const res = await api(`/carrinho/count/${auth.usuario.id}`);
     const data = await res.json();
 
     const contador = document.getElementById("contadorCarrinho");
@@ -144,7 +144,7 @@ async function atualizarContadorCarrinho() {
 // ============================
 async function carregarProdutos(search = "") {
   try {
-    const res = await fetch(`/produtos?search=${search}`)
+    const res = await api(`/produtos?search=${search}`)
     const produtos = await res.json();
 
     if (!container) return;
@@ -153,6 +153,8 @@ async function carregarProdutos(search = "") {
     produtos.forEach(p => {
       const card = document.createElement("div");
       card.className = "card";
+
+      console.log("produto imagem:", p.imagem);
 
       const temPromocao = p.tem_promocao;
 
@@ -192,9 +194,9 @@ async function carregarProdutos(search = "") {
 
         ${badgeHTML}
 
-       <img src="${p.imagem || 'https://via.placeholder.com/200x150/cccccc/666666?text=Sem+Imagem'}"
+       <img src="${p.imagem || window.SEM_IMAGEM_FALLBACK}"
        alt="${p.nome}"
-       onerror="this.src='https://via.placeholder.com/200x150/cccccc/666666?text=Sem+Imagem'" />
+       onerror="this.onerror=null; this.src=window.SEM_IMAGEM_FALLBACK" />
 
        <h3>${p.nome}</h3>
 
@@ -235,11 +237,8 @@ async function adicionarAoCarrinho(produto_id, botao, quantidade = 1) {
 
   try {
 
-    const res = await fetch("/carrinho/add", {
+    const res = await api("/carrinho/add", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
       body: JSON.stringify({
         usuario_id: auth.usuario.id,
         produto_id,
@@ -301,7 +300,7 @@ function mostrarToastCarrinho() {
 // ============================
 async function carregarCategorias() {
   try {
-    const res = await fetch("/categorias");
+    const res = await api("/categorias");
     const categorias = await res.json();
 
     const categoriasContainer = document.getElementById("categorias");
