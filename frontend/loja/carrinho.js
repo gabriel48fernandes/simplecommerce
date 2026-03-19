@@ -37,7 +37,14 @@ async function carregarCarrinho() {
   }
 
   if (!auth) {
-    window.location.href = "/login.html";
+    // Se não logado, mostra carrinho vazio
+    lista.innerHTML = `
+      <div class="carrinho-vazio">
+        <p>Seu carrinho está vazio 😢</p>
+        <p>Faça login para ver seus itens salvos.</p>
+      </div>
+    `;
+    totalElemento.innerText = "Total: R$ 0,00";
     return;
   }
 
@@ -79,7 +86,7 @@ async function carregarCarrinho() {
 
         <div class="item-carrinho">
 
-          <img class="item-img" src="${item.imagem}" />
+          <img class="item-img" src="${item.imagem || window.SEM_IMAGEM_FALLBACK}" onerror="this.onerror=null; this.src=window.SEM_IMAGEM_FALLBACK" />
 
           <div class="item-info">
 

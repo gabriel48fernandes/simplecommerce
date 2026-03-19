@@ -154,8 +154,6 @@ async function carregarProdutos(search = "") {
       const card = document.createElement("div");
       card.className = "card";
 
-      console.log("produto imagem:", p.imagem);
-
       const temPromocao = p.tem_promocao;
 
       let precoHTML = "";
