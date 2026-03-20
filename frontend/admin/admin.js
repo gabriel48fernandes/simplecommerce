@@ -2,6 +2,7 @@ import { carregarDadosDashboard, esconderTodas, mostrarDashboard } from "./dashb
 import { carregarProdutos, inicializarProdutos } from "./produtos.js"
 import { carregarClientes } from "./clientes.js"
 import { carregarPedidos, inicializarPedidos } from "./pedidos.js"
+import { renderBanners } from "./banners.js"
 
 /* =========================
    AUTH CHECK
@@ -82,12 +83,18 @@ document.getElementById("menuPedidos").onclick = () => {
   carregarPedidos()
 }
 
+document.getElementById("menuBanners").onclick = () => {
+  mostrarSecao("banners")
+document.getElementById("headerSearchContainer").innerHTML = ""
+renderBanners()
+}
 function mostrarSecao(secao) {
   const secDashboard = document.getElementById("secDashboard")
   const secProdutos = document.getElementById("secProdutos")
   const secClientes = document.getElementById("secClientes")
   const secPedidos = document.getElementById("secPedidos")
   const btnNovo = document.getElementById("btnNovo")
+  const secBanners = document.getElementById("secBanners")
 
   // Remove classe active de todos os itens do menu
   document.querySelectorAll('.nav-item').forEach(item => {
@@ -99,7 +106,7 @@ function mostrarSecao(secao) {
   secProdutos.style.display = "none"
   secClientes.style.display = "none"
   secPedidos.style.display = "none"
-
+  secBanners.style.display = "none"
   // Mostra apenas a escolhida e adiciona classe active
   if (secao === "dashboard") {
     secDashboard.style.display = "block"
@@ -123,6 +130,11 @@ function mostrarSecao(secao) {
     secPedidos.style.display = "block"
     btnNovo.style.display = "none"
     document.getElementById("menuPedidos").classList.add('active')
+  }
+  if (secao === "banners") {
+    secBanners.style.display = "block"
+    btnNovo.style.display = "none"
+    document.getElementById("menuBanners").classList.add('active')
   }
 }
 

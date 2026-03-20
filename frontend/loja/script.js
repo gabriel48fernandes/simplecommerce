@@ -56,35 +56,6 @@ if (areaUsuario) {
 
 }
 
-let currentSlide = 0
-
-const slides = document.querySelectorAll(".slide")
-const dots = document.querySelectorAll(".dot")
-
-function showSlide(index){
-
- slides.forEach(slide => slide.classList.remove("active"))
- dots.forEach(dot => dot.classList.remove("active"))
-
- slides[index].classList.add("active")
- dots[index].classList.add("active")
-
-}
-
-function nextSlide(){
-
- currentSlide++
-
- if(currentSlide >= slides.length){
-  currentSlide = 0
- }
-
- showSlide(currentSlide)
-
-}
-
-setInterval(nextSlide,4000)
-
 function animarProdutoCarrinho(imagemProduto) {
 
   const carrinho = document.getElementById("iconeCarrinho");
@@ -138,6 +109,130 @@ async function atualizarContadorCarrinho() {
   }
 
 }
+let currentIndex = 0
+let slides = []
+let dots = []
+let intervalo = null
+
+async function carregarBannersHome() {
+  const container = document.getElementById("carouselHome")
+  const dotsContainer = document.getElementById("dots")
+
+  try {
+    const res = await fetch("/banners")
+    const banners = await res.json()
+
+    if (!banners.length) {
+      container.innerHTML = "<p>Sem banners</p>"
+      return
+    }
+
+    // 🔥 CRIA SLIDES
+    container.innerHTML = banners.map((b, index) => `
+      <div class="slide ${index === 0 ? "active" : ""}">
+        <img src="${b.imagem_url}" alt="Banner">
+        <button class="banner-btn">Ver ofertas</button>
+      </div>
+    `).join("")
+
+    // 🔥 CRIA DOTS
+    dotsContainer.innerHTML = banners.map((_, index) => `
+      <span class="dot ${index === 0 ? "active" : ""}" data-index="${index}"></span>
+    `).join("")
+
+    slides = document.querySelectorAll(".slide")
+    dots = document.querySelectorAll(".dot")
+
+    // clique nos dots
+    dots.forEach(dot => {
+      dot.addEventListener("click", () => {
+        const index = Number(dot.dataset.index)
+        mostrarSlide(index)
+        resetIntervalo()
+      })
+    })
+
+    iniciarCarrossel()
+
+  } catch (err) {
+    console.error("Erro ao carregar banners:", err)
+  }
+}
+
+function getCorDominante(img) {
+  const canvas = document.createElement("canvas")
+  const ctx = canvas.getContext("2d")
+
+  canvas.width = img.naturalWidth
+  canvas.height = img.naturalHeight
+
+  ctx.drawImage(img, 0, 0)
+
+  const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data
+
+  let r = 0, g = 0, b = 0
+  let total = 0
+
+  // pega amostragem (não precisa todos pixels)
+  for (let i = 0; i < data.length; i += 40) {
+    r += data[i]
+    g += data[i + 1]
+    b += data[i + 2]
+    total++
+  }
+
+  r = Math.floor(r / total)
+  g = Math.floor(g / total)
+  b = Math.floor(b / total)
+
+  return `rgb(${r}, ${g}, ${b})`
+}
+
+function mostrarSlide(index) {
+  slides.forEach(s => s.classList.remove("active"))
+  dots.forEach(d => d.classList.remove("active"))
+
+  const slideAtivo = slides[index]
+  slideAtivo.classList.add("active")
+  dots[index].classList.add("active")
+
+  currentIndex = index
+
+  // 🔥 AQUI A MÁGICA
+  const img = slideAtivo.querySelector("img")
+
+  if (img.complete) {
+    aplicarSombra(img)
+  } else {
+    img.onload = () => aplicarSombra(img)
+  }
+}
+function aplicarSombra(img) {
+  const cor = getCorDominante(img)
+  const banner = document.querySelector(".banner-container")
+
+  banner.style.boxShadow = `0 20px 60px ${cor}`
+}
+
+function proximoSlide() {
+  let next = currentIndex + 1
+  if (next >= slides.length) next = 0
+  mostrarSlide(next)
+}
+
+function iniciarCarrossel() {
+  intervalo = setInterval(proximoSlide, 4000)
+}
+
+function resetIntervalo() {
+  clearInterval(intervalo)
+  iniciarCarrossel()
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  carregarBannersHome()
+})
+
 
 // ============================
 // PRODUTOS

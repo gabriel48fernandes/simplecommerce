@@ -20,6 +20,7 @@ import usuariosRoutes from "./routes/usuarios.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
 import freteRoutes from "./routes/frete.js";
 import pagamentoRoutes from "./routes/pagamento.routes.js";
+import bannersRoutes from "./routes/banners.routes.js";
 
 
 // =====================
@@ -57,7 +58,7 @@ app.use("/usuarios", usuariosRoutes);
 app.use("/dashboard", dashboardRoutes);
 app.use("/frete", freteRoutes);
 app.use("/pagamento", pagamentoRoutes);
-
+app.use("/banners", bannersRoutes);
 // =====================
 // ROTA PRINCIPAL
 // =====================
@@ -84,17 +85,19 @@ app.get("/test-db", async (req, res) => {
 });
 
 // =====================
-// FALLBACK (para rotas não encontradas)
-// =====================
-app.use((req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "loja", "index.html"));
-});
-
-// =====================
 // START SERVER
 // =====================
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`✅ SimpleCommerce rodando em http://localhost:${PORT}`);
+});
+// =====================
+// FALLBACK (para rotas não encontradas)
+// =====================
+app.use((req, res, next) => {
+  if (req.method === "GET" && !req.path.startsWith("/api")) {
+    return res.sendFile(path.join(__dirname, "frontend", "loja", "index.html"));
+  }
+  next();
 });

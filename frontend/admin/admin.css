@@ -535,6 +535,113 @@ td button:last-child:hover {
 ::-webkit-scrollbar-thumb:hover {
   background: #764ba2;
 }
+/* =========================
+   BANNERS
+========================= */
+
+#secBanners {
+  padding: 20px;
+}
+
+/* Título */
+#secBanners h1 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* FORM */
+#formBanner {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
+}
+
+#formBanner input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  flex: 1;
+  min-width: 180px;
+  font-size: 14px;
+}
+
+#formBanner input[type="file"] {
+  padding: 5px;
+}
+
+#formBanner button {
+  background: #3483fa;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+#formBanner button:hover {
+  background: #2968c8;
+}
+
+/* LISTA */
+#listaBanners {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* CARD */
+.banner-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: #fff;
+  padding: 12px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* IMAGEM */
+.banner-item img {
+  width: 140px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+/* INFO */
+.banner-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.banner-info span {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* BOTÃO */
+.banner-item button {
+  background: #ff4d4f;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.banner-item button:hover {
+  background: #d9363e;
+}
 
 /* ==================
    RESPONSIVO
