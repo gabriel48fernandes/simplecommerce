@@ -114,6 +114,9 @@ let slides = []
 let dots = []
 let intervalo = null
 
+// Cache de cores
+const coresCache = new Map()
+
 async function carregarBannersHome() {
   const container = document.getElementById("carouselHome")
   const dotsContainer = document.getElementById("dots")
@@ -127,16 +130,36 @@ async function carregarBannersHome() {
       return
     }
 
-    // 🔥 CRIA SLIDES
-    container.innerHTML = banners.map((b, index) => `
+    // Filtrar banners com imagens válidas
+    const bannersValidos = await Promise.all(banners.map(async (b) => {
+      const valido = await verificarImagem(b.imagem_url)
+      return valido ? b : null
+    }))
+    
+    const bannersFiltrados = bannersValidos.filter(b => b !== null)
+    
+    if (bannersFiltrados.length === 0) {
+      container.innerHTML = "<p>Nenhum banner válido encontrado</p>"
+      return
+    }
+
+    console.log(`📦 ${bannersFiltrados.length} banners válidos de ${banners.length} total`)
+
+    // CRIA SLIDES COM CROSSORIGIN E TRATAMENTO DE ERRO
+    container.innerHTML = bannersFiltrados.map((b, index) => `
       <div class="slide ${index === 0 ? "active" : ""}">
-        <img src="${b.imagem_url}" alt="Banner">
+        <img 
+          src="${b.imagem_url}" 
+          alt="${b.titulo || 'Banner'}"
+          crossorigin="anonymous"
+          onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'100%25\' height=\'100%25\'%3E%3Crect width=\'100%25\' height=\'100%25\' fill=\'%23cccccc\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dy=\'.3em\' fill=\'%23666666\'%3EImagem indisponível%3C/text%3E%3C/svg%3E'"
+        >
         <button class="banner-btn">Ver ofertas</button>
       </div>
     `).join("")
 
-    // 🔥 CRIA DOTS
-    dotsContainer.innerHTML = banners.map((_, index) => `
+    // CRIA DOTS
+    dotsContainer.innerHTML = bannersFiltrados.map((_, index) => `
       <span class="dot ${index === 0 ? "active" : ""}" data-index="${index}"></span>
     `).join("")
 
@@ -152,76 +175,218 @@ async function carregarBannersHome() {
       })
     })
 
+    // Pré-carregar cores
+    await preCarregarCores()
+    
     iniciarCarrossel()
 
   } catch (err) {
     console.error("Erro ao carregar banners:", err)
+    container.innerHTML = "<p>Erro ao carregar banners</p>"
   }
 }
 
-function getCorDominante(img) {
-  const canvas = document.createElement("canvas")
-  const ctx = canvas.getContext("2d")
-
-  canvas.width = img.naturalWidth
-  canvas.height = img.naturalHeight
-
-  ctx.drawImage(img, 0, 0)
-
-  const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data
-
-  let r = 0, g = 0, b = 0
-  let total = 0
-
-  // pega amostragem (não precisa todos pixels)
-  for (let i = 0; i < data.length; i += 40) {
-    r += data[i]
-    g += data[i + 1]
-    b += data[i + 2]
-    total++
+// Função para verificar se a imagem existe
+async function verificarImagem(url) {
+  try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 5000)
+    
+    const response = await fetch(url, {
+      method: 'HEAD',
+      signal: controller.signal
+    })
+    
+    clearTimeout(timeoutId)
+    return response.ok
+  } catch (error) {
+    console.warn(`Imagem não acessível: ${url}`, error.message)
+    return false
   }
-
-  r = Math.floor(r / total)
-  g = Math.floor(g / total)
-  b = Math.floor(b / total)
-
-  return `rgb(${r}, ${g}, ${b})`
 }
 
-function mostrarSlide(index) {
+// Pré-carregar cores
+async function preCarregarCores() {
+  const imagens = document.querySelectorAll('.slide img')
+  console.log(`🎨 Pré-carregando ${imagens.length} imagens...`)
+  
+  for (let i = 0; i < imagens.length; i++) {
+    const img = imagens[i]
+    
+    // Pular imagens que são placeholders
+    if (img.src.includes('data:image/svg')) {
+      console.log(`⚠️ Banner ${i + 1} é placeholder, pulando...`)
+      continue
+    }
+    
+    if (img.complete && img.naturalWidth > 0) {
+      const cor = await getCorDominanteSeguro(img)
+      coresCache.set(img.src, cor)
+    } else {
+      img.addEventListener('load', async () => {
+        if (img.naturalWidth > 0) {
+          const cor = await getCorDominanteSeguro(img)
+          coresCache.set(img.src, cor)
+          console.log(`✅ Cor do banner ${i + 1} carregada:`, cor)
+        }
+      }, { once: true })
+      
+      img.addEventListener('error', () => {
+        console.warn(`⚠️ Banner ${i + 1} falhou ao carregar`)
+      })
+    }
+  }
+}
+
+// Versão segura do getCorDominante
+async function getCorDominanteSeguro(img) {
+  // Verificar cache
+  if (coresCache.has(img.src)) {
+    return coresCache.get(img.src)
+  }
+
+  return new Promise((resolve) => {
+    try {
+      // Verificar se a imagem é válida
+      if (!img.complete || img.naturalWidth === 0) {
+        resolve('rgb(100, 100, 100)')
+        return
+      }
+      
+      const canvas = document.createElement("canvas")
+      const ctx = canvas.getContext("2d")
+      
+      const maxSize = 100
+      let width = img.naturalWidth
+      let height = img.naturalHeight
+      
+      if (width === 0 || height === 0) {
+        resolve('rgb(100, 100, 100)')
+        return
+      }
+      
+      if (width > height && width > maxSize) {
+        height = (height * maxSize) / width
+        width = maxSize
+      } else if (height > maxSize) {
+        width = (width * maxSize) / height
+        height = maxSize
+      }
+      
+      canvas.width = width
+      canvas.height = height
+      
+      ctx.drawImage(img, 0, 0, width, height)
+      
+      const imageData = ctx.getImageData(0, 0, width, height)
+      const data = imageData.data
+      
+      let r = 0, g = 0, b = 0
+      let total = 0
+      
+      const step = Math.max(1, Math.floor((width * height) / 800))
+      
+      for (let i = 0; i < data.length; i += step * 4) {
+        const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3
+        if (brightness < 40 || brightness > 220) continue
+        
+        r += data[i]
+        g += data[i + 1]
+        b += data[i + 2]
+        total++
+      }
+      
+      if (total === 0) {
+        const centerX = Math.floor(width / 2)
+        const centerY = Math.floor(height / 2)
+        const centerPixel = ctx.getImageData(centerX, centerY, 1, 1).data
+        r = centerPixel[0]
+        g = centerPixel[1]
+        b = centerPixel[2]
+      } else {
+        r = Math.floor(r / total)
+        g = Math.floor(g / total)
+        b = Math.floor(b / total)
+      }
+      
+      const cor = `rgb(${r}, ${g}, ${b})`
+      resolve(cor)
+      
+    } catch (error) {
+      console.warn('Erro ao extrair cor:', error)
+      resolve('rgb(52, 131, 250)')
+    }
+  })
+}
+
+async function mostrarSlide(index) {
+  if (!slides.length) return
+  
   slides.forEach(s => s.classList.remove("active"))
   dots.forEach(d => d.classList.remove("active"))
 
   const slideAtivo = slides[index]
+  if (!slideAtivo) return
+  
   slideAtivo.classList.add("active")
-  dots[index].classList.add("active")
+  if (dots[index]) dots[index].classList.add("active")
 
   currentIndex = index
+  console.log(`📺 Slide ${index + 1}/${slides.length}`)
 
-  // 🔥 AQUI A MÁGICA
   const img = slideAtivo.querySelector("img")
-
-  if (img.complete) {
-    aplicarSombra(img)
+  
+  if (img && !img.src.includes('data:image/svg')) {
+    if (img.complete && img.naturalWidth > 0) {
+      await aplicarSombraAsync(img)
+    } else {
+      img.onload = async () => {
+        if (img.naturalWidth > 0) {
+          await aplicarSombraAsync(img)
+        }
+      }
+    }
   } else {
-    img.onload = () => aplicarSombra(img)
+    // Usar cor padrão se a imagem for placeholder
+    const banner = document.querySelector(".banner-container")
+    if (banner) {
+      banner.style.boxShadow = '0 30px 40px -20px rgba(52, 131, 250, 0.5)'
+    }
   }
 }
-function aplicarSombra(img) {
-  const cor = getCorDominante(img)
-  const banner = document.querySelector(".banner-container")
 
-  banner.style.boxShadow = `0 20px 60px ${cor}`
+async function aplicarSombraAsync(img) {
+  try {
+    const cor = await getCorDominanteSeguro(img)
+    const banner = document.querySelector(".banner-container")
+    
+    if (banner) {
+      banner.style.transition = 'box-shadow 0.5s ease'
+      banner.style.boxShadow = `0 30px 40px -20px ${cor}`
+      console.log('✅ Sombra aplicada:', cor)
+    }
+  } catch (error) {
+    console.error('Erro ao aplicar sombra:', error)
+    const banner = document.querySelector(".banner-container")
+    if (banner) {
+      banner.style.boxShadow = '0 30px 40px -20px rgba(52, 131, 250, 0.5)'
+    }
+  }
 }
 
 function proximoSlide() {
+  if (!slides.length) return
   let next = currentIndex + 1
   if (next >= slides.length) next = 0
   mostrarSlide(next)
 }
 
 function iniciarCarrossel() {
-  intervalo = setInterval(proximoSlide, 4000)
+  if (intervalo) clearInterval(intervalo)
+  if (slides.length > 1) {
+    intervalo = setInterval(proximoSlide, 4000)
+    console.log('🔄 Carrossel iniciado')
+  }
 }
 
 function resetIntervalo() {
@@ -230,9 +395,9 @@ function resetIntervalo() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  console.log('🚀 Inicializando...')
   carregarBannersHome()
 })
-
 
 // ============================
 // PRODUTOS

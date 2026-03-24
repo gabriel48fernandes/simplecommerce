@@ -32,9 +32,6 @@ export function renderBanners() {
   carregarBanners()
 }
 
-/* =========================
-   PREVIEW DA IMAGEM
-========================= */
 function configurarPreview() {
   const input = document.getElementById("imagem")
   const preview = document.getElementById("preview")
@@ -49,9 +46,6 @@ function configurarPreview() {
   })
 }
 
-/* =========================
-   LISTAR
-========================= */
 async function carregarBanners() {
   try {
     const res = await fetch("/banners")
@@ -69,13 +63,11 @@ async function carregarBanners() {
 
     lista.innerHTML = banners.map(b => `
       <div class="banner-item">
-        <img src="${b.imagem_url}" />
-
+        <img src="${b.imagem_url}" crossorigin="anonymous" />
         <div class="banner-info">
           <strong>${b.titulo || "Sem título"}</strong>
           <small>${b.link || ""}</small>
         </div>
-
         <button onclick="deletarBanner(${b.id})">Excluir</button>
       </div>
     `).join("")
@@ -87,9 +79,6 @@ async function carregarBanners() {
   }
 }
 
-/* =========================
-   FORM
-========================= */
 function configurarForm() {
   document.getElementById("formBanner").addEventListener("submit", async (e) => {
     e.preventDefault()
@@ -128,7 +117,6 @@ function configurarForm() {
 
       e.target.reset()
       document.getElementById("preview").style.display = "none"
-
       carregarBanners()
 
     } catch (err) {
@@ -142,15 +130,26 @@ function configurarForm() {
   })
 }
 
-/* =========================
-   UPLOAD SUPABASE
-========================= */
 async function uploadImagem(file) {
-  const fileName = Date.now() + "-" + file.name
-
+  // Validar tipo de arquivo
+  const tiposPermitidos = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/jpg']
+  
+  if (!tiposPermitidos.includes(file.type)) {
+    throw new Error('Tipo de arquivo não permitido. Use JPEG, PNG, GIF ou WEBP.')
+  }
+  
+  // Validar tamanho (max 5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error('Arquivo muito grande. Máximo 5MB.')
+  }
+  
+  // Gerar nome sem caracteres especiais
+  const extensao = file.name.split('.').pop()
+  const nomeLimpo = Date.now() + '-' + Math.random().toString(36).substring(7) + '.' + extensao
+  
   const { error } = await supabase.storage
     .from("banners")
-    .upload(fileName, file)
+    .upload(nomeLimpo, file)
 
   if (error) {
     console.error(error)
@@ -160,14 +159,11 @@ async function uploadImagem(file) {
   const { data } = supabase
     .storage
     .from("banners")
-    .getPublicUrl(fileName)
+    .getPublicUrl(nomeLimpo)
 
   return data.publicUrl
 }
 
-/* =========================
-   DELETE
-========================= */
 window.deletarBanner = async function (id) {
   if (!confirm("Excluir banner?")) return
 
