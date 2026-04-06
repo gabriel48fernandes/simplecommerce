@@ -9,8 +9,7 @@ const router = express.Router();
 ========================= */
 router.get("/", async (req, res) => {
   try {
-
-    const { search } = req.query;
+    const { search, categoria, categorias, precoMin, precoMax, promo } = req.query;
 
     let query = `
       SELECT DISTINCT ON (p.id)
@@ -26,13 +25,71 @@ router.get("/", async (req, res) => {
       JOIN categorias c ON c.id = p.categoria_id
       LEFT JOIN imagens_produto i 
         ON i.produto_id = p.id
+      WHERE 1=1
     `;
 
     const values = [];
+    let index = 1;
 
+    // 🔍 busca por nome
     if (search) {
-      query += ` WHERE p.nome ILIKE $1 `;
+      query += ` AND p.nome ILIKE $${index}`;
       values.push(`%${search}%`);
+      index++;
+    }
+
+    // 📦 filtro por categoria (suporta um ou vários ids)
+    const categoriasRaw = [];
+
+    if (categoria) {
+      if (Array.isArray(categoria)) {
+        categoriasRaw.push(...categoria);
+      } else {
+        categoriasRaw.push(...String(categoria).split(",").map(s => s.trim()));
+      }
+    }
+
+    if (categorias) {
+      if (Array.isArray(categorias)) {
+        categoriasRaw.push(...categorias);
+      } else {
+        categoriasRaw.push(...String(categorias).split(",").map(s => s.trim()));
+      }
+    }
+
+    const categoriaIds = categoriasRaw
+      .map(item => parseInt(item, 10))
+      .filter(Number.isInteger);
+
+    if (categoriaIds.length > 0) {
+      query += ` AND p.categoria_id = ANY($${index}::int[])`;
+      values.push(categoriaIds);
+      index++;
+    }
+
+    // 💰 preço mínimo
+    if (precoMin !== undefined && precoMin !== "") {
+      const precoMinNum = Number(precoMin);
+      if (!Number.isNaN(precoMinNum)) {
+        query += ` AND p.preco >= $${index}`;
+        values.push(precoMinNum);
+        index++;
+      }
+    }
+
+    // 💰 preço máximo
+    if (precoMax !== undefined && precoMax !== "") {
+      const precoMaxNum = Number(precoMax);
+      if (!Number.isNaN(precoMaxNum)) {
+        query += ` AND p.preco <= $${index}`;
+        values.push(precoMaxNum);
+        index++;
+      }
+    }
+
+    // 🔥 promoção
+    if (promo === "true") {
+      query += ` AND p.preco_promocional IS NOT NULL AND p.preco_promocional < p.preco`;
     }
 
     query += ` ORDER BY p.id`;
@@ -62,6 +119,25 @@ router.get("/", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ erro: "Erro ao buscar produtos" });
+  }
+});
+
+/* =========================
+   GET /produtos/preco-max
+========================= */
+router.get("/preco-max", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT MAX(preco) AS max FROM produtos
+    `);
+
+    res.json({
+      max: Number(result.rows[0].max) || 0
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: "Erro ao buscar preço máximo" });
   }
 });
 /* =========================

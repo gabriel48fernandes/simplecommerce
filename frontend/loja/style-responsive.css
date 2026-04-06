@@ -1,0 +1,255 @@
+/* ========================================
+   RESPONSIVE DESIGN - NOVO LAYOUT
+   ======================================== */
+
+/* TABLET */
+@media (max-width: 1024px) {
+    .main-layout {
+        gap: 15px;
+        padding: 15px;
+    }
+    
+    .painel-filtros {
+        width: 250px;
+        top: 90px;
+    }
+    
+    .carousel {
+        height: 400px;
+    }
+    
+    .banner-btn {
+        bottom: 40px;
+        left: 40px;
+        padding: 12px 28px;
+        font-size: 14px;
+    }
+    
+    .produtos-container {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+}
+
+/* TABLET PEQUENO / MOBILE GRANDE */
+@media (max-width: 768px) {
+    .main-layout {
+        flex-direction: column;
+        gap: 20px;
+        padding: 10px;
+    }
+    
+    .painel-filtros {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 280px;
+        height: 100vh;
+        max-height: 100vh;
+        overflow-y: auto;
+        border-radius: 0;
+        transition: left 0.3s ease;
+        z-index: 999;
+        top: 0 !important;
+    }
+    
+    .painel-filtros.ativo {
+        left: 0;
+    }
+    
+    .close-filtros {
+        display: block;
+    }
+    
+    .btn-filtrar-mobile {
+        display: block;
+        margin-bottom: 10px;
+    }
+    
+    .carousel {
+        height: 300px;
+    }
+    
+    .banner-btn {
+        bottom: 30px;
+        left: 30px;
+        padding: 10px 24px;
+        font-size: 13px;
+    }
+    
+    .categorias-container {
+        gap: 15px;
+        margin: 30px auto;
+    }
+    
+    .categoria-card {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .produtos-container {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 12px;
+    }
+    
+    .card {
+        padding: 12px;
+    }
+    
+    .card img {
+        height: 140px;
+    }
+    
+    .card h3 {
+        font-size: 13px;
+    }
+    
+    .card .preco {
+        font-size: 14px;
+    }
+    
+    .badge {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+}
+
+/* MOBILE PEQUENO */
+@media (max-width: 480px) {
+    .header {
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 10px 12px;
+    }
+
+    .logo-container {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .logo {
+        font-size: 16px;
+    }
+
+    .logo-icon {
+        font-size: 20px;
+    }
+
+    .search {
+        width: 100%;
+        flex: unset;
+        order: 3;
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+
+    .icons {
+        width: 100%;
+        justify-content: center;
+        order: 4;
+        gap: 12px;
+        font-size: 14px;
+    }
+    
+    .main-layout {
+        padding: 8px;
+        gap: 12px;
+    }
+    
+    .carousel {
+        height: 220px;
+    }
+    
+    .banner-btn {
+        bottom: 20px;
+        left: 20px;
+        padding: 8px 20px;
+        font-size: 12px;
+    }
+    
+    .carousel-indicators {
+        bottom: 12px;
+        gap: 6px;
+    }
+    
+    .dot {
+        width: 6px;
+        height: 6px;
+    }
+    
+    .dot.active {
+        width: 16px;
+    }
+    
+    .btn-filtrar-mobile {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .categorias-container {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin: 20px auto;
+        padding: 0 10px;
+    }
+
+    .categoria-card {
+        width: 90px;
+        height: 90px;
+        padding: 15px;
+    }
+
+    .categoria-card img {
+        max-height: 100px;
+    }
+
+    .categoria-card span {
+        font-size: 12px;
+    }
+
+    .produtos-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .card {
+        padding: 10px;
+    }
+
+    .card img {
+        height: 120px;
+    }
+
+    .card h3 {
+        font-size: 12px;
+        margin: 8px 0 6px;
+    }
+
+    .card .preco {
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+
+    .card button {
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+    
+    .badge {
+        font-size: 9px;
+        padding: 3px 6px;
+        top: 6px;
+        right: 6px;
+    }
+
+    .beneficios {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin: 20px auto;
+        padding: 15px 0;
+    }
+
+    .beneficios div {
+        padding: 12px;
+        font-size: 13px;
+    }
+}

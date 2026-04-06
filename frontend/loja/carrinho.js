@@ -290,9 +290,10 @@ async function iniciarPagamento() {
 
     if (!pedido) return;
 
-    document.getElementById("toastPedido").classList.add("mostrar");
+    const toastPedido = document.getElementById("toastPedido");
+    if (toastPedido) toastPedido.classList.add("mostrar");
     setTimeout(() => {
-      document.getElementById("toastPedido").classList.remove("mostrar");
+      if (toastPedido) toastPedido.classList.remove("mostrar");
     }, 3000);
 
 

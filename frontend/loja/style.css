@@ -471,10 +471,10 @@ body {
     width: 100%;
     margin-top: 0;
     position: relative;
-    /* A sombra vai se estender para baixo */
     box-shadow: 0 30px 40px -20px rgba(0, 0, 0, 0.3);
     transition: box-shadow 0.5s ease;
     background: #f5f5f5;
+    overflow: hidden;
 }
 
 .carousel {
@@ -512,27 +512,44 @@ body {
     object-fit: cover;
 }
 
+.slide::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.3) 100%);
+    z-index: 2;
+}
+
 /* Botão do banner */
 .banner-btn {
     position: absolute;
-    bottom: 40px;
-    left: 40px;
-    padding: 12px 24px;
-    background: #2d6cdf;
+    bottom: 50px;
+    left: 50px;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
     border-radius: 8px;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     z-index: 10;
-    transition: transform 0.2s ease, background 0.2s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .banner-btn:hover {
-    background: #1a5bc0;
-    transform: scale(1.05);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+}
+
+.banner-btn:active {
+    transform: translateY(-1px);
 }
 
 /* GRADIENTE QUE FAZ A TRANSIÇÃO PARA AS CATEGORIAS */
@@ -584,12 +601,284 @@ body {
     background: #2d6cdf;
     transform: scale(1.2);
 }
+/* BOTÃO */
+.btn-filtrar {
+  margin: 20px;
+  padding: 10px 18px;
+  background: #6C63FF;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
 
+/* ========================
+   LAYOUT PRINCIPAL
+   ======================== */
+.main-layout {
+    display: flex;
+    max-width: 1400px;
+    margin: 0 auto;
+    gap: 20px;
+    padding: 20px;
+    position: relative;
+}
+
+/* SIDEBAR FILTROS (DESKTOP) */
+.painel-filtros {
+    width: 280px;
+    position: sticky;
+    top: 80px;
+    height: fit-content;
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.topo-filtros {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 12px;
+}
+
+.topo-filtros h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+}
+
+.close-filtros {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.2s ease;
+    padding: 0;
+    display: none;
+}
+
+.close-filtros:hover {
+    color: #333;
+}
+
+/* FILTROS */
+.filtro {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.filtro h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.filtro label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #555;
+}
+
+.filtro input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #667eea;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.checkbox-label span {
+    font-size: 14px;
+    color: #555;
+}
+
+.price-input {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.price-input input[type="range"] {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: #e0e0e0;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.price-input input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.price-input input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.price-input span {
+    font-size: 14px;
+    font-weight: 600;
+    color: #667eea;
+}
+
+/* BOTÃO APLICAR */
+.btn-aplicar {
+    margin-top: auto;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.btn-aplicar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+}
+
+.btn-aplicar:active {
+    transform: translateY(0);
+}
+
+/* OVERLAY */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 998;
+}
+
+.overlay.ativo {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* CONTEÚDO PRODUTOS */
+.conteudo-produtos {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* BOTÃO FILTRAR (MOBILE) */
+.btn-filtrar-mobile {
+    display: none;
+}
+
+/* ========================
+   RESPONSIVIDADE FILTROS
+   ======================== */
+@media (max-width: 1024px) {
+    .main-layout {
+        gap: 15px;
+        padding: 15px;
+    }
+    
+    .painel-filtros {
+        width: 250px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-layout {
+        flex-direction: column;
+        gap: 20px;
+        padding: 10px;
+    }
+    
+    .painel-filtros {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 280px;
+        height: 100vh;
+        max-height: 100vh;
+        overflow-y: auto;
+        border-radius: 0;
+        transition: left 0.3s ease;
+        z-index: 999;
+    }
+    
+    .painel-filtros.ativo {
+        left: 0;
+    }
+    
+    .close-filtros {
+        display: block;
+    }
+    
+    .btn-filtrar-mobile {
+        display: block;
+        padding: 12px 16px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        width: 100%;
+    }
+    
+    .btn-filtrar-mobile:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+    }
+}
 /* ==================
    CATEGORIAS
    ================== */
 .categorias-container {
-    max-width: 1200px;
+    max-width: 1400px;
     width: 100%;
     display: flex;
     flex-wrap: wrap;
@@ -662,78 +951,77 @@ body {
    PRODUTOS
    ================== */
 .produtos-container {
-    max-width: 1200px;
-    /* limite igual Mercado Livre */
-    margin: 40px auto;
-    padding: 0 20px 40px;
-
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    /* SEMPRE 5 produtos */
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 20px;
+    width: 100%;
 }
 
 .card {
     background: white;
     border-radius: 12px;
-    padding: 16px;
+    padding: 14px;
     text-align: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
-    border: 2px solid transparent;
+    border: 1px solid #f0f0f0;
     z-index: 1;
+    position: relative;
+    overflow: hidden;
 }
 
 .card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 24px rgba(102, 126, 234, 0.2);
-    border-color: #667eea;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+    border-color: #e0e0e0;
     z-index: 2;
 }
 
 .card img {
     width: 100%;
-    height: 180px;
+    height: 160px;
     object-fit: contain;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     transition: transform 0.3s ease;
 }
 
 .card:hover img {
-    transform: scale(1.05);
+    transform: scale(1.08);
 }
 
 .card h3 {
-    font-size: 16px;
-    margin: 12px 0 8px;
+    font-size: 15px;
+    margin: 10px 0 8px;
     color: #333;
     font-weight: 600;
+    line-height: 1.3;
+    min-height: 30px;
 }
 
 .card .preco {
     font-weight: bold;
     color: #667eea;
-    font-size: 18px;
-    margin-bottom: 12px;
+    font-size: 16px;
+    margin-bottom: 8px;
 }
 
 .card button {
-    padding: 10px 16px;
+    padding: 10px 14px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
-    border-radius: 20px;
+    border-radius: 8px;
     cursor: pointer;
-    font-weight: 600;
-    font-size: 14px;
+    font-weight: 700;
+    font-size: 13px;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
     width: 100%;
 }
 
 .card button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .card button:active {
@@ -746,29 +1034,29 @@ body {
 
 .badge {
     position: absolute;
-    top: 12px;
-    left: 12px;
-    background: #ff3b3b;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, #ff3b3b 0%, #ff6b6b 100%);
     color: white;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
     padding: 6px 10px;
-    border-radius: 20px;
+    border-radius: 6px;
     z-index: 10;
 }
 
 
 .preco-antigo {
     text-decoration: line-through;
-    color: gray;
-    font-size: 14px;
+    color: #999;
+    font-size: 12px;
     margin: 0;
 }
 
 .preco-promocional {
-    color: green;
-    font-size: 18px;
-    font-weight: bold;
+    color: #2ecc71;
+    font-size: 16px;
+    font-weight: 700;
     margin: 0;
 }
 

@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SimpleCommerce - Sua Loja Online</title>
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style-responsive.css" />
+    <link rel="stylesheet" href="produto-style.css" />
     <link rel="stylesheet" href="carrinho.css" />
 </head>
 
@@ -34,14 +36,54 @@
         </div>
     </section>
 
-    <!-- CONTEÚDO CENTRALIZADO -->
-    <div class="container">
+    <!-- CATEGORIAS -->
+    <div id="categorias" class="categorias-container"></div>
 
-        <div id="categorias" class="categorias-container"></div>
+    <!-- LAYOUT PRINCIPAL: FILTROS + PRODUTOS -->
+    <div class="main-layout">
+        <!-- SIDEBAR FILTROS (DESKTOP) -->
+        <aside id="painelFiltros" class="painel-filtros">
+            <div class="topo-filtros">
+                <h3>Filtrar produtos</h3>
+                <button class="close-filtros" onclick="fecharFiltros()">✕</button>
+            </div>
 
-        <!-- PRODUTOS -->
-        <section class="produtos-container" id="produtos"></section>
+            <div class="filtro" id="filtroCategorias">
+                <h4>Categoria</h4>
+            </div>
 
+            <div class="filtro">
+                <h4>Preço</h4>
+                <div class="price-input">
+                    <input type="range" min="0" id="precoRange" />
+                    <span id="precoValor">R$ 2000</span>
+                </div>
+            </div>
+
+            <div class="filtro">
+                <h4>Promoção</h4>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="promo" />
+                    <span>Apenas promoção</span>
+                </label>
+            </div>
+
+            <button class="btn-aplicar" onclick="aplicarFiltros()">Aplicar filtros</button>
+        </aside>
+
+        <!-- OVERLAY (MOBILE) -->
+        <div id="overlay" class="overlay" onclick="fecharFiltros()"></div>
+
+        <!-- CONTEÚDO PRODUTOS -->
+        <div class="conteudo-produtos">
+            <!-- BOTÃO FILTRAR (MOBILE) -->
+            <button class="btn-filtrar-mobile" onclick="abrirFiltros()">
+                🔍 Filtros
+            </button>
+
+            <!-- CONTAINER DE PRODUTOS -->
+            <section class="produtos-container" id="produtos"></section>
+        </div>
     </div>
 
 
@@ -110,6 +152,75 @@
         </div>
 
     </div>
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-content">
+            <!-- COLUNA 1: LOGO E INFO -->
+            <div class="footer-column">
+                <div class="footer-logo">
+                    <span>🛍️</span>
+                    <h3>SimpleCommerce</h3>
+                </div>
+                <p class="footer-desc">Sua loja online de confiança. Qualidade, segurança e variedade em um único lugar.</p>
+                <div class="footer-social">
+                    <a href="#" title="Instagram">📱</a>
+                    <a href="#" title="Facebook">👤</a>
+                    <a href="#" title="WhatsApp">💬</a>
+                    <a href="#" title="Twitter">𝕏</a>
+                </div>
+            </div>
+
+            <!-- COLUNA 2: INSTITUCIONAL -->
+            <div class="footer-column">
+                <h4>Institucional</h4>
+                <ul>
+                    <li><a href="#">Sobre nós</a></li>
+                    <li><a href="#">Contato</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Carreiras</a></li>
+                </ul>
+            </div>
+
+            <!-- COLUNA 3: AJUDA -->
+            <div class="footer-column">
+                <h4>Ajuda</h4>
+                <ul>
+                    <li><a href="#">Frete e entrega</a></li>
+                    <li><a href="#">Trocas e devoluções</a></li>
+                    <li><a href="#">Rastrear pedido</a></li>
+                    <li><a href="#">FAQ</a></li>
+                </ul>
+            </div>
+
+            <!-- COLUNA 4: LEGAL -->
+            <div class="footer-column">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Termos de uso</a></li>
+                    <li><a href="#">Política de privacidade</a></li>
+                    <li><a href="#">Segurança</a></li>
+                    <li><a href="#">Cookies</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PAGAMENTOS -->
+        <div class="footer-payments">
+            <h4>Formas de Pagamento</h4>
+            <div class="payment-icons">
+                <span title="PIX">💳</span>
+                <span title="Visa">💳</span>
+                <span title="Mastercard">💳</span>
+                <span title="Elo">💳</span>
+                <span title="Boleto">📋</span>
+            </div>
+        </div>
+
+        <!-- COPYRIGHT -->
+        <div class="footer-bottom">
+            <p>&copy; 2025 SimpleCommerce — Todos os direitos reservados</p>
+        </div>
+    </footer>
     <script src="/utils.js"></script>
     <script src="/carrinho.js"></script>
 

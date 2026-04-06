@@ -58,25 +58,60 @@ function mostrarProduto(produto) {
   if (precoEl) {
 
     const preco = Number(produto.preco);
+    const temPromocao = produto.tem_promocao === true || produto.tem_promocao === 1;
+    const precoPromocional = temPromocao ? Number(produto.preco_promocional) : 0;
 
-    precoEl.innerText = preco.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL"
-    });
-
-    /* PARCELAMENTO */
-
-    const parcelas = document.createElement("p");
-
-    const valorParcela = preco / 12;
-
-    parcelas.innerHTML =
-      `ou 12x de <strong>${valorParcela.toLocaleString("pt-BR", {
+    if (temPromocao && precoPromocional > 0) {
+      // Mostrar preço antigo riscado e preço promocional em destaque
+      const precoAntigo = document.createElement("span");
+      precoAntigo.className = "preco-antigo";
+      precoAntigo.innerText = preco.toLocaleString("pt-BR", {
         style: "currency",
         currency: "BRL"
-      })}</strong> <span class="sem-juros">sem juros</span>`;
+      });
 
-    precoEl.after(parcelas);
+      const precoPromocionalEl = document.createElement("span");
+      precoPromocionalEl.className = "preco-promocional";
+      precoPromocionalEl.innerText = precoPromocional.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+      });
+
+      precoEl.innerHTML = "";
+      precoEl.appendChild(precoAntigo);
+      precoEl.innerHTML += " ";
+      precoEl.appendChild(precoPromocionalEl);
+
+      /* PARCELAMENTO baseado no preço promocional */
+      const parcelas = document.createElement("p");
+      const valorParcela = precoPromocional / 12;
+
+      parcelas.innerHTML =
+        `ou 12x de <strong>${valorParcela.toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL"
+        })}</strong> <span class="sem-juros">sem juros</span>`;
+
+      precoEl.after(parcelas);
+    } else {
+      // Sem promoção, mostrar preço normal
+      precoEl.innerText = preco.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+      });
+
+      /* PARCELAMENTO */
+      const parcelas = document.createElement("p");
+      const valorParcela = preco / 12;
+
+      parcelas.innerHTML =
+        `ou 12x de <strong>${valorParcela.toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL"
+        })}</strong> <span class="sem-juros">sem juros</span>`;
+
+      precoEl.after(parcelas);
+    }
 
   }
 
