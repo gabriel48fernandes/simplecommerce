@@ -1,243 +1,316 @@
-async function carregarProduto() {
+// ==========================================
+// PRODUTO - CARREGAMENTO E RENDERIZAÇÃO
+// ==========================================
+// Este arquivo gerencia o carregamento dinâmico de dados do produto
+// e renderiza variações, estoque e imagens com base na resposta da API
 
+// Estado global do produto
+let produtoAtual = null;
+let variacoesSelecionadas = {};
+
+async function carregarProduto() {
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
 
   if (!id) return;
 
   try {
-
     const res = await api(`/produtos/${id}`);
-    const produto = await res.json();
-
-    mostrarProduto(produto);
-
+    const data = await res.json();
+    
+    // A resposta pode vir como { produto, ... } ou ser o produto direto
+    produtoAtual = data.produto || data;
+    
+    mostrarProduto(produtoAtual);
   } catch (err) {
-
     console.error("Erro ao carregar produto:", err);
-
   }
-
 }
 
-
 function mostrarProduto(produto) {
+  if (!produto) return;
 
   const nomeEl = document.getElementById("nomeProduto");
   const precoEl = document.getElementById("precoProduto");
   const descricaoEl = document.getElementById("descricaoProduto");
   const estoqueEl = document.getElementById("estoqueProduto");
-  const botao = document.getElementById("btnAdicionarCarrinho");
-  const inputQtd = document.getElementById("quantidadeProduto");
 
-  const estoque = Number(produto.quantidade) || 0;
+  // NOME
+  if (nomeEl) nomeEl.innerText = produto.nome || "";
 
-  /* BOTÃO DISPONIBILIDADE */
-
-  if (botao && estoque <= 0) {
-
-    botao.disabled = true;
-    botao.innerText = "Produto indisponível";
-
-  }
-
-  /* LIMITAR QUANTIDADE */
-
-  if (inputQtd) {
-    inputQtd.max = estoque;
-  }
-
-  /* NOME */
-
-  if (nomeEl) {
-    nomeEl.innerText = produto.nome;
-  }
-
-  /* PREÇO */
-
+  // PREÇO
   if (precoEl) {
+    precoEl.innerHTML = "";
 
-    const preco = Number(produto.preco);
+    const preco = Number(produto.preco) || 0;
     const temPromocao = produto.tem_promocao === true || produto.tem_promocao === 1;
-    const precoPromocional = temPromocao ? Number(produto.preco_promocional) : 0;
+    const precoPromo = Number(produto.preco_promocional) || 0;
 
-    if (temPromocao && precoPromocional > 0) {
-      // Mostrar preço antigo riscado e preço promocional em destaque
-      const precoAntigo = document.createElement("span");
-      precoAntigo.className = "preco-antigo";
-      precoAntigo.innerText = preco.toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL"
-      });
-
-      const precoPromocionalEl = document.createElement("span");
-      precoPromocionalEl.className = "preco-promocional";
-      precoPromocionalEl.innerText = precoPromocional.toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL"
-      });
-
-      precoEl.innerHTML = "";
-      precoEl.appendChild(precoAntigo);
-      precoEl.innerHTML += " ";
-      precoEl.appendChild(precoPromocionalEl);
-
-      /* PARCELAMENTO baseado no preço promocional */
-      const parcelas = document.createElement("p");
-      const valorParcela = precoPromocional / 12;
-
-      parcelas.innerHTML =
-        `ou 12x de <strong>${valorParcela.toLocaleString("pt-BR", {
-          style: "currency",
-          currency: "BRL"
-        })}</strong> <span class="sem-juros">sem juros</span>`;
-
-      precoEl.after(parcelas);
+    if (temPromocao && precoPromo > 0) {
+      precoEl.innerHTML = `
+        <span class="preco-antigo">${preco.toLocaleString("pt-BR", {style:"currency",currency:"BRL"})}</span>
+        <span class="preco-promocional">${precoPromo.toLocaleString("pt-BR", {style:"currency",currency:"BRL"})}</span>
+      `;
     } else {
-      // Sem promoção, mostrar preço normal
       precoEl.innerText = preco.toLocaleString("pt-BR", {
         style: "currency",
         currency: "BRL"
       });
-
-      /* PARCELAMENTO */
-      const parcelas = document.createElement("p");
-      const valorParcela = preco / 12;
-
-      parcelas.innerHTML =
-        `ou 12x de <strong>${valorParcela.toLocaleString("pt-BR", {
-          style: "currency",
-          currency: "BRL"
-        })}</strong> <span class="sem-juros">sem juros</span>`;
-
-      precoEl.after(parcelas);
     }
-
   }
 
-  /* DESCRIÇÃO */
+  // DESCRIÇÃO
+  if (descricaoEl) descricaoEl.innerText = produto.descricao || "Sem descrição";
 
-  if (descricaoEl) {
-    descricaoEl.innerText = produto.descricao || "Sem descrição";
-  }
+  // IMAGENS - renderizar miniaturas
+  renderizarImagens(produto);
 
-  /* ESTOQUE */
+  // VARIAÇÕES - renderizar dinamicamente
+  renderizarVariacoes(produto);
 
-  if (estoqueEl) {
+  // ESTOQUE INICIAL
+  atualizarEstoque(produto);
+}
 
-    if (estoque > 0) {
+// ==========================================
+// IMAGENS
+// ==========================================
 
-      estoqueEl.innerText = estoque + " unidades disponíveis";
-      estoqueEl.classList.add("estoque-ok");
-
-    } else {
-
-      estoqueEl.innerText = "Produto indisponível";
-      estoqueEl.classList.add("estoque-zero");
-
-    }
-
-  }
-
-  /* IMAGEM PRINCIPAL */
-
+function renderizarImagens(produto) {
+  const miniaturas = document.getElementById("miniaturas");
   const imagemPrincipal = document.getElementById("imagemPrincipal");
 
-  if (imagemPrincipal) {
-    imagemPrincipal.src = produto.imagem || window.SEM_IMAGEM_FALLBACK;
-    imagemPrincipal.onerror = function () {
-      this.onerror = null;
-      this.src = window.SEM_IMAGEM_FALLBACK;
-    };
-  }
-
-  /* MINIATURAS */
-
-  const miniaturas = document.getElementById("miniaturas");
-
-  if (!miniaturas) return;
+  if (!miniaturas || !imagemPrincipal) return;
 
   miniaturas.innerHTML = "";
 
-  const imagens = produto.imagens || [produto.imagem];
+  // Usar array de imagens da API ou fallback para imagem única
+  const imagens = produto.imagens || [{ url: produto.imagem }];
 
-  imagens.forEach((src, index) => {
+  imagens.forEach((img, index) => {
+    const src = img.url || img;
+    const imgEl = document.createElement("img");
+    imgEl.src = src;
+    imgEl.alt = `Miniatura ${index + 1}`;
+    
+    miniaturas.appendChild(imgEl);
+  });
 
-    const img = document.createElement("img");
+  // Mostrar primeira imagem por padrão
+  if (imagens.length > 0) {
+    const firstSrc = imagens[0].url || imagens[0];
+    imagemPrincipal.src = firstSrc;
+  }
+}
 
-    img.src = src || window.SEM_IMAGEM_FALLBACK;
-    img.onerror = function () {
-      this.onerror = null;
-      this.src = window.SEM_IMAGEM_FALLBACK;
-    };
+// ==========================================
+// VARIAÇÕES DINÂMICAS
+// ==========================================
+// 
+// Agrupa variações por tipo e renderiza botões dinamicamente
+// Exemplo: [{ tipo: "tamanho", valor: "P" }, { tipo: "cor", valor: "Vermelho" }]
+// Resultado: { tamanho: [...], cor: [...] }
 
-    img.addEventListener("click", () => {
-      imagemPrincipal.src = img.src;
+function renderizarVariacoes(produto) {
+  const container = document.getElementById("variacoesContainer");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  // Agrupar variações por tipo
+  const variacoesPorTipo = agruparVariacoesPorTipo(produto.variacoes || []);
+
+  // Se não há variações, retornar
+  if (Object.keys(variacoesPorTipo).length === 0) {
+    console.log("Produto sem variações");
+    return;
+  }
+
+  // Renderizar cada tipo de variação
+  Object.keys(variacoesPorTipo).forEach(tipo => {
+    const bloco = document.createElement("div");
+    bloco.className = "produto-variacao";
+
+    const titulo = document.createElement("h3");
+    titulo.innerText = tipo.toUpperCase();
+    titulo.className = "variacao-titulo";
+
+    const opcoes = document.createElement("div");
+    opcoes.className = "variacao-opcoes";
+    opcoes.setAttribute("data-tipo", tipo);
+
+    variacoesPorTipo[tipo].forEach(valor => {
+      const btn = document.createElement("button");
+      btn.innerText = valor;
+      btn.className = "variacao-btn";
+      btn.setAttribute("data-tipo", tipo);
+      btn.setAttribute("data-valor", valor);
+
+      // Desabilitar se não há estoque
+      if (!temEstoque(tipo, valor)) {
+        btn.disabled = true;
+        btn.classList.add("indisponivel");
+      }
+
+      btn.addEventListener("click", () => {
+        selecionarVariacao(tipo, valor, opcoes, produto);
+      });
+
+      opcoes.appendChild(btn);
     });
 
-    miniaturas.appendChild(img);
+    bloco.appendChild(titulo);
+    bloco.appendChild(opcoes);
+    container.appendChild(bloco);
+  });
+}
 
-    if (index === 0 && imagemPrincipal) {
-      imagemPrincipal.src = img.src;
+// Agrupar variações por tipo
+function agruparVariacoesPorTipo(variacoes) {
+  const agrupado = {};
+
+  variacoes.forEach(v => {
+    const tipo = v.tipo.toLowerCase();
+    if (!agrupado[tipo]) {
+      agrupado[tipo] = [];
     }
-
+    if (!agrupado[tipo].includes(v.valor)) {
+      agrupado[tipo].push(v.valor);
+    }
   });
 
+  return agrupado;
 }
 
+// Verificar se uma variação tem estoque
+function temEstoque(tipo, valor) {
+  if (!produtoAtual || !produtoAtual.itens) {
+    return true; // Se não há dados de estoque, assumir que tem
+  }
 
-/* BOTÃO ADICIONAR CARRINHO */
+  return produtoAtual.itens.some(item => {
+    const combinacaoValida = Object.keys(variacoesSelecionadas).every(t => {
+      return variacoesSelecionadas[t] === (item[`variacao_${t}`] || item[t]);
+    });
 
-const btnAdicionarCarrinho = document.getElementById("btnAdicionarCarrinho");
+    if (!combinacaoValida) return false;
 
-if (btnAdicionarCarrinho) {
+    // Verificar se há estoque para essa combinação
+    return item[`variacao_${tipo}`] === valor && item.estoque > 0;
+  });
+}
 
-  btnAdicionarCarrinho.addEventListener("click", () => {
-
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
-
-    const qtd = Number(document.getElementById("quantidadeProduto").value) || 1;
-
-    adicionarAoCarrinho(id, btnAdicionarCarrinho, qtd);
-
+// Selecionar uma variação
+function selecionarVariacao(tipo, valor, container, produto) {
+  // Remover ativo de outros botões do mesmo tipo
+  container.querySelectorAll("button").forEach(b => {
+    b.classList.remove("ativo");
   });
 
-}
+  // Marcar como ativo
+  container.querySelector(`[data-valor="${valor}"]`)?.classList.add("ativo");
 
+  // Atualizar estado
+  variacoesSelecionadas[tipo] = valor;
 
-/* CONTROLE DE QUANTIDADE */
-
-const inputQtd = document.getElementById("quantidadeProduto");
-const btnMais = document.getElementById("aumentarQtd");
-const btnMenos = document.getElementById("diminuirQtd");
-
-if (btnMais) {
-
-  btnMais.onclick = () => {
-
-    const max = Number(inputQtd.max) || 1;
-    const atual = Number(inputQtd.value);
-
-    if (atual < max) {
-      inputQtd.value = atual + 1;
+  // Trocar imagem se for "cor"
+  if (tipo === "cor" && produto.imagens) {
+    const imagemCor = produto.imagens.find(img => img.cor === valor);
+    if (imagemCor) {
+      document.getElementById("imagemPrincipal").src = imagemCor.url || imagemCor;
     }
+  }
 
-  };
-
+  // Atualizar estoque e validações
+  atualizarEstoque(produto);
 }
 
-if (btnMenos) {
+// ==========================================
+// ESTOQUE E QUANTIDADE
+// ==========================================
 
-  btnMenos.onclick = () => {
+function atualizarEstoque(produto) {
+  const estoqueEl = document.getElementById("estoqueProduto");
+  const botao = document.getElementById("btnAdicionarCarrinho");
+  const inputQtd = document.getElementById("quantidadeProduto");
 
-    if (inputQtd.value > 1) {
-      inputQtd.value = Number(inputQtd.value) - 1;
+  // Calcular estoque disponível para a combinação selecionada
+  let estoque = 0;
+
+  if (produto.itens && Object.keys(variacoesSelecionadas).length > 0) {
+    // Se há variações selecionadas, usar estoque da combinação
+    const item = produto.itens.find(it => {
+      return Object.keys(variacoesSelecionadas).every(tipo => {
+        return variacoesSelecionadas[tipo] === (it[`variacao_${tipo}`] || it[tipo]);
+      });
+    });
+    estoque = item ? item.estoque : 0;
+  } else {
+    // Se não há variações, usar estoque geral do produto
+    estoque = produto.quantidade || 0;
+  }
+
+  // Atualizar elemento de estoque
+  if (estoqueEl) {
+    if (estoque > 0) {
+      estoqueEl.innerText = `${estoque} ${estoque === 1 ? "unidade" : "unidades"} disponível`;
+      estoqueEl.classList.remove("estoque-zero");
+      estoqueEl.classList.add("estoque-ok");
+    } else {
+      estoqueEl.innerText = "Produto indisponível";
+      estoqueEl.classList.remove("estoque-ok");
+      estoqueEl.classList.add("estoque-zero");
     }
+  }
 
-  };
+  // Atualizar input de quantidade
+  if (inputQtd) {
+    inputQtd.max = Math.max(estoque, 1);
+    inputQtd.value = estoque > 0 ? 1 : 0;
+  }
 
+  // Desabilitar botão de compra
+  if (botao) {
+    botao.disabled = estoque <= 0;
+  }
 }
 
+// ==========================================
+// ADICIONAR AO CARRINHO
+// ==========================================
 
+document.addEventListener("DOMContentLoaded", () => {
+  const btnAdicionar = document.getElementById("btnAdicionarCarrinho");
+  if (btnAdicionar) {
+    btnAdicionar.addEventListener("click", () => {
+      const id = new URLSearchParams(window.location.search).get("id");
+      const qtd = Number(document.getElementById("quantidadeProduto").value) || 1;
+
+      adicionarAoCarrinho(id, null, qtd, variacoesSelecionadas);
+    });
+  }
+
+  // Botões de quantidade
+  const inputQtd = document.getElementById("quantidadeProduto");
+  const btnAumentar = document.getElementById("aumentarQtd");
+  const btnDiminuir = document.getElementById("diminuirQtd");
+
+  if (btnAumentar) {
+    btnAumentar.addEventListener("click", () => {
+      if (inputQtd && inputQtd.value < inputQtd.max) {
+        inputQtd.value = Number(inputQtd.value) + 1;
+      }
+    });
+  }
+
+  if (btnDiminuir) {
+    btnDiminuir.addEventListener("click", () => {
+      if (inputQtd && inputQtd.value > 1) {
+        inputQtd.value = Number(inputQtd.value) - 1;
+      }
+    });
+  }
+});
+
+// Carregar produto ao abrir a página
 carregarProduto();

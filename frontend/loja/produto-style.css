@@ -758,3 +758,26 @@
     font-weight: 700;
     margin: 0;
 }
+
+.variacao-opcoes {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.variacao-btn {
+  padding: 8px 14px;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
+}
+
+.variacao-btn.ativo {
+  background: #667eea;
+  color: white;
+}
+
+.variacao-btn.indisponivel {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

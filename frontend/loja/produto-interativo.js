@@ -1,201 +1,194 @@
 // ==========================================
 // PÁGINA DE PRODUTO - INTERATIVIDADES
 // ==========================================
+// 
+// Este arquivo gerencia as interações dinâmicas da página de produto
+// 
+// NOTA: A lógica de produtos, variações, estoque e quantidade é 
+// gerenciada por produto.js. Este arquivo cuida apenas de:
+// - Acordeões (abrir/fechar seções)
+// - Galeria de imagens (miniaturas e dots)
+// - Wishlist
+// - Menus mobile
 
 // ============================
 // ACORDEÃO
 // ============================
-document.querySelectorAll('.accordion-header').forEach(header => {
-  header.addEventListener('click', function() {
-    const item = this.parentElement;
-    const content = item.querySelector('.accordion-content');
-    const icon = this.querySelector('.accordion-icon');
-
-    // Fechar outros accordeões
-    document.querySelectorAll('.accordion-item').forEach(otherItem => {
-      if (otherItem !== item) {
-        otherItem.querySelector('.accordion-header').classList.remove('active');
-        otherItem.querySelector('.accordion-content').classList.remove('active');
-      }
-    });
-
-    // Toggle do atual
-    this.classList.toggle('active');
-    content.classList.toggle('active');
-  });
-});
-
-// Abrir o primeiro acordeão por padrão
 document.addEventListener('DOMContentLoaded', () => {
-  const firstAccordion = document.querySelector('.accordion-header');
-  if (firstAccordion) {
-    firstAccordion.click();
-  }
-});
+  const setupAccordions = () => {
+    document.querySelectorAll('.accordion-header').forEach(header => {
+      header.addEventListener('click', function() {
+        const item = this.parentElement;
+        const content = item.querySelector('.accordion-content');
 
-// ============================
-// SELEÇÃO DE TAMANHO
-// ============================
-document.querySelectorAll('.tamanho-btn').forEach(btn => {
-  btn.addEventListener('click', function() {
-    // Remove classe active de todos
-    document.querySelectorAll('.tamanho-btn').forEach(b => {
-      b.classList.remove('active');
+        // Fechar outros accordeões
+        document.querySelectorAll('.accordion-item').forEach(otherItem => {
+          if (otherItem !== item) {
+            otherItem.querySelector('.accordion-header').classList.remove('active');
+            otherItem.querySelector('.accordion-content').classList.remove('active');
+          }
+        });
+
+        // Toggle do atual
+        this.classList.toggle('active');
+        content.classList.toggle('active');
+      });
     });
-    
-    // Adiciona ao clicado
-    this.classList.add('active');
-    
-    // Salva no localStorage
-    const tamanho = this.dataset.tamanho;
-    localStorage.setItem('tamanhoSelecionado', tamanho);
-    console.log('✅ Tamanho selecionado:', tamanho);
-  });
-});
 
-// Restaurar tamanho selecionado ao carregar
-window.addEventListener('load', () => {
-  const tamanhoSalvo = localStorage.getItem('tamanhoSelecionado');
-  if (tamanhoSalvo) {
-    document.querySelector(`[data-tamanho="${tamanhoSalvo}"]`)?.classList.add('active');
-  }
+    // Abrir o primeiro acordeão por padrão
+    const firstAccordion = document.querySelector('.accordion-header');
+    if (firstAccordion) {
+      firstAccordion.click();
+    }
+  };
+
+  setupAccordions();
 });
 
 // ============================
-// QUANTIDADE
+// GALERIA DE IMAGENS (COM EVENT DELEGATION)
 // ============================
-const btnDiminuir = document.getElementById('diminuirQtd');
-const btnAumentar = document.getElementById('aumentarQtd');
-const inputQtd = document.getElementById('quantidadeProduto');
+// 
+// As miniaturas são criadas dinamicamente por produto.js
+// Usamos event delegation para capturar cliques em elementos criados dinamicamente
 
-if (btnDiminuir && btnAumentar && inputQtd) {
-  btnDiminuir.addEventListener('click', () => {
-    let qtd = parseInt(inputQtd.value) || 1;
-    if (qtd > 1) {
-      inputQtd.value = qtd - 1;
+const galeryManager = {
+  currentSlide: 0,
+
+  // Atualizar imagem principal e indicadores visuais
+  showSlide(index) {
+    const slider = document.getElementById('miniaturas');
+    if (!slider) return;
+
+    const slides = slider.querySelectorAll('img');
+    if (!slides.length || index < 0 || index >= slides.length) return;
+
+    // Remover classe active de todas as miniaturas
+    slides.forEach((slide, i) => {
+      slide.classList.toggle('active', i === index);
+    });
+
+    // Atualizar imagem principal
+    const mainImage = document.getElementById('imagemPrincipal');
+    if (mainImage && slides[index]) {
+      mainImage.src = slides[index].src;
     }
-  });
 
-  btnAumentar.addEventListener('click', () => {
-    let qtd = parseInt(inputQtd.value) || 1;
-    inputQtd.value = qtd + 1;
-  });
-}
+    this.currentSlide = index;
+  },
 
-// ============================
-// GALERIA DE IMAGENS
-// ============================
-let slideAtualGaleria = 0;
+  // Inicializar event delegation para miniaturas
+  initGalleryEvents() {
+    const slider = document.getElementById('miniaturas');
+    if (!slider) return;
 
-function mostrarSlideGaleria(index) {
-  const slides = document.querySelectorAll('.galeria-miniaturas img');
-  const dots = document.querySelectorAll('.galeria-dots span');
-  
-  if (!slides.length) return;
+    slider.addEventListener('click', (e) => {
+      const img = e.target.closest('img');
+      if (!img) return;
 
-  // Atualizar miniaturas
-  slides.forEach((slide, i) => {
-    slide.classList.remove('active');
-    if (i === index) {
-      slide.classList.add('active');
-    }
-  });
-
-  // Atualizar dots
-  if (dots.length > 0) {
-    dots.forEach((dot, i) => {
-      dot.classList.remove('active');
-      if (i === index) {
-        dot.classList.add('active');
+      const slides = slider.querySelectorAll('img');
+      const index = Array.from(slides).indexOf(img);
+      if (index !== -1) {
+        this.showSlide(index);
       }
     });
   }
+};
 
-  // Atualizar imagem principal
-  const imagemlPrincipal = document.getElementById('imagemPrincipal');
-  if (imagemlPrincipal && slides[index]) {
-    imagemPrincipal.src = slides[index].src;
-  }
-
-  slideAtualGaleria = index;
-}
-
-// Cliques nas miniaturas
-document.querySelectorAll('.galeria-miniaturas img').forEach((img, index) => {
-  img.addEventListener('click', () => {
-    mostrarSlideGaleria(index);
-  });
-});
-
-// Cliques nos dots
-document.querySelectorAll('.galeria-dots span').forEach((dot, index) => {
-  dot.addEventListener('click', () => {
-    mostrarSlideGaleria(index);
-  });
-});
-
-// Inicializar galeria no carregamento
-window.addEventListener('load', () => {
-  mostrarSlideGaleria(0);
+// Inicializar galeria quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', () => {
+  galeryManager.initGalleryEvents();
+  // Mostrar primeira imagem
+  galeryManager.showSlide(0);
 });
 
 // ============================
-// ADICIONAR À LISTA (WISHLIST)
+// WISHLIST
 // ============================
-const btnWishlist = document.getElementById('btnAdicionarWishlist');
-if (btnWishlist) {
-  btnWishlist.addEventListener('click', () => {
+// Gerenciar favoritos do usuário
+
+const wishlistManager = {
+  init() {
+    const btnWishlist = document.getElementById('btnAdicionarWishlist');
+    if (!btnWishlist) return;
+
+    btnWishlist.addEventListener('click', () => this.toggleWishlist());
+
+    // Verificar se produto já está na lista ao carregar
+    window.addEventListener('load', () => this.updateWishlistUI());
+  },
+
+  toggleWishlist() {
     const urlParams = new URLSearchParams(window.location.search);
-    const produtoId = urlParams.get('id');
-    
+    const produtoId = parseInt(urlParams.get('id'));
+
     if (!produtoId) {
       alert('Erro ao identificar produto');
       return;
     }
 
-    // Salvar na lista de desejos (localStorage)
     let wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-    
-    if (wishlist.includes(parseInt(produtoId))) {
-      wishlist = wishlist.filter(id => id !== parseInt(produtoId));
-      btnWishlist.classList.remove('ativo');
-      btnWishlist.textContent = '❤️ Adicionar à lista';
+    const estava = wishlist.includes(produtoId);
+
+    if (estava) {
+      wishlist = wishlist.filter(id => id !== produtoId);
     } else {
-      wishlist.push(parseInt(produtoId));
-      btnWishlist.classList.add('ativo');
-      btnWishlist.textContent = '❤️ Em minha lista';
+      wishlist.push(produtoId);
     }
 
     localStorage.setItem('wishlist', JSON.stringify(wishlist));
+    this.updateWishlistUI();
     console.log('✅ Wishlist atualizada:', wishlist);
-  });
+  },
 
-  // Verificar se produto já está na lista
-  window.addEventListener('load', () => {
+  updateWishlistUI() {
+    const btnWishlist = document.getElementById('btnAdicionarWishlist');
+    if (!btnWishlist) return;
+
     const urlParams = new URLSearchParams(window.location.search);
-    const produtoId = urlParams.get('id');
+    const produtoId = parseInt(urlParams.get('id'));
     const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+    const estaLista = wishlist.includes(produtoId);
 
-    if (wishlist.includes(parseInt(produtoId))) {
+    if (estaLista) {
       btnWishlist.classList.add('ativo');
       btnWishlist.textContent = '❤️ Em minha lista';
+    } else {
+      btnWishlist.classList.remove('ativo');
+      btnWishlist.textContent = '❤️ Adicionar à lista';
     }
-  });
-}
+  }
+};
+
+// Inicializar wishlist
+document.addEventListener('DOMContentLoaded', () => {
+  wishlistManager.init();
+});
 
 // ============================
-// MOBILE MENU ACORDEÃO DO FOOTER
+// MOBILE FOOTER MENU (ACCORDION)
 // ============================
-if (window.matchMedia('(max-width: 768px)').matches) {
-  document.querySelectorAll('.footer-column h4').forEach(h4 => {
-    h4.style.cursor = 'pointer';
-    h4.addEventListener('click', () => {
-      const ul = h4.nextElementSibling;
-      if (ul && ul.tagName === 'UL') {
-        ul.style.display = ul.style.display === 'none' ? 'flex' : 'none';
-      }
+// Em dispositivos móveis (≤768px), os menus do footer se comportam como acordeões
+
+const mobileFooterMenu = {
+  init() {
+    if (!window.matchMedia('(max-width: 768px)').matches) return;
+
+    document.querySelectorAll('.footer-column h4').forEach(h4 => {
+      h4.style.cursor = 'pointer';
+      h4.addEventListener('click', () => {
+        const ul = h4.nextElementSibling;
+        if (ul && ul.tagName === 'UL') {
+          ul.style.display = ul.style.display === 'none' ? 'flex' : 'none';
+        }
+      });
     });
-  });
-}
+  }
+};
+
+// Inicializar mobile footer
+document.addEventListener('DOMContentLoaded', () => {
+  mobileFooterMenu.init();
+});
 
 console.log('✅ Página de produto carregada com sucesso!');

@@ -24,7 +24,7 @@ router.get("/", async (req, res) => {
       FROM produtos p
       JOIN categorias c ON c.id = p.categoria_id
       LEFT JOIN imagens_produto i 
-        ON i.produto_id = p.id
+      ON i.produto_id = p.id AND i.principal = true
       WHERE 1=1
     `;
 
@@ -147,49 +147,76 @@ router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    const query = `
-  SELECT 
-    p.id,
-    p.nome,
-    p.preco,
-    p.preco_promocional,
-    p.quantidade,
-    p.categoria_id,
-    c.nome AS categoria,
-    i.url AS imagem
-  FROM produtos p
-  JOIN categorias c ON c.id = p.categoria_id
-  LEFT JOIN imagens_produto i 
-    ON i.produto_id = p.id
-  WHERE p.id = $1
-  LIMIT 1
-`;
+    // 🔥 PRODUTO
+    const produtoResult = await pool.query(`
+      SELECT 
+        p.*,
+        c.nome AS categoria
+      FROM produtos p
+      JOIN categorias c ON c.id = p.categoria_id
+      WHERE p.id = $1
+    `, [id]);
 
-
-    const result = await pool.query(query, [id]);
-
-    if (result.rows.length === 0) {
+    if (produtoResult.rows.length === 0) {
       return res.status(404).json({ erro: "Produto não encontrado" });
     }
 
-    const p = result.rows[0];
+    const produto = produtoResult.rows[0];
 
-    const preco = Number(p.preco);
-    const precoPromocional = Number(p.preco_promocional);
+    // 🖼️ IMAGENS
+    const imagensResult = await pool.query(`
+      SELECT url, principal
+      FROM imagens_produto
+      WHERE produto_id = $1
+      ORDER BY principal DESC
+    `, [id]);
+
+    // 🎯 VARIAÇÕES (BRUTO)
+    const variacoesResult = await pool.query(`
+      SELECT tipo, valor
+      FROM produto_variacoes
+      WHERE produto_id = $1
+    `, [id]);
+
+    // 🧠 ORGANIZA VARIAÇÕES (🔥 IMPORTANTE)
+    const variacoesOrganizadas = {};
+
+    variacoesResult.rows.forEach(v => {
+      if (!variacoesOrganizadas[v.tipo]) {
+        variacoesOrganizadas[v.tipo] = [];
+      }
+      variacoesOrganizadas[v.tipo].push(v.valor);
+    });
+
+    // 📦 ITENS (estoque por combinação)
+    const itensResult = await pool.query(`
+      SELECT variacao_1, variacao_2, estoque
+      FROM produto_itens
+      WHERE produto_id = $1
+    `, [id]);
+
+    // 💰 PROMOÇÃO
+    const preco = Number(produto.preco);
+    const precoPromocional = Number(produto.preco_promocional);
 
     const temPromocao =
-      precoPromocional !== null && precoPromocional < preco;
+      precoPromocional && precoPromocional < preco;
 
     const percentualDesconto = temPromocao
       ? Math.round(((preco - precoPromocional) / preco) * 100)
       : null;
 
     res.json({
-      ...p,
+      ...produto,
+      imagens: imagensResult.rows,
+
+      // 🔥 AGORA VAI ORGANIZADO PRO FRONT
+      variacoes: variacoesOrganizadas,
+
+      itens: itensResult.rows,
       tem_promocao: temPromocao,
       percentual_desconto: percentualDesconto
     });
-
 
   } catch (err) {
     console.error(err);
@@ -202,7 +229,7 @@ router.get("/:id", async (req, res) => {
 ========================= */
 router.post("/", autenticarToken, apenasAdmin, async (req, res) => {
   try {
-    const { nome, preco, preco_promocional, quantidade, categoria_id, imagem_url } = req.body;
+    const { nome, preco, preco_promocional, quantidade, categoria_id, imagens } = req.body;
 
 
     if (!nome || preco == null || quantidade == null || !categoria_id) {
@@ -224,14 +251,18 @@ router.post("/", autenticarToken, apenasAdmin, async (req, res) => {
 
     const produtoId = produtoResult.rows[0].id;
 
-    if (imagem_url) {
-      await pool.query(
-        `
-        INSERT INTO imagens_produto (produto_id, url)
-        VALUES ($1, $2)
-        `,
-        [produtoId, imagem_url]
-      );
+    if (imagens && imagens.length > 0) {
+      for (let i = 0; i < imagens.length; i++) {
+        const img = imagens[i];
+
+        await pool.query(
+          `
+      INSERT INTO imagens_produto (produto_id, url, principal)
+      VALUES ($1, $2, $3)
+      `,
+          [produtoId, img.url, i === 0] // primeira = principal
+        );
+      }
     }
 
     res.status(201).json({
@@ -251,48 +282,58 @@ router.post("/", autenticarToken, apenasAdmin, async (req, res) => {
 router.put("/:id", autenticarToken, apenasAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    const { nome, preco, preco_promocional, quantidade, categoria_id, imagem_url } = req.body;
+
+    // 🔥 AGORA RECEBE ARRAY DE IMAGENS
+    const {
+      nome,
+      preco,
+      preco_promocional,
+      quantidade,
+      categoria_id,
+      imagens // ← mudou aqui
+    } = req.body;
 
     if (!nome || preco == null || quantidade == null || !categoria_id) {
       return res.status(400).json({ erro: "Dados inválidos" });
     }
 
+    // 🧱 ATUALIZA PRODUTO
     await pool.query(
       `
       UPDATE produtos
       SET nome = $1,
-      preco = $2,
-      preco_promocional = $3,
-      quantidade = $4,
-      categoria_id = $5
+          preco = $2,
+          preco_promocional = $3,
+          quantidade = $4,
+          categoria_id = $5
       WHERE id = $6
-
       `,
       [nome, preco, preco_promocional || null, quantidade, categoria_id, id]
     );
 
-    if (imagem_url) {
-      const imgExiste = await pool.query(
-        `SELECT id FROM imagens_produto WHERE produto_id = $1`,
+    // 🖼️ ATUALIZA IMAGENS (MODO PROFISSIONAL)
+    if (imagens && Array.isArray(imagens)) {
+
+      // 🧹 REMOVE TODAS AS IMAGENS ANTIGAS
+      await pool.query(
+        `DELETE FROM imagens_produto WHERE produto_id = $1`,
         [id]
       );
 
-      if (imgExiste.rows.length > 0) {
+      // ➕ INSERE NOVAS IMAGENS
+      for (let i = 0; i < imagens.length; i++) {
+        const img = imagens[i];
+
         await pool.query(
           `
-          UPDATE imagens_produto
-          SET url = $1
-          WHERE produto_id = $2
+          INSERT INTO imagens_produto (produto_id, url, principal)
+          VALUES ($1, $2, $3)
           `,
-          [imagem_url, id]
-        );
-      } else {
-        await pool.query(
-          `
-          INSERT INTO imagens_produto (produto_id, url)
-          VALUES ($1, $2)
-          `,
-          [id, imagem_url]
+          [
+            id,
+            img.url,
+            i === 0 // 🔥 primeira imagem = principal
+          ]
         );
       }
     }
