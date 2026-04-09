@@ -1,91 +1,134 @@
-async function carregarPedidos() {
-
+// Carregar usuário e pedidos
+document.addEventListener('DOMContentLoaded', async () => {
   const auth = JSON.parse(localStorage.getItem("auth"));
 
   if (!auth) {
-    window.location.href = "login.html";
+    window.location.href = "/login.html";
     return;
   }
 
-  const div = document.getElementById("listaPedidos");
+  // Atualizar área de usuário
+  const areaUsuario = document.getElementById("area-usuario");
+  const primeiroNome = auth.usuario.nome
+    ? auth.usuario.nome.split(" ")[0]
+    : auth.usuario.email;
+
+  areaUsuario.innerHTML = `
+    <span style="color: white; font-weight: 600;">Olá, ${primeiroNome} 👋</span>
+    <button id="logout" style="padding: 10px 20px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s; border: 1px solid rgba(255,255,255,0.3);">Sair</button>
+  `;
+
+  document.getElementById("logout").onclick = () => {
+    localStorage.removeItem("auth");
+    window.location.href = "/";
+  };
+
+  // A navegação agora está integrada na area-usuario do header
+
+  // Carregar pedidos
+  await carregarPedidos();
+});
+
+async function carregarPedidos() {
+  const lista = document.getElementById("lista-pedidos");
+  const auth = JSON.parse(localStorage.getItem("auth"));
+
+  if (!auth || !auth.usuario.id) {
+    lista.innerHTML = `
+      <div class="pedidos-vazio">
+        <p>Você precisa estar logado para ver seus pedidos 😢</p>
+        <p style="margin-top: 15px; color: #999; font-size: 14px;">
+          <a href="/login.html" style="color: #667eea; text-decoration: none; font-weight: 600;">Fazer login</a>
+        </p>
+      </div>
+    `;
+    return;
+  }
 
   try {
     const res = await api(`/pedidos/usuario/${auth.usuario.id}`);
-    
+
     if (!res.ok) {
-      throw new Error("Erro ao carregar pedidos");
+      throw new Error("Erro ao buscar pedidos");
     }
 
     const pedidos = await res.json();
 
+    lista.innerHTML = "";
+
     if (!pedidos || pedidos.length === 0) {
-      div.innerHTML = `
+      lista.innerHTML = `
         <div class="pedidos-vazio">
-          <h2>Você ainda não tem pedidos</h2>
-          <p>Comece a comprar agora e acompanhe seus pedidos aqui!</p>
-          <a href="/" class="btn-voltar">← Voltar à loja</a>
+          <p>Você ainda não tem pedidos 😢</p>
+          <p style="margin-top: 15px; color: #999; font-size: 14px;">
+            <a href="/" style="color: #667eea; text-decoration: none; font-weight: 600;">← Voltar para a loja e fazer uma compra</a>
+          </p>
         </div>
       `;
       return;
     }
 
-    div.innerHTML = "";
+    pedidos.forEach(pedido => {
+      const dataFormatada = new Date(pedido.criado_em).toLocaleDateString('pt-BR', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      const statusClass = `status-${pedido.status_pagamento || pedido.status}`;
 
-    pedidos.forEach(p => {
-      const statusClass = `status-${p.status_pagamento || 'pendente'}`;
-      const dataFormatada = new Date(p.criado_em).toLocaleDateString('pt-BR');
-      
-      const itensHTML = (p.itens || []).map(item => `
-        <div class="item-lista">
-          <span class="item-nome">${item.nome}</span>
-          <span class="item-qtd">${item.quantidade}x</span>
-          <span class="item-preco">R$ ${Number(item.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-        </div>
-      `).join('');
-
-      div.innerHTML += `
+      let html = `
         <div class="pedido-card">
           <div class="pedido-header">
-            <span class="pedido-id">Pedido #${p.id}</span>
-            <span class="pedido-status ${statusClass}">${p.status_pagamento || 'Pendente'}</span>
-          </div>
-
-          <div class="pedido-info">
-            <div class="info-item">
-              <span class="info-label">Total</span>
-              <span class="info-value">R$ ${Number(p.total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            <div class="pedido-info">
+              <div class="pedido-id">Pedido #${pedido.id}</div>
+              <div class="pedido-total">R$ ${(parseFloat(pedido.total) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+              <div class="pedido-data">${dataFormatada}</div>
             </div>
-            <div class="info-item">
-              <span class="info-label">Status</span>
-              <span class="info-value">${p.status || 'Pendente'}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">Data</span>
-              <span class="info-value">${dataFormatada}</span>
+            <div class="pedido-status-badge ${statusClass}">
+              ${pedido.status_pagamento || pedido.status}
             </div>
           </div>
 
-          ${p.itens && p.itens.length > 0 ? `
-            <div class="pedido-itens">
-              <h4>Itens (${p.itens.length})</h4>
-              ${itensHTML}
+          <div class="pedido-itens">
+      `;
+
+      if (pedido.itens && pedido.itens.length > 0) {
+        pedido.itens.forEach(item => {
+          const imagemUrl = item.imagem || window.SEM_IMAGEM_FALLBACK;
+
+          html += `
+            <div class="item-pedido">
+              <img src="${imagemUrl}" alt="${item.nome}" class="item-imagem" onerror="this.src=window.SEM_IMAGEM_FALLBACK;" />
+              <div class="item-detalhes">
+                <div class="item-nome">${item.nome}</div>
+                <div class="item-info">
+                  <span>Quantidade: <strong>${item.quantidade}</strong></span>
+                  <span class="item-preco">R$ ${(parseFloat(item.preco) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                  <span>Subtotal: <strong>R$ ${((parseFloat(item.preco) || 0) * (item.quantidade || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong></span>
+                </div>
+              </div>
             </div>
-          ` : ''}
+          `;
+        });
+      }
+
+      html += `
+          </div>
         </div>
       `;
+
+      lista.innerHTML += html;
     });
 
   } catch (error) {
     console.error("Erro ao carregar pedidos:", error);
-    div.innerHTML = `
+    lista.innerHTML = `
       <div class="pedidos-vazio">
-        <h2>Erro ao carregar pedidos</h2>
-        <p>Desculpe, houve um erro ao carregar seus pedidos. Tente novamente mais tarde.</p>
-        <a href="/" class="btn-voltar">← Voltar à loja</a>
+        <p>Erro ao carregar pedidos 😢</p>
+        <p style="margin-top: 15px; color: #999; font-size: 14px;">
+          <a href="/" style="color: #667eea; text-decoration: none; font-weight: 600;">← Voltar para home</a>
+        </p>
       </div>
     `;
   }
-
 }
-
-carregarPedidos();

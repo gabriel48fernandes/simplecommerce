@@ -88,7 +88,8 @@ router.get("/usuario/:usuario_id", async (req, res) => {
             pi.produto_id,
             pi.quantidade,
             pi.preco,
-            p.nome
+            p.nome,
+            (SELECT url FROM imagens_produto WHERE produto_id = p.id ORDER BY principal DESC, id ASC LIMIT 1) as imagem
           FROM pedido_itens pi
           JOIN produtos p ON p.id = pi.produto_id
           WHERE pi.pedido_id = $1

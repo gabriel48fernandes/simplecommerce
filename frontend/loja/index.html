@@ -132,25 +132,25 @@
             </select>
         </div>
 
-        <div id="pagamento-pix" class="pix-area" style="display:none;">
-            <div class="pix-card">
-                <h3>PIX</h3>
-                <img id="pix-qrcode" src="" alt="QR Code PIX" />
-                <input id="pix-copia-cola" class="pix-copia" readonly />
-                <p id="status-pagamento">⏳ Aguardando pagamento...</p>
-                <div class="pix-botoes">
-                    <button class="btn-pix btn-copiar"
-                        onclick="navigator.clipboard.writeText(document.getElementById('pix-copia-cola').value).then(() => alert('Copiado!'))">Copiar</button>
-                    <button class="btn-pix btn-confirmar" onclick="confirmarPagamentoPix()">Já paguei</button>
-                </div>
-            </div>
-        </div>
-
         <div class="cart-footer">
             <div id="total-carrinho">Total: R$ 0,00</div>
             <button type="button" onclick="iniciarPagamento()">Finalizar compra</button>
         </div>
 
+    </div>
+
+    <div id="pagamento-pix" class="pix-area" style="display:none; position: fixed; bottom: 0; right: 0; width: 420px; padding: 20px; background: white; z-index: 2001;">
+        <div class="pix-card">
+            <h3>PIX</h3>
+            <img id="pix-qrcode" src="" alt="QR Code PIX" />
+            <input id="pix-copia-cola" class="pix-copia" readonly />
+            <p id="status-pagamento">⏳ Aguardando pagamento...</p>
+            <div class="pix-botoes">
+                <button class="btn-pix btn-copiar"
+                    onclick="navigator.clipboard.writeText(document.getElementById('pix-copia-cola').value).then(() => alert('Copiado!'))">Copiar</button>
+                <button class="btn-pix btn-confirmar" onclick="confirmarPagamentoPix()">Já paguei</button>
+            </div>
+        </div>
     </div>
     <!-- FOOTER -->
     <footer class="footer">

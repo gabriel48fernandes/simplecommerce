@@ -143,35 +143,7 @@ cursor:pointer;
    FOOTER DO CARRINHO
 ========================= */
 
-.cart-footer{
-
-background:white;
-
-padding:20px;
-
-border-top:1px solid #eee;
-
-}
-
-.cart-footer button{
-
-width:100%;
-
-padding:14px;
-
-border:none;
-
-border-radius:8px;
-
-font-weight:bold;
-
-background:linear-gradient(135deg,#667eea,#764ba2);
-
-color:white;
-
-cursor:pointer;
-
-}
+/* Estilos consolidados em style.css */
 
 /* =========================
    FRETE

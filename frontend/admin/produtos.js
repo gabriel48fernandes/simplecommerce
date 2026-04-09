@@ -22,6 +22,25 @@ export function inicializarProdutos() {
   }
 
   form.addEventListener("submit", salvarProduto)
+  
+  // Image preview functionality
+  const imagemInput = document.getElementById("imagem")
+  const previewContainer = document.getElementById("preview-container")
+  const previewImage = document.getElementById("preview-image")
+  const previewFilename = document.getElementById("preview-filename")
+  
+  imagemInput.addEventListener("change", (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        previewImage.src = event.target.result
+        previewFilename.textContent = file.name
+        previewContainer.style.display = "block"
+      }
+      reader.readAsDataURL(file)
+    }
+  })
 }
 
 function abrirModal(produto = null) {
@@ -44,6 +63,10 @@ function fecharModal() {
   modal.classList.remove("active")
   form.reset()
   produtoEditandoId = null
+  
+  // Hide preview
+  const previewContainer = document.getElementById("preview-container")
+  previewContainer.style.display = "none"
 }
 
 async function getSelectedImageDataUrl() {

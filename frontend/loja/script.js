@@ -76,6 +76,10 @@ if (areaUsuario) {
     areaUsuario.innerHTML = `
       <span>Olá, ${primeiroNome} 👋</span>
 
+      <a href="/meus-pedidos.html" class="icon-link" style="text-decoration: none; font-weight: 600; color: #333; transition: all 0.3s;" title="Meus Pedidos">
+        📦
+      </a>
+
       <button class="icon-link" id="iconeCarrinho" onclick="abrirCarrinho()">
         🛒 <span id="contadorCarrinho">0</span>
       </button>
