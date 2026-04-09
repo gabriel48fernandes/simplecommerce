@@ -12,7 +12,7 @@ router.get("/", async (req, res) => {
     const { search, categoria, categorias, precoMin, precoMax, promo } = req.query;
 
     let query = `
-      SELECT DISTINCT ON (p.id)
+      SELECT 
         p.id,
         p.nome,
         p.preco,
@@ -20,11 +20,14 @@ router.get("/", async (req, res) => {
         p.quantidade,
         p.categoria_id,
         c.nome AS categoria,
-        i.url AS imagem
+        (
+          SELECT url FROM imagens_produto 
+          WHERE produto_id = p.id 
+          ORDER BY principal DESC, id ASC
+          LIMIT 1
+        ) AS imagem
       FROM produtos p
       JOIN categorias c ON c.id = p.categoria_id
-      LEFT JOIN imagens_produto i 
-      ON i.produto_id = p.id AND i.principal = true
       WHERE 1=1
     `;
 
@@ -107,8 +110,15 @@ router.get("/", async (req, res) => {
         ? Math.round(((preco - precoPromocional) / preco) * 100)
         : null;
 
+      // 🔥 Converter imagem simples para array de imagens
+      const imagens = p.imagem 
+        ? [{ url: p.imagem, principal: true }]
+        : [];
+
       return {
         ...p,
+        imagem: p.imagem,
+        imagens: imagens,
         tem_promocao: temPromocao,
         percentual_desconto: percentualDesconto
       };
@@ -209,10 +219,7 @@ router.get("/:id", async (req, res) => {
     res.json({
       ...produto,
       imagens: imagensResult.rows,
-
-      // 🔥 AGORA VAI ORGANIZADO PRO FRONT
       variacoes: variacoesOrganizadas,
-
       itens: itensResult.rows,
       tem_promocao: temPromocao,
       percentual_desconto: percentualDesconto

@@ -1,4 +1,10 @@
 import { formatarPreco, api } from "./utils.js"
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"
+
+const supabase = createClient(
+  "https://fcknvwqerkyujhquugls.supabase.co",
+  "sb_publishable_c-_9HXFPIQLd56o_2bixfw_oh-bMdXZ"
+)
 
 let produtoEditandoId = null
 
@@ -45,13 +51,28 @@ async function getSelectedImageDataUrl() {
   if (!input || !input.files || input.files.length === 0) return null;
 
   const file = input.files[0];
-
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
+  
+  // Upload to Supabase
+  try {
+    const nomeArquivo = Date.now() + '-' + Math.random().toString(36).substring(7) + '.' + file.name.split('.').pop();
+    
+    const { error } = await supabase.storage
+      .from("produtos")
+      .upload(nomeArquivo, file);
+    
+    if (error) {
+      console.error("Erro ao fazer upload:", error);
+      alert("Erro ao fazer upload da imagem");
+      return null;
+    }
+    
+    const { data } = supabase.storage.from("produtos").getPublicUrl(nomeArquivo);
+    return data.publicUrl;
+  } catch (err) {
+    console.error("❌ Erro ao upload de imagem:", err);
+    alert("Erro ao fazer upload da imagem");
+    return null;
+  }
 }
 
 async function salvarProduto(e) {
@@ -67,9 +88,10 @@ async function salvarProduto(e) {
     categoria_id: Number(document.getElementById("categoria").value)
   }
 
+  // 🔥 Upload image and get URL - then add to imagens array
   const imagemUrl = await getSelectedImageDataUrl();
   if (imagemUrl) {
-    data.imagem_url = imagemUrl;
+    data.imagens = [{ url: imagemUrl, principal: true }];
   }
 
   const metodo = produtoEditandoId ? "PUT" : "POST"

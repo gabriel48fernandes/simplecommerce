@@ -76,17 +76,20 @@ async function carregarCarrinho() {
 
     itens.forEach(item => {
 
-      const preco = Number(item.preco);
+      const preco = Number(item.preco_final || item.preco);
       const quantidade = Number(item.quantidade);
       const subtotal = preco * quantidade;
 
       total += subtotal;
 
+      // 🔥 Garantir que imagem tem fallback
+      const imagemUrl = item.imagem || window.SEM_IMAGEM_FALLBACK;
+
       lista.innerHTML += `
 
         <div class="item-carrinho">
 
-          <img class="item-img" src="${item.imagem || window.SEM_IMAGEM_FALLBACK}" onerror="this.onerror=null; this.src=window.SEM_IMAGEM_FALLBACK" />
+          <img class="item-img" src="${imagemUrl}" onerror="this.onerror=null; this.src=window.SEM_IMAGEM_FALLBACK" />
 
           <div class="item-info">
 
@@ -274,7 +277,6 @@ function atualizarTotal() {
 // INICIAR PAGAMENTO
 // ============================
 async function iniciarPagamento() {
-  console.log("iniciarPagamento() chamado");
   try {
     if (freteSelecionado === 0) {
       const continuar = confirm(
@@ -340,15 +342,19 @@ initCarrinhoDrawer();
 
 async function confirmarPagamentoPix() {
 
-  console.log("pedidoAtual:", pedidoAtual);
-
   const res = await api(`/pedidos/confirmar-pagamento/${pedidoAtual}`, {
     method: "PUT"
   });
 
-  const text = await res.text();
+  const data = await res.json();
 
-  console.log("Resposta do servidor:", text);
+  if (!res.ok) {
+    alert("Erro ao confirmar pagamento: " + data.erro);
+    return;
+  }
+
+  alert("Pagamento confirmado com sucesso!");
+  window.location.href = "/meus-pedidos.html";
 
 }
 // ============================
@@ -358,12 +364,17 @@ async function confirmarPagamentoPix() {
 async function finalizarCompra() {
 
   const auth = JSON.parse(localStorage.getItem("auth"));
-  const cep = document.getElementById("cep").value;
+  const cep = document.getElementById("cep").value.trim();
   const formaPagamento = document.getElementById("formaPagamento").value;
 
   if (!auth) {
     window.location.href = "/login.html";
     return;
+  }
+
+  if (!cep) {
+    alert("⚠️ Por favor, preencha o CEP");
+    return null;
   }
 
   const res = await api("/pedidos/finalizar", {

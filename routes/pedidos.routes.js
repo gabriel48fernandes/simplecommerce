@@ -52,8 +52,65 @@ router.get("/", apenasAdmin, async (req, res) => {
 
 
 // ==========================
-// FINALIZAR PEDIDO
+// MEUS PEDIDOS (USUARIO)
 // ==========================
+router.get("/usuario/:usuario_id", async (req, res) => {
+  
+  const { usuario_id } = req.params;
+  
+  // Validar que usuário só pode ver seus próprios pedidos
+  if (req.usuario.role !== "admin" && Number(usuario_id) !== req.usuario.id) {
+    return res.status(403).json({ erro: "Acesso negado" });
+  }
+
+  try {
+    const pedidos = await pool.query(`
+      SELECT
+        p.id,
+        p.total,
+        p.status,
+        p.status_pagamento,
+        p.criado_em,
+        p.frete,
+        p.transportadora,
+        p.prazo,
+        p.forma_pagamento
+      FROM pedidos p
+      WHERE p.usuario_id = $1
+      ORDER BY p.criado_em DESC
+    `, [usuario_id]);
+
+    // Para cada pedido, buscar os itens
+    const pedidosComItens = await Promise.all(
+      pedidos.rows.map(async (pedido) => {
+        const itens = await pool.query(`
+          SELECT
+            pi.produto_id,
+            pi.quantidade,
+            pi.preco,
+            p.nome
+          FROM pedido_itens pi
+          JOIN produtos p ON p.id = pi.produto_id
+          WHERE pi.pedido_id = $1
+        `, [pedido.id]);
+
+        return {
+          ...pedido,
+          itens: itens.rows
+        };
+      })
+    );
+
+    res.json(pedidosComItens);
+
+  } catch (error) {
+    console.error("Erro ao buscar pedidos do usuário:", error);
+    res.status(500).json({ erro: "Erro ao buscar pedidos" });
+  }
+
+});
+
+
 router.post("/finalizar", async (req, res) => {
 
   const {
@@ -325,7 +382,7 @@ router.put("/:id/status", apenasAdmin, async (req, res) => {
 // ==========================
 // CONFIRMAR PAGAMENTO PIX
 // ==========================
-router.put("/confirmar-pagamento/:id", apenasAdmin, async (req, res) => {
+router.put("/confirmar-pagamento/:id", async (req, res) => {
 
   const id = Number(req.params.id);
 
@@ -346,6 +403,11 @@ router.put("/confirmar-pagamento/:id", apenasAdmin, async (req, res) => {
     }
 
     const pedido = pedidoResult.rows[0];
+
+    // 🔒 Validar que é o próprio pedido do usuário (ou admin)
+    if (req.usuario.role !== "admin" && pedido.usuario_id !== req.usuario.id) {
+      return res.status(403).json({ erro: "Você não pode confirmar este pedido" });
+    }
 
     // 2️⃣ Evitar confirmar duas vezes
     if (pedido.status_pagamento === "pago") {

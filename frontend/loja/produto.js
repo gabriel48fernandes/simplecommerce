@@ -84,22 +84,46 @@ function renderizarImagens(produto) {
 
   miniaturas.innerHTML = "";
 
-  // Usar array de imagens da API ou fallback para imagem única
-  const imagens = produto.imagens || [{ url: produto.imagem }];
+  // 🔥 Usar array de imagens da API
+  let imagens = produto.imagens || [];
+  
+  // Fallback para imagem única se não houver array
+  if ((!imagens || imagens.length === 0) && produto.imagem) {
+    imagens = [{ url: produto.imagem, principal: true }];
+  }
+
+  // Se ainda não temos imagens, usar placeholder
+  if (!imagens || imagens.length === 0) {
+    imagens = [{ url: window.SEM_IMAGEM_FALLBACK, principal: true }];
+  }
 
   imagens.forEach((img, index) => {
-    const src = img.url || img;
+    const src = img.url || img || window.SEM_IMAGEM_FALLBACK;
     const imgEl = document.createElement("img");
     imgEl.src = src;
     imgEl.alt = `Miniatura ${index + 1}`;
+    imgEl.onerror = function() {
+      this.onerror = null;
+      this.src = window.SEM_IMAGEM_FALLBACK;
+    };
     
     miniaturas.appendChild(imgEl);
   });
 
   // Mostrar primeira imagem por padrão
   if (imagens.length > 0) {
-    const firstSrc = imagens[0].url || imagens[0];
+    // Procurar pela imagem principal se existir
+    const imgPrincipal = imagens.find(img => img.principal === true || img.principal === 1);
+    const firstImg = imgPrincipal || imagens[0];
+    const firstSrc = firstImg?.url || firstImg || window.SEM_IMAGEM_FALLBACK;
+    
     imagemPrincipal.src = firstSrc;
+    imagemPrincipal.onerror = function() {
+      this.onerror = null;
+      this.src = window.SEM_IMAGEM_FALLBACK;
+    };
+  } else {
+    imagemPrincipal.src = window.SEM_IMAGEM_FALLBACK;
   }
 }
 

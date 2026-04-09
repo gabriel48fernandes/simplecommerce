@@ -1,18 +1,219 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Meus Pedidos - SimpleCommerce</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style-responsive.css" />
+    <style>
+        .meus-pedidos-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .meus-pedidos-container h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .pedido-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #f9f9f9;
+        }
+
+        .pedido-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .pedido-id {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .pedido-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-pendente {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-pago {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-enviado {
+            background-color: #cfe2ff;
+            color: #084298;
+        }
+
+        .status-entregue {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .pedido-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .pedido-itens {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .pedido-itens h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .item-lista {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .item-nome {
+            flex: 1;
+        }
+
+        .item-qtd {
+            text-align: center;
+            min-width: 60px;
+        }
+
+        .item-preco {
+            text-align: right;
+            min-width: 90px;
+        }
+
+        .pedidos-vazio {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .pedidos-vazio h2 {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .pedidos-vazio a {
+            color: #5865f2;
+            text-decoration: none;
+            margin-top: 20px;
+            display: inline-block;
+        }
+
+        .pedidos-vazio a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-voltar {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #5865f2;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 20px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-voltar:hover {
+            background: #4752c4;
+        }
+
+        @media (max-width: 768px) {
+            .meus-pedidos-container {
+                padding: 10px;
+                margin: 20px auto;
+            }
+
+            .pedido-info {
+                grid-template-columns: 1fr;
+            }
+
+            .pedido-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .pedido-status {
+                align-self: flex-start;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Meus pedidos</h1>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo-container">
+            <span class="logo-icon">🛍️</span>
+            <div class="logo">SimpleCommerce</div>
+        </div>
 
-    <div id="listaPedidos"></div>
+        <input type="text" id="buscaProduto" placeholder="🔍 Buscar produtos..." class="search" />
 
-    <script src="/utils.js"></script>
+        <div class="icons" id="area-usuario">
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="meus-pedidos-container">
+        <h1>Meus Pedidos</h1>
+
+        <div id="listaPedidos"></div>
+    </main>
+
+    <script src="utils.js"></script>
+    <script src="script.js"></script>
     <script src="meus-pedidos.js"></script>
 </body>
 

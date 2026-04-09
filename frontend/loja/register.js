@@ -8,8 +8,13 @@ form.addEventListener("submit", async (e) => {
   const email = document.getElementById("email").value;
   const senha = document.getElementById("senha").value;
 
+  // 🔥 Define API_URL para production compatibility
+  const API_URL = window.location.hostname.includes("localhost")
+    ? "http://localhost:3000"
+    : "https://simplecommerce.onrender.com";
+
   try {
-    const response = await fetch("/auth/register", {
+    const response = await fetch(`${API_URL}/auth/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

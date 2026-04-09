@@ -175,7 +175,7 @@ async function carregarBannersHome() {
   }
 
   try {
-    const res = await fetch(`${API_URL}/banners`);
+    const res = await api(`${API_URL}/banners`);
     
     if (!res.ok) {
       throw new Error(`Erro ao buscar banners: ${res.status} ${res.statusText}`);
@@ -351,6 +351,17 @@ async function carregarProdutos(search = "") {
 
       const temPromocao = p.tem_promocao;
 
+      // 🔥 Obter URL da imagem principal (com fallback)
+      let imagemUrl = window.SEM_IMAGEM_FALLBACK;
+      
+      if (p.imagens && Array.isArray(p.imagens) && p.imagens.length > 0) {
+        // Procurar imagem principal
+        const imagemPrincipal = p.imagens.find(img => img.principal === true || img.principal === 1);
+        imagemUrl = imagemPrincipal?.url || p.imagens[0]?.url || p.imagem || window.SEM_IMAGEM_FALLBACK;
+      } else if (p.imagem) {
+        imagemUrl = p.imagem;
+      }
+
       let precoHTML = "";
       let badgeHTML = "";
 
@@ -386,7 +397,7 @@ async function carregarProdutos(search = "") {
        <a class="card-link" href="produto.html?id=${p.id}">
         ${badgeHTML}
 
-        <img src="${p.imagem || window.SEM_IMAGEM_FALLBACK}"
+        <img src="${imagemUrl}"
         alt="${p.nome}"
         onerror="this.onerror=null; this.src=window.SEM_IMAGEM_FALLBACK" />
 

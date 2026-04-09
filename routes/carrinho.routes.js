@@ -146,6 +146,7 @@ router.get("/:usuario_id", async (req, res) => {
         p.nome,
         p.preco,
         p.preco_promocional,
+        COALESCE(p.preco_promocional, p.preco) AS preco_final,
         i.url AS imagem
       FROM carrinho_itens ci
       JOIN produtos p ON ci.produto_id = p.id

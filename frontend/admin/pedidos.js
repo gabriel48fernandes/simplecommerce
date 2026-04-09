@@ -59,6 +59,22 @@ window.verPedidoModal = async (id) => {
 
   <hr>
 
+  <h4>Atualizar Status</h4>
+  <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+    <select id="selectStatus" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+      <option value="">-- Selecione um status --</option>
+      <option value="pendente">Pendente</option>
+      <option value="pago">Pago</option>
+      <option value="enviado">Enviado</option>
+      <option value="entregue">Entregue</option>
+    </select>
+    <button onclick="window.atualizarStatusPedido(${id}, document.getElementById('selectStatus').value)" style="padding: 8px 16px; background: #5865f2; color: white; border: none; border-radius: 4px; cursor: pointer;">
+      Atualizar
+    </button>
+  </div>
+
+  <hr>
+
   <h4>Entrega</h4>
 
   <p><strong>Transportadora:</strong> ${pedido.transportadora ?? "-"}</p>
@@ -83,11 +99,26 @@ window.verPedidoModal = async (id) => {
 }
 
 window.atualizarStatusPedido = async (id, status) => {
-  await api(`/pedidos/${id}/status`, {
-    method: "PUT",
-    body: JSON.stringify({ status })
-  })
+  if (!status) {
+    alert("Selecione um status");
+    return;
+  }
 
-  window.verPedidoModal(id)
-  carregarPedidos()
+  try {
+    const res = await api(`/pedidos/${id}/status`, {
+      method: "PUT",
+      body: JSON.stringify({ status })
+    })
+
+    if (!res.ok) {
+      throw new Error("Erro ao atualizar status");
+    }
+
+    alert("✅ Status atualizado com sucesso!");
+    window.verPedidoModal(id)
+    carregarPedidos()
+  } catch (error) {
+    console.error("Erro ao atualizar status:", error);
+    alert("❌ Erro ao atualizar status");
+  }
 }
