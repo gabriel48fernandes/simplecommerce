@@ -6,7 +6,7 @@ const areaUsuario = document.getElementById("area-usuario");
 
 const API_URL = window.location.hostname.includes("localhost")
   ? "http://localhost:3000"
-  : "https://simplecommerce.onrender.com/";
+  : "https://simplecommerce.onrender.com";
 
 let PRECO_MAXIMO = 0;
 
