@@ -292,7 +292,9 @@ body {
 
     transition: all 0.3s ease;
 
-    z-index: 9999;
+    z-index: 1900;
+    pointer-events: none;
+    /* Não interfere com cliques quando não está visível */
 
 }
 
@@ -300,6 +302,8 @@ body {
 
     opacity: 1;
     transform: translateY(0);
+    pointer-events: auto;
+    /* Permite interação quando visível */
 
 }
 
@@ -348,8 +352,8 @@ body {
 
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
-    /* permite rolar todo o drawer quando o conteúdo exceder */
+    overflow: hidden;
+    /* Evita overflow do container, mantém footer visível */
 
 }
 
@@ -426,6 +430,9 @@ body {
 
     padding: 20px;
 
+    min-height: 0;
+    /* Permite que flex funcione corretamente com overflow */
+
 }
 
 
@@ -442,14 +449,15 @@ body {
     padding: 20px;
     border-top: 1px solid #eee;
 
-    position: sticky;
-    bottom: 0;
-    z-index: 100;
+    position: relative;
+    z-index: 101;
     background: white;
     display: flex;
     flex-direction: column;
     gap: 12px;
     box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+    /* Garante que o footer não é comprimido e sempre fica visível */
 
 }
 
