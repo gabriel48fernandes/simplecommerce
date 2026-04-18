@@ -8,22 +8,44 @@
 let produtoAtual = null;
 let variacoesSelecionadas = {};
 
+
+function mostrarLoadingProduto() {
+  const nome = document.getElementById("nomeProduto");
+  const preco = document.getElementById("precoProduto");
+
+  if (nome) nome.innerText = "Carregando produto...";
+  if (preco) preco.innerText = "Aguarde...";
+  if (imagemPrincipal) imagemPrincipal.src = window.SEM_IMAGEM_FALLBACK;
+}
+
 async function carregarProduto() {
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
 
   if (!id) return;
 
+  // 🔥 MOSTRA LOADING ANTES DE BUSCAR
+  mostrarLoadingProduto();
+
   try {
     const res = await api(`/produtos/${id}`);
     const data = await res.json();
-    
-    // A resposta pode vir como { produto, ... } ou ser o produto direto
+
     produtoAtual = data.produto || data;
-    
+
+    // 🔥 LIMPA O LOADING
+    const container = document.getElementById("produto-container");
+    if (container) container.innerHTML = "";
+
     mostrarProduto(produtoAtual);
+
   } catch (err) {
     console.error("Erro ao carregar produto:", err);
+
+    const container = document.getElementById("produto-container");
+    if (container) {
+      container.innerHTML = `<p>❌ Erro ao carregar produto</p>`;
+    }
   }
 }
 
@@ -142,7 +164,11 @@ function renderizarVariacoes(produto) {
   container.innerHTML = "";
 
   // Agrupar variações por tipo
-  const variacoesPorTipo = agruparVariacoesPorTipo(produto.variacoes || []);
+  const listaVariacoes = Array.isArray(produto.variacoes)
+  ? produto.variacoes
+  : [];
+
+const variacoesPorTipo = agruparVariacoesPorTipo(listaVariacoes);
 
   // Se não há variações, retornar
   if (Object.keys(variacoesPorTipo).length === 0) {
@@ -193,13 +219,26 @@ function renderizarVariacoes(produto) {
 function agruparVariacoesPorTipo(variacoes) {
   const agrupado = {};
 
+  // 🔥 proteção pra não quebrar
+  if (!Array.isArray(variacoes)) {
+    console.warn("variacoes inválidas:", variacoes);
+    return agrupado;
+  }
+
   variacoes.forEach(v => {
-    const tipo = v.tipo.toLowerCase();
+    if (!v) return;
+
+    const tipo = (v.tipo || "").toLowerCase();
+    const valor = v.valor;
+
+    if (!tipo || !valor) return;
+
     if (!agrupado[tipo]) {
       agrupado[tipo] = [];
     }
-    if (!agrupado[tipo].includes(v.valor)) {
-      agrupado[tipo].push(v.valor);
+
+    if (!agrupado[tipo].includes(valor)) {
+      agrupado[tipo].push(valor);
     }
   });
 

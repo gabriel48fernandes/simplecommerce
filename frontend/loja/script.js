@@ -73,34 +73,97 @@ if (areaUsuario) {
       ? auth.usuario.nome.split(" ")[0]
       : auth.usuario.email;
 
+    // pega inicial para avatar
+    const inicial = primeiroNome.charAt(0).toUpperCase();
+
     areaUsuario.innerHTML = `
-      <span>Olá, ${primeiroNome} 👋</span>
+      <div class="user-menu">
 
-      <a href="/meus-pedidos.html" class="icon-link" style="text-decoration: none; font-weight: 600; color: #333; transition: all 0.3s;" title="Meus Pedidos">
-        📦
-      </a>
+        <div class="user-info" onclick="toggleUserMenu()">
+          <div class="avatar">${inicial}</div>
+          <span>${primeiroNome}</span>
+        </div>
 
-      <button class="icon-link" id="iconeCarrinho" onclick="abrirCarrinho()">
-        🛒 <span id="contadorCarrinho">0</span>
-      </button>
+        <div class="user-dropdown" id="userDropdown">
 
-      ${auth.usuario.role === "admin"
-        ? `<a href="/admin/admin.html" class="btn-admin">⚙ ADM</a>`
-        : ""
-      }
+          <button onclick="irParaPedidos()">
+            📦 Meus pedidos
+          </button>
 
-      <button id="logout">Sair</button>
+          ${auth.usuario.role === "admin"
+            ? `<button onclick="irParaAdmin()">⚙ Painel ADM</button>`
+            : ""
+          }
+
+          <button onclick="logout()">
+            🚪 Sair
+          </button>
+
+        </div>
+
+        <button class="icon-link" id="iconeCarrinho" onclick="abrirCarrinho()">
+          🛒 <span id="contadorCarrinho">0</span>
+        </button>
+
+      </div>
     `;
 
     atualizarContadorCarrinho();
 
-    document.getElementById("logout").onclick = () => {
-      localStorage.removeItem("auth");
-      window.location.reload();
-    };
-
   }
 
+}
+
+// ============================
+// FUNÇÕES DO MENU USUÁRIO
+// ============================
+
+function toggleUserMenu() {
+  const menu = document.getElementById("userDropdown");
+  if (menu) {
+    menu.classList.toggle("ativo");
+  }
+}
+
+function logout() {
+  localStorage.removeItem("auth");
+  window.location.reload();
+}
+
+function irParaPedidos() {
+  window.location.href = "/meus-pedidos.html";
+}
+
+function irParaAdmin() {
+  window.location.href = "/admin/admin.html";
+}
+
+// Fecha dropdown ao clicar fora
+document.addEventListener("click", function (e) {
+  const menu = document.getElementById("userDropdown");
+  const userInfo = document.querySelector(".user-info");
+
+  if (!menu || !userInfo) return;
+
+  if (!userInfo.contains(e.target) && !menu.contains(e.target)) {
+    menu.classList.remove("ativo");
+  }
+});
+
+
+
+function toggleUserMenu() {
+  const menu = document.getElementById("userDropdown");
+  menu.classList.toggle("ativo");
+}
+
+function logout() {
+  localStorage.removeItem("auth");
+  window.location.reload();
+}
+
+function irParaPedidos() {
+  window.location.href = "/meus-pedidos.html";
 }
 
 function animarProdutoCarrinho(imagemProduto) {
