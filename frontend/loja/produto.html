@@ -23,8 +23,6 @@
     <div class="icons" id="area-usuario"></div>
   </header>
 
-  <div id="produto-container"></div>
-
   <!-- NAVEGAÇÃO -->
   <div class="breadcrumb">
     <a href="index.html">Loja</a>
@@ -32,8 +30,19 @@
     <span>Detalhes do Produto</span>
   </div>
 
-  <!-- PRODUTO -->
-  <main class="produto-page">
+  <!-- CONTAINER PRINCIPAL -->
+  <div id="produto-container">
+
+    <!-- SKELETON LOADING - UMA ÚNICA CLASSE SIMPLES -->
+    <div id="produto-loading">
+      <div class="skeleton-card"></div>
+    </div>
+
+    <!-- CONTEÚDO REAL -->
+    <div id="produto-conteudo" style="display: none;">
+
+      <!-- PRODUTO -->
+      <main class="produto-page">
 
     <!-- GALERIA DO PRODUTO -->
     <section class="produto-galeria">
@@ -111,6 +120,10 @@
     </section>
 
   </main>
+
+    </div><!-- fecha #produto-conteudo -->
+
+  </div><!-- fecha #produto-container -->
 
   <!-- ACCORDION SEÇÕES -->
   <section class="produto-accordion">

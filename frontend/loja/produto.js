@@ -8,14 +8,24 @@
 let produtoAtual = null;
 let variacoesSelecionadas = {};
 
+// ==========================================
+// FUNÇÕES DE LOADING GLOBAL
+// ==========================================
 
-function mostrarLoadingProduto() {
-  const nome = document.getElementById("nomeProduto");
-  const preco = document.getElementById("precoProduto");
+function mostrarLoading() {
+  const loading = document.getElementById("produto-loading");
+  const conteudo = document.getElementById("produto-conteudo");
+  
+  if (loading) loading.style.display = "block";
+  if (conteudo) conteudo.style.display = "none";
+}
 
-  if (nome) nome.innerText = "Carregando produto...";
-  if (preco) preco.innerText = "Aguarde...";
-  if (imagemPrincipal) imagemPrincipal.src = window.SEM_IMAGEM_FALLBACK;
+function esconderLoading() {
+  const loading = document.getElementById("produto-loading");
+  const conteudo = document.getElementById("produto-conteudo");
+  
+  if (loading) loading.style.display = "none";
+  if (conteudo) conteudo.style.display = "block";
 }
 
 async function carregarProduto() {
@@ -24,8 +34,8 @@ async function carregarProduto() {
 
   if (!id) return;
 
-  // 🔥 MOSTRA LOADING ANTES DE BUSCAR
-  mostrarLoadingProduto();
+  // 🔥 MOSTRA SKELETON LOADING
+  mostrarLoading();
 
   try {
     const res = await api(`/produtos/${id}`);
@@ -33,18 +43,14 @@ async function carregarProduto() {
 
     produtoAtual = data.produto || data;
 
-    // 🔥 LIMPA O LOADING
-    const container = document.getElementById("produto-container");
-    if (container) container.innerHTML = "";
-
     mostrarProduto(produtoAtual);
 
   } catch (err) {
     console.error("Erro ao carregar produto:", err);
 
-    const container = document.getElementById("produto-container");
-    if (container) {
-      container.innerHTML = `<p>❌ Erro ao carregar produto</p>`;
+    const loading = document.getElementById("produto-loading");
+    if (loading) {
+      loading.innerHTML = `<p style="text-align: center; padding: 40px; color: #d32f2f;">❌ Erro ao carregar produto</p>`;
     }
   }
 }
@@ -92,6 +98,9 @@ function mostrarProduto(produto) {
 
   // ESTOQUE INICIAL
   atualizarEstoque(produto);
+
+  // 🔥 ESCONDE SKELETON E MOSTRA CONTEÚDO
+  esconderLoading();
 }
 
 // ==========================================
