@@ -621,34 +621,7 @@ body {
     z-index: 2;
 }
 
-/* Botão do banner */
-.banner-btn {
-    position: absolute;
-    bottom: 50px;
-    left: 50px;
-    padding: 14px 32px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    z-index: 10;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
 
-.banner-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-}
-
-.banner-btn:active {
-    transform: translateY(-1px);
-}
 
 /* GRADIENTE QUE FAZ A TRANSIÇÃO PARA AS CATEGORIAS */
 .carousel::after {
