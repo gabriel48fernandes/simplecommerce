@@ -73,68 +73,84 @@ if (areaUsuario) {
 
   } else {
 
-    const primeiroNome = auth.usuario.nome
-      ? auth.usuario.nome.split(" ")[0]
-      : auth.usuario.email;
+  const primeiroNome = auth.usuario.nome
+    ? auth.usuario.nome.split(" ")[0]
+    : auth.usuario.email;
 
-    const inicial = primeiroNome.charAt(0).toUpperCase();
+  const inicial = primeiroNome.charAt(0).toUpperCase();
 
-    areaUsuario.innerHTML = `
-      <div class="user-menu">
+  areaUsuario.innerHTML = `
+    <div class="user-menu">
 
-        <div class="user-info" onclick="toggleUserMenu()">
-          <div class="avatar">${inicial}</div>
-          <span>${primeiroNome}</span>
+      <div class="user-info" onclick="abrirModalUsuario()">
+        <div class="avatar">${inicial}</div>
+        <span>${primeiroNome}</span>
+      </div>
+
+      <button class="icon-link" id="iconeCarrinho" onclick="abrirCarrinho()">
+        <i data-lucide="shopping-cart"></i>
+        <span id="contadorCarrinho">0</span>
+      </button>
+
+    </div>
+
+    <!-- MODAL USUÁRIO -->
+    <div class="user-modal" id="userModal">
+      <div class="user-modal-content">
+
+        <div class="user-modal-header">
+          <div class="avatar grande">${inicial}</div>
+
+          <div class="info">
+            <h4>${primeiroNome}</h4>
+            <span>${auth.usuario.email}</span>
+          </div>
+
+          <button onclick="fecharModalUsuario()">
+            <i data-lucide="x"></i>
+          </button>
         </div>
 
-        <div class="user-dropdown" id="userDropdown">
+        <div class="user-modal-body">
 
           <button onclick="irParaPedidos()">
             <i data-lucide="package"></i>
             Meus pedidos
           </button>
 
-          ${auth.usuario.role === "admin"
-            ? `
-              <button onclick="irParaAdmin()">
-                <i data-lucide="settings"></i>
-                Painel ADM
-              </button>
-            `
-            : ""
+          ${
+            auth.usuario.role === "admin"
+              ? `
+                <button onclick="irParaAdmin()">
+                  <i data-lucide="settings"></i>
+                  Painel ADM
+                </button>
+              `
+              : ""
           }
 
-          <button onclick="logout()">
+          <div class="divider"></div>
+
+          <button onclick="logout()" class="logout">
             <i data-lucide="log-out"></i>
             Sair
           </button>
 
         </div>
 
-        <button class="icon-link" id="iconeCarrinho" onclick="abrirCarrinho()">
-          <i data-lucide="shopping-cart"></i>
-          <span id="contadorCarrinho">0</span>
-        </button>
-
       </div>
-    `;
+    </div>
+  `;
 
-    atualizarContadorCarrinho();
-    lucide.createIcons();
-  }
+  atualizarContadorCarrinho();
+  lucide.createIcons();
+}
 
 }
 
 // ============================
 // FUNÇÕES DO MENU USUÁRIO
 // ============================
-
-function toggleUserMenu() {
-  const menu = document.getElementById("userDropdown");
-  if (menu) {
-    menu.classList.toggle("ativo");
-  }
-}
 
 function logout() {
   localStorage.removeItem("auth");
@@ -147,25 +163,6 @@ function irParaPedidos() {
 
 function irParaAdmin() {
   window.location.href = "/admin/admin.html";
-}
-
-// Fecha dropdown ao clicar fora
-document.addEventListener("click", function (e) {
-  const menu = document.getElementById("userDropdown");
-  const userInfo = document.querySelector(".user-info");
-
-  if (!menu || !userInfo) return;
-
-  if (!userInfo.contains(e.target) && !menu.contains(e.target)) {
-    menu.classList.remove("ativo");
-  }
-});
-
-
-
-function toggleUserMenu() {
-  const menu = document.getElementById("userDropdown");
-  menu.classList.toggle("ativo");
 }
 
 function logout() {
@@ -208,6 +205,21 @@ function animarProdutoCarrinho(imagemProduto) {
   }, 800);
 
 }
+document.addEventListener("click", function (e) {
+  const modal = document.getElementById("userModal");
+  const content = document.querySelector(".user-modal-content");
+  const userInfo = document.querySelector(".user-info");
+
+  if (!modal || !content || !userInfo) return;
+
+  if (
+    modal.classList.contains("ativo") &&
+    !content.contains(e.target) &&
+    !userInfo.contains(e.target)
+  ) {
+    modal.classList.remove("ativo");
+  }
+});
 
 async function atualizarContadorCarrinho() {
 
@@ -672,4 +684,13 @@ if (buscaInput) {
   buscaInput.addEventListener("input", (event) => {
     carregarProdutos(event.target.value.trim());
   });
+}
+function abrirModalUsuario() {
+  const modal = document.getElementById("userModal");
+  if (modal) modal.classList.add("ativo");
+}
+
+function fecharModalUsuario() {
+  const modal = document.getElementById("userModal");
+  if (modal) modal.classList.remove("ativo");
 }
