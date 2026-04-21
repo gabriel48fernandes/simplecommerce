@@ -12,8 +12,10 @@
 </head>
 
 <body>
+    <script src="https://unpkg.com/lucide@latest"></script>
 
     <!-- HEADER -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <header class="header">
         <div class="logo-container">
             <span class="logo-icon">🛍️</span>
@@ -89,17 +91,21 @@
 
     <!-- BENEFÍCIOS -->
     <section class="beneficios">
-        <div>🚚 Entrega Rápida</div>
-        <div>🔒 Compra Segura</div>
-        <div>💳 Pix e Cartão</div>
-        <div>🔁 Troca Facilitada</div>
+        <div><i class="fas fa-truck"></i> Entrega Rápida</div>
+        <div><i class="fas fa-shield-alt"></i> Compra Segura</div>
+        <div><i class="fas fa-credit-card"></i> Pix e Cartão</div>
+        <div><i class="fas fa-exchange-alt"></i> Troca Facilitada</div>
     </section>
+
     <!-- Toast de notificação -->
     <div id="toastCarrinho" class="toast-carrinho">
-        ✔ Produto adicionado ao carrinho
+        <i class="fas fa-check-circle"></i>
+        Produto adicionado ao carrinho
     </div>
+
     <div id="toastPedido" class="toast-carrinho">
-        📦 pedido criado! Segue com o pagamento.
+        <i class="fas fa-box"></i>
+        Pedido criado! Segue com o pagamento.
     </div>
 
     <!-- Carrinho lateral -->
@@ -139,7 +145,8 @@
 
     </div>
 
-    <div id="pagamento-pix" class="pix-area" style="display:none; position: fixed; bottom: 0; right: 0; width: 420px; padding: 20px; background: white; z-index: 2001;">
+    <div id="pagamento-pix" class="pix-area"
+        style="display:none; position: fixed; bottom: 0; right: 0; width: 420px; padding: 20px; background: white; z-index: 2001;">
         <div class="pix-card">
             <h3>PIX</h3>
             <img id="pix-qrcode" src="" alt="QR Code PIX" />
@@ -161,12 +168,13 @@
                     <span>🛍️</span>
                     <h3>SimpleCommerce</h3>
                 </div>
-                <p class="footer-desc">Sua loja online de confiança. Qualidade, segurança e variedade em um único lugar.</p>
+                <p class="footer-desc">Sua loja online de confiança. Qualidade, segurança e variedade em um único lugar.
+                </p>
                 <div class="footer-social">
-                    <a href="#" title="Instagram">📱</a>
-                    <a href="#" title="Facebook">👤</a>
-                    <a href="#" title="WhatsApp">💬</a>
-                    <a href="#" title="Twitter">𝕏</a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#"><i class="fab fa-x-twitter"></i></a>
                 </div>
             </div>
 
@@ -208,11 +216,11 @@
         <div class="footer-payments">
             <h4>Formas de Pagamento</h4>
             <div class="payment-icons">
-                <span title="PIX">💳</span>
-                <span title="Visa">💳</span>
-                <span title="Mastercard">💳</span>
-                <span title="Elo">💳</span>
-                <span title="Boleto">📋</span>
+                <span><i class="fas fa-credit-card"></i></span>
+                <span><i class="fab fa-cc-visa"></i></span>
+                <span><i class="fab fa-cc-mastercard"></i></span>
+                <span><i class="fab fa-cc-amex"></i></span>
+                <span><i class="fas fa-barcode"></i></span>
             </div>
         </div>
 

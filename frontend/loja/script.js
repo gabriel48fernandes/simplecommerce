@@ -39,9 +39,9 @@ async function carregarPrecoMaximo() {
     return 0;
   }
 }
-document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-    return false;
+document.addEventListener('contextmenu', function (e) {
+  e.preventDefault();
+  return false;
 });
 
 // ============================
@@ -60,12 +60,16 @@ if (areaUsuario) {
   if (!auth) {
 
     areaUsuario.innerHTML = `
-      <a href="/login.html" class="icon-link">👤</a>
+      <a href="/login.html" class="icon-link">
+        <i data-lucide="user"></i>
+      </a>
 
       <button class="icon-link" onclick="abrirCarrinho()">
-        🛒
+        <i data-lucide="shopping-cart"></i>
       </button>
     `;
+
+    lucide.createIcons();
 
   } else {
 
@@ -73,7 +77,6 @@ if (areaUsuario) {
       ? auth.usuario.nome.split(" ")[0]
       : auth.usuario.email;
 
-    // pega inicial para avatar
     const inicial = primeiroNome.charAt(0).toUpperCase();
 
     areaUsuario.innerHTML = `
@@ -87,29 +90,37 @@ if (areaUsuario) {
         <div class="user-dropdown" id="userDropdown">
 
           <button onclick="irParaPedidos()">
-            📦 Meus pedidos
+            <i data-lucide="package"></i>
+            Meus pedidos
           </button>
 
           ${auth.usuario.role === "admin"
-            ? `<button onclick="irParaAdmin()">⚙ Painel ADM</button>`
+            ? `
+              <button onclick="irParaAdmin()">
+                <i data-lucide="settings"></i>
+                Painel ADM
+              </button>
+            `
             : ""
           }
 
           <button onclick="logout()">
-            🚪 Sair
+            <i data-lucide="log-out"></i>
+            Sair
           </button>
 
         </div>
 
         <button class="icon-link" id="iconeCarrinho" onclick="abrirCarrinho()">
-          🛒 <span id="contadorCarrinho">0</span>
+          <i data-lucide="shopping-cart"></i>
+          <span id="contadorCarrinho">0</span>
         </button>
 
       </div>
     `;
 
     atualizarContadorCarrinho();
-
+    lucide.createIcons();
   }
 
 }
@@ -243,11 +254,11 @@ async function carregarBannersHome() {
 
   try {
     const res = await api(`${API_URL}/banners`);
-    
+
     if (!res.ok) {
       throw new Error(`Erro ao buscar banners: ${res.status} ${res.statusText}`);
     }
-    
+
     const banners = await res.json();
 
     if (!banners || banners.length === 0) {
@@ -420,7 +431,7 @@ async function carregarProdutos(search = "") {
 
       // 🔥 Obter URL da imagem principal (com fallback)
       let imagemUrl = window.SEM_IMAGEM_FALLBACK;
-      
+
       if (p.imagens && Array.isArray(p.imagens) && p.imagens.length > 0) {
         // Procurar imagem principal
         const imagemPrincipal = p.imagens.find(img => img.principal === true || img.principal === 1);
@@ -473,7 +484,7 @@ async function carregarProdutos(search = "") {
       </a>
 
       <button onclick="adicionarAoCarrinho(${p.id}, this)">
-        🛒 Adicionar
+       Adicionar ao carrinho
       </button>
       `;
 
@@ -608,29 +619,29 @@ async function initHome() {
   const temProdutos = document.getElementById("produtos");
   const temCategorias = document.getElementById("categorias");
   const temBanners = document.getElementById("carouselHome");
-  
+
   // Se nenhum desses elementos existe, provavelmente não é a página home
   if (!temProdutos && !temCategorias && !temBanners) {
     console.log("⚠️  Não é a página home. Inicialização parcial.");
   }
-  
+
   try {
     // 1. Carregar categorias
     await carregarCategorias();
     console.log("✅ Categorias carregadas");
-    
+
     // 2. Carregar preço máximo (apenas se tiver filtro de preço)
     if (document.getElementById("precoRange")) {
       await carregarPrecoMaximo();
       console.log("✅ Preço máximo carregado");
     }
-    
+
     // 3. Carregar produtos (apenas se existir container)
     if (temProdutos) {
       carregarProdutos();
       console.log("✅ Produtos carregados");
     }
-    
+
     // 4. Carregar banners da home (apenas se existir container)
     if (temBanners) {
       await carregarBannersHome();

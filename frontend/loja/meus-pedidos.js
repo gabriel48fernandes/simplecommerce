@@ -43,6 +43,7 @@ async function carregarPedidos() {
       </div>
     `;
     return;
+    lucide.createIcons();
   }
 
   try {

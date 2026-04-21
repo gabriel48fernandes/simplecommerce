@@ -155,23 +155,33 @@
 </head>
 
 <body>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <!-- HEADER já vem do style.css -->
     <header class="header">
         <div class="logo-container">
             <span class="logo-icon">🛍️</span>
             <div class="logo">SimpleCommerce</div>
         </div>
+        <div class="logo">SimpleCommerce</div>
+        </div>
 
         <div class="icons" id="area-usuario"></div>
     </header>
 
-    <!-- NAVEGAÇÃO (será injetada pelo JS) -->
+    <!-- NAVEGAÇÃO -->
     <nav class="navbar" id="navbar-pedidos" style="display: none;"></nav>
 
     <div class="meus-pedidos-container">
-        <h1>📦 Meus Pedidos</h1>
+        <h1>
+            <i data-lucide="package"></i>
+            Meus Pedidos
+        </h1>
+
         <div id="lista-pedidos">
-            <div class="pedidos-vazio">Carregando pedidos...</div>
+            <div class="pedidos-vazio">
+                <i data-lucide="loader"></i>
+                Carregando pedidos...
+            </div>
         </div>
     </div>
 
@@ -180,7 +190,7 @@
 </body>
 
 </html>
-         
+
 </head>
 
 <body>
