@@ -1,3 +1,5 @@
+/*=========register.css =========*/
+
 * {
   margin: 0;
   padding: 0;
@@ -7,14 +9,14 @@
 
 body {
   height: 100vh;
-  background: linear-gradient(135deg, #111, #1e1e1e);
+  background: linear-gradient(135deg, var(--text) 0%, #1e1e1e 100%);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .auth-container {
-  background: #ffffff;
+  background: var(--card);
   padding: 40px;
   width: 350px;
   border-radius: 12px;
@@ -24,29 +26,29 @@ body {
 
 .auth-container h2 {
   margin-bottom: 25px;
-  color: #222;
+  color: var(--text);
 }
 
 .auth-container input {
   width: 100%;
   padding: 12px;
   margin-bottom: 15px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   border-radius: 6px;
   font-size: 14px;
   transition: 0.2s ease;
 }
 
 .auth-container input:focus {
-  border-color: #000;
+  border-color: var(--text);
   outline: none;
 }
 
 .auth-container button {
   width: 100%;
   padding: 12px;
-  background: #000;
-  color: #fff;
+  background: var(--text);
+  color: var(--card);
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -64,7 +66,7 @@ body {
 }
 
 .auth-container a {
-  color: #000;
+  color: var(--text);
   font-weight: bold;
   text-decoration: none;
 }
