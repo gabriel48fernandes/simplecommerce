@@ -13,7 +13,7 @@
   <div class="layout">
 
     <!-- SIDEBAR -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
       <div class="logo-admin">
         <span class="logo-icon">🔒</span>
         <h2>Simple<span>ADM</span></h2>
@@ -21,12 +21,16 @@
 
       <nav class="nav-menu">
         <a href="#" class="nav-item" id="menuDashboard">
-        <span class="icon">📊</span>
-        <span class="label">Dashboard</span>
+          <span class="icon">📊</span>
+          <span class="label">Dashboard</span>
         </a>
         <a href="#" class="nav-item active" id="menuProdutos">
           <span class="icon">📦</span>
           <span class="label">Produtos</span>
+        </a>
+        <a href="#" class="nav-item" id="menuCategorias">
+          <span class="icon">🏷️</span>
+          <span class="label">Categorias</span>
         </a>
         <a href="#" class="nav-item" id="menuPedidos">
           <span class="icon">🧾</span>
@@ -36,10 +40,10 @@
           <span class="icon">👥</span>
           <span class="label">Clientes</span>
         </a>
-          <a href="#" class="nav-item" id="menuBanners">
-            <span class="icon">🖼️</span>
-            <span class="label">Banners</span>
-          </a>
+        <a href="#" class="nav-item" id="menuBanners">
+          <span class="icon">🖼️</span>
+          <span class="label">Banners</span>
+        </a>
         <a href="#" class="nav-item">
           <span class="icon">⚙️</span>
           <span class="label">Configurações</span>
@@ -57,128 +61,101 @@
       </nav>
     </aside>
 
+    <!-- OVERLAY DA SIDEBAR (mobile) — FORA do main, irmão da sidebar -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <!-- CONTEÚDO -->
     <main class="content">
 
       <header class="topo">
+        <!-- HAMBURGER — visível só no mobile via CSS -->
+        <button class="btn-hamburger" id="btnHamburger" aria-label="Abrir menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
         <div class="topo-left">
           <h1 id="tituloPagina">Gerenciar Produtos</h1>
           <p class="breadcrumb" id="breadcrumb">Dashboard / Produtos</p>
         </div>
+
         <div id="headerSearchContainer"></div>
+
         <button id="btnNovo" class="btn-novo">+ Novo Produto</button>
       </header>
 
       <!-- DASHBOARD -->
-      <section class="card-tabela" id="secDashboard" style="display:none;">
-
+      <section class="card-tabela sec-conteudo" id="secDashboard" style="display:none;">
         <div class="dashboard-cards">
-
-          <div class="card">
-            <h3>Total de Pedidos</h3>
-            <p id="totalPedidos">0</p>
-          </div>
-
-          <div class="card">
-            <h3>Faturamento Total</h3>
-            <p id="faturamentoTotal">R$ 0</p>
-          </div>
-
-          <div class="card">
-            <h3>Faturamento do Mês</h3>
-            <p id="faturamentoMes">R$ 0</p>
-          </div>
-
-          <div class="card">
-            <h3>Total Clientes</h3>
-            <p id="totalClientes">0</p>
-          </div>
-
-          <div class="card">
-            <h3>Estoque Baixo</h3>
-            <p id="estoqueBaixo">0</p>
-          </div>
-
-          <div class="card">
-            <h3>Ticket Médio</h3>
-            <p id="ticketMedio">R$ 0</p>
-          </div>
-
+          <div class="card"><h3>Total de Pedidos</h3><p id="totalPedidos">0</p></div>
+          <div class="card"><h3>Faturamento Total</h3><p id="faturamentoTotal">R$ 0</p></div>
+          <div class="card"><h3>Faturamento do Mês</h3><p id="faturamentoMes">R$ 0</p></div>
+          <div class="card"><h3>Total Clientes</h3><p id="totalClientes">0</p></div>
+          <div class="card"><h3>Estoque Baixo</h3><p id="estoqueBaixo">0</p></div>
+          <div class="card"><h3>Ticket Médio</h3><p id="ticketMedio">R$ 0</p></div>
         </div>
-
         <canvas id="graficoVendas" style="margin-top:30px;"></canvas>
-
       </section>
 
       <!-- PRODUTOS -->
-      <section class="card-tabela" id="secProdutos">
+      <section class="card-tabela sec-conteudo" id="secProdutos">
         <table id="tabela-produtos" class="produtos-grid">
           <thead>
             <tr>
-              <th>Imagem</th>
-              <th>Nome</th>
-              <th>Preço</th>
-              <th>Qtd</th>
-              <th>Categoria</th>
-              <th>Ações</th>
+              <th>Imagem</th><th>Nome</th><th>Preço</th>
+              <th>Qtd</th><th>Categoria</th><th>Ações</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </section>
 
+      <!-- CATEGORIAS -->
+      <section class="card-tabela sec-conteudo" id="secCategorias" style="display:none;">
+        <div id="grid-categorias" class="categorias-admin-grid"></div>
+      </section>
+
       <!-- CLIENTES -->
-      <section class="card-tabela" id="secClientes" style="display:none;">
+      <section class="card-tabela sec-conteudo" id="secClientes" style="display:none;">
         <table>
           <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nome</th>
-              <th>Email</th>
-              <th>Tipo</th>
-            </tr>
+            <tr><th>ID</th><th>Nome</th><th>Email</th><th>Tipo</th></tr>
           </thead>
           <tbody id="tabela-clientes"></tbody>
         </table>
       </section>
 
       <!-- PEDIDOS -->
-      <section class="card-tabela" id="secPedidos" style="display:none;">
+      <section class="card-tabela sec-conteudo" id="secPedidos" style="display:none;">
         <table>
           <thead>
-            <tr>
-              <th>ID</th>
-              <th>Cliente</th>
-              <th>Total</th>
-              <th>Status</th>
-              <th>Data</th>
-              <th>Ações</th>
-            </tr>
+            <tr><th>ID</th><th>Cliente</th><th>Total</th><th>Status</th><th>Data</th><th>Ações</th></tr>
           </thead>
           <tbody id="tabela-pedidos"></tbody>
         </table>
       </section>
 
       <!-- BANNERS -->
-      <section class="card-tabela" id="secBanners" style="display:none;"></section>
+      <section class="card-tabela sec-conteudo" id="secBanners" style="display:none;"></section>
 
     </main>
   </div>
 
-  <!-- MODAL -->
+  <!-- ================================
+       MODAL PRODUTO
+  ================================ -->
   <div class="modal-overlay" id="modal">
     <div class="modal">
       <div class="modal-header">
         <h2 id="tituloModal">Cadastrar Produto</h2>
         <button class="modal-close" id="btnCancelarX">✕</button>
       </div>
-
       <form id="form-produto" class="modal-form">
         <div class="form-group">
           <label for="nome">Nome do Produto</label>
           <input type="text" id="nome" placeholder="Digite o nome do produto" required />
         </div>
-
         <div class="form-row">
           <div class="form-group">
             <label for="preco">Preço</label>
@@ -188,13 +165,11 @@
             <label for="preco_promocional">Preço Promocional (opcional)</label>
             <input type="number" id="preco_promocional" step="0.01" placeholder="0.00" />
           </div>
-
           <div class="form-group">
             <label for="quantidade">Quantidade</label>
             <input type="number" id="quantidade" placeholder="0" required />
           </div>
         </div>
-
         <div class="form-group">
           <label for="categoria">Categoria</label>
           <select id="categoria">
@@ -204,49 +179,114 @@
             <option value="4">Utilidades</option>
           </select>
         </div>
-
         <div class="form-group">
-          <label for="imagem">Imagem do Produto</label>
-
-          <label for="imagem" class="upload-box">
-            <span>📁 Escolher arquivo</span>
-          </label>
-
+          <label>Imagem do Produto</label>
+          <label for="imagem" class="upload-box"><span>📁 Escolher arquivo</span></label>
           <input type="file" id="imagem" name="imagem" accept="image/*" hidden>
-          
-          <div id="preview-container" style="display: none; margin-top: 15px; text-align: center;">
-            <img id="preview-image" style="max-width: 100%; max-height: 250px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            <p id="preview-filename" style="margin-top: 10px; font-size: 13px; color: #666;"></p>
+          <div id="preview-container" style="display:none; margin-top:15px; text-align:center;">
+            <img id="preview-image" style="max-width:100%; max-height:250px; border-radius:8px;">
+            <p id="preview-filename" style="margin-top:10px; font-size:13px; color:#666;"></p>
           </div>
         </div>
-
-
         <div class="modal-actions">
           <button type="button" class="btn-cancelar" id="btnCancelar">Cancelar</button>
           <button type="submit" class="btn-salvar">Salvar Produto</button>
         </div>
       </form>
-
     </div>
   </div>
-  <!-- MODAL PEDIDO -->
+
+  <!-- ================================
+       MODAL CATEGORIA
+  ================================ -->
+  <div class="modal-overlay" id="modalCategoria">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="tituloModalCategoria">Nova Categoria</h2>
+        <button class="modal-close" id="btnFecharCategoria">✕</button>
+      </div>
+      <form id="form-categoria" class="modal-form">
+        <div class="form-group">
+          <label for="cat-nome">Nome da Categoria</label>
+          <input type="text" id="cat-nome" placeholder="Ex: Eletrônicos" required />
+        </div>
+        <div class="form-group">
+          <label>Imagem da Categoria</label>
+          <label for="cat-imagem" class="upload-box"><span>📁 Escolher imagem (opcional)</span></label>
+          <input type="file" id="cat-imagem" accept="image/*" hidden>
+
+          <!-- Preview quando há imagem -->
+          <div id="cat-preview-area" style="margin-top:14px; text-align:center; display:none;">
+            <img id="cat-preview-img"
+              style="width:100px;height:100px;object-fit:cover;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+            <p id="cat-preview-nome" style="margin-top:8px;font-size:13px;color:#666;"></p>
+          </div>
+
+          <!-- Fallback visual com inicial quando não há imagem -->
+          <div id="cat-fallback-area" style="margin-top:14px;text-align:center;display:none;">
+            <div id="cat-fallback-circle"
+              style="width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#4f46e5);display:flex;align-items:center;justify-content:center;margin:0 auto;font-size:36px;font-weight:700;color:white;letter-spacing:-1px;"></div>
+            <p style="margin-top:8px;font-size:12px;color:#999;">Sem imagem — será usada a inicial</p>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancelar" id="btnCancelarCategoria">Cancelar</button>
+          <button type="submit" class="btn-salvar">Salvar Categoria</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================================
+       MODAL PEDIDO
+  ================================ -->
   <div class="modal-overlay" id="modalPedido">
     <div class="modal">
       <div class="modal-header">
         <h2 id="tituloPedido">Pedido</h2>
         <button class="modal-close" id="fecharPedidoX">✕</button>
       </div>
-
       <div id="conteudoPedido" style="padding:20px;"></div>
-
-      <div style="padding:20px; text-align:right;">
-        <button id="btnFecharPedido" class="btn-cancelar">
-          Fechar
-        </button>
+      <div style="padding:20px;text-align:right;">
+        <button id="btnFecharPedido" class="btn-cancelar">Fechar</button>
       </div>
     </div>
   </div>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- HAMBURGER SCRIPT — inline para garantir que roda antes do module -->
+  <script>
+    (function () {
+      const btn     = document.getElementById('btnHamburger');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+
+      function abrir() {
+        sidebar.classList.add('aberta');
+        overlay.classList.add('ativo');
+        document.body.style.overflow = 'hidden';
+      }
+      function fechar() {
+        sidebar.classList.remove('aberta');
+        overlay.classList.remove('ativo');
+        document.body.style.overflow = '';
+      }
+
+      btn.addEventListener('click', () =>
+        sidebar.classList.contains('aberta') ? fechar() : abrir()
+      );
+      overlay.addEventListener('click', fechar);
+
+      // Fecha ao clicar em item do menu no mobile
+      document.querySelectorAll('.nav-item').forEach(item =>
+        item.addEventListener('click', () => {
+          if (window.innerWidth <= 768) fechar();
+        })
+      );
+    })();
+  </script>
+
   <script type="module" src="admin.js"></script>
 </body>
 

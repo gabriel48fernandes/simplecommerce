@@ -253,3 +253,118 @@
         font-size: 13px;
     }
 }
+
+/* ========================================
+   MELHORIAS MOBILE ADICIONAIS
+   ======================================== */
+
+/* Header mobile — evita quebra de layout */
+@media (max-width: 768px) {
+  .header {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 15px;
+  }
+
+  .logo-container {
+    flex: 1;
+  }
+
+  .search {
+    order: 3;
+    width: 100%;
+    flex: unset;
+  }
+
+  .icons {
+    order: 2;
+  }
+}
+
+/* Carrinho lateral — full width no mobile */
+@media (max-width: 480px) {
+  .cart-drawer {
+    width: 100%;
+    right: -100%;
+  }
+
+  .cart-drawer.open {
+    right: 0;
+  }
+}
+
+/* Cards de produto — 2 colunas no mobile pequeno */
+@media (max-width: 380px) {
+  .produtos-container {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .card {
+    padding: 8px;
+  }
+
+  .card img {
+    height: 100px;
+  }
+
+  .card h3 {
+    font-size: 11px;
+    min-height: auto;
+  }
+
+  .card .preco {
+    font-size: 11px;
+  }
+
+  .card button {
+    padding: 7px 6px;
+    font-size: 10px;
+  }
+}
+
+/* Categorias — 3 colunas compactas no mobile */
+@media (max-width: 480px) {
+  .categorias-container {
+    gap: 10px;
+    padding: 0 10px;
+  }
+
+  .categoria-card {
+    width: 85px;
+    height: 85px;
+    padding: 12px;
+  }
+
+  .categoria-card span {
+    font-size: 11px;
+  }
+}
+
+/* Filtros mobile — altura máxima com scroll */
+@media (max-width: 768px) {
+  .painel-filtros {
+    overflow-y: auto;
+    padding-bottom: 30px;
+  }
+
+  .btn-aplicar {
+    position: sticky;
+    bottom: 0;
+  }
+}
+
+/* Benefícios — 1 coluna no mobile pequeno */
+@media (max-width: 480px) {
+  .beneficios {
+    grid-template-columns: 1fr;
+  }
+
+  .beneficios div {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+    padding: 14px 16px;
+  }
+}

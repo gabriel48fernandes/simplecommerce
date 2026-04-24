@@ -79,7 +79,7 @@ body {
   align-items: center;
   gap: 12px;
   padding: 12px 15px;
-  color: var(--primary-dark);
+  color: rgba(255, 255, 255, 0.85);
   text-decoration: none;
   border-radius: 8px;
   transition: all 0.3s ease;
@@ -202,7 +202,7 @@ body {
 }
 
 .search-admin::placeholder {
-  color: var(--text)
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .dashboard-cards {
@@ -644,50 +644,288 @@ td button:last-child:hover {
 }
 
 /* ==================
-   RESPONSIVO
+   HAMBURGER BUTTON
    ================== */
-@media (max-width: 768px) {
+.btn-hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  flex-direction: column;
+  gap: 5px;
+  transition: background 0.2s;
+}
+
+.btn-hamburger:hover {
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.btn-hamburger span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+/* SIDEBAR OVERLAY (mobile) */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.ativo {
+  opacity: 1;
+}
+
+/* ==================
+   RESPONSIVO — TABLET
+   ================== */
+@media (max-width: 1024px) {
   .sidebar {
-    width: 0;
-    padding: 0;
+    width: 220px;
   }
 
   .content {
-    margin-left: 0;
+    margin-left: 220px;
     padding: 20px;
   }
 
-  .topo {
+  .search-admin {
+    width: 300px;
+  }
+}
+
+/* ==================
+   RESPONSIVO — MOBILE
+   ================== */
+@media (max-width: 768px) {
+
+  /* Layout base */
+  .layout {
     flex-direction: column;
-    gap: 15px;
-    align-items: flex-start;
-    padding: 20px;
+    height: auto;
+    min-height: 100vh;
   }
 
-  .btn-novo {
+  /* Sidebar vira drawer lateral */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100vh;
+    z-index: 999;
+    transition: left 0.3s ease;
+    padding: 20px 0;
+    overflow-y: auto;
+  }
+
+  .sidebar.aberta {
+    left: 0;
+  }
+
+  /* Overlay aparece quando sidebar abre */
+  .sidebar-overlay {
+    display: block;
+    pointer-events: none;
+  }
+
+  .sidebar-overlay.ativo {
+    pointer-events: auto;
+  }
+
+  /* Conteúdo ocupa tela toda */
+  .content {
+    margin-left: 0;
+    padding: 0;
     width: 100%;
   }
 
-  .form-row {
-    grid-template-columns: 1fr;
+  /* Topo mobile */
+  .topo {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    padding: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-radius: 0;
   }
 
-  .modal {
-    width: 95%;
-    max-width: 100%;
+  .topo-left {
+    flex: 1;
+  }
+
+  .topo-left h1 {
+    font-size: 20px;
+    margin-bottom: 2px;
+  }
+
+  .topo-left .breadcrumb {
+    font-size: 12px;
+  }
+
+  /* Mostra o hamburger */
+  .btn-hamburger {
+    display: flex;
+    order: -1;
+  }
+
+  /* Botão novo ocupa linha inteira */
+  .btn-novo {
+    width: 100%;
+    order: 3;
+  }
+
+  /* Search admin some no mobile (está no topo desktop) */
+  .search-admin {
+    display: none;
+  }
+
+  /* Dashboard cards empilham */
+  .dashboard-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .card h3 {
+    font-size: 13px;
+  }
+
+  .card p {
+    font-size: 18px;
+  }
+
+  /* Tabela vira scroll horizontal */
+  .card-tabela {
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+    margin: 0 16px 16px;
+    border-radius: 12px;
+    overflow: hidden;
   }
 
   table {
     font-size: 12px;
+    min-width: 500px;
   }
 
   th, td {
-    padding: 12px 8px;
+    padding: 10px 8px;
   }
 
   table img {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
+  }
+
+  /* Form row empilha */
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* Modal */
+  .modal {
+    width: 95%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .modal-form {
+    padding: 20px 16px;
+  }
+
+  /* Seção banners */
+  #secBanners {
+    padding: 16px;
+  }
+
+  #formBanner {
+    flex-direction: column;
+  }
+
+  #formBanner input,
+  #formBanner button {
+    width: 100%;
+  }
+
+  .banner-item {
+    flex-wrap: wrap;
+  }
+
+  .banner-item img {
+    width: 100%;
+    height: 120px;
+  }
+}
+
+/* ==================
+   RESPONSIVO — MOBILE PEQUENO
+   ================== */
+@media (max-width: 480px) {
+  .topo {
+    padding: 12px;
+  }
+
+  .topo-left h1 {
+    font-size: 17px;
+  }
+
+  .dashboard-cards {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .card {
+    padding: 12px;
+  }
+
+  .card p {
+    font-size: 16px;
+  }
+
+  .card-tabela {
+    margin: 0 12px 12px;
+  }
+
+  .modal-overlay {
+    padding: 20px 10px;
+  }
+
+  .modal-header {
+    padding: 18px 16px;
+  }
+
+  .modal-header h2 {
+    font-size: 17px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .btn-cancelar,
+  .btn-salvar {
+    width: 100%;
   }
 }
 
@@ -813,5 +1051,169 @@ td button:last-child:hover {
   #tabela-produtos.produtos-grid {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
     gap: 15px !important;
+  }
+}
+
+/* ==========================================
+   CATEGORIAS ADMIN — GRID DE CARDS
+   ========================================== */
+
+.categorias-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.cat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.cat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(99,102,241,0.14);
+  border-color: var(--primary);
+}
+
+/* Thumb — imagem ou fallback */
+.cat-card-thumb {
+  width: 100%;
+  height: 140px;
+  position: relative;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.cat-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Fallback com inicial */
+.cat-card-fallback {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: var(--card);
+  font-size: 32px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: -1px;
+  flex-shrink: 0;
+}
+
+/* Info */
+.cat-card-info {
+  padding: 14px 16px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.cat-card-nome {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.cat-card-id {
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+/* Ações */
+.cat-card-acoes {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px 14px;
+  border-top: 1px solid var(--border);
+}
+
+.cat-btn-editar,
+.cat-btn-excluir {
+  flex: 1;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cat-btn-editar {
+  background: #fbbf24;
+  color: var(--text);
+}
+
+.cat-btn-editar:hover {
+  background: #f59e0b;
+  transform: translateY(-1px);
+}
+
+.cat-btn-excluir {
+  background: #ff6b6b;
+  color: var(--card);
+}
+
+.cat-btn-excluir:hover {
+  background: #ff5252;
+  transform: translateY(-1px);
+}
+
+/* Responsivo categorias */
+@media (max-width: 768px) {
+  .categorias-admin-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 14px;
+    padding: 14px;
+  }
+
+  .cat-card-thumb {
+    height: 110px;
+  }
+}
+
+@media (max-width: 480px) {
+  .categorias-admin-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .cat-card-thumb {
+    height: 90px;
+  }
+
+  .cat-card-fallback {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+  }
+
+  .cat-card-nome {
+    font-size: 13px;
+  }
+
+  .cat-btn-editar,
+  .cat-btn-excluir {
+    font-size: 11px;
+    padding: 7px 6px;
   }
 }

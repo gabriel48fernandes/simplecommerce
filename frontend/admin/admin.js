@@ -1,8 +1,9 @@
-import { carregarDadosDashboard, esconderTodas, mostrarDashboard } from "./dashboard.js"
+import { carregarDadosDashboard, mostrarDashboard } from "./dashboard.js"
 import { carregarProdutos, inicializarProdutos } from "./produtos.js"
 import { carregarClientes } from "./clientes.js"
 import { carregarPedidos, inicializarPedidos } from "./pedidos.js"
 import { renderBanners } from "./banners.js"
+import { inicializarCategorias, carregarCategorias } from "./categorias.js"
 
 /* =========================
    AUTH CHECK
@@ -17,6 +18,7 @@ if (!auth || !auth.token) {
 ========================= */
 inicializarProdutos()
 inicializarPedidos()
+inicializarCategorias()
 
 /* =========================
    BUSCA DINÂMICA HEADER
@@ -31,27 +33,27 @@ function atualizarBusca(tipo) {
   if (tipo === "produtos") {
     placeholder = "🔍 Buscar produto..."
     funcao = carregarProdutos
-  }
-
-  if (tipo === "clientes") {
+  } else if (tipo === "clientes") {
     placeholder = "🔍 Buscar cliente..."
     funcao = carregarClientes
-  }
-
-  if (tipo === "pedidos") {
+  } else if (tipo === "pedidos") {
     placeholder = "🔍 Buscar pedido..."
     funcao = carregarPedidos
+  } else if (tipo === "categorias") {
+    placeholder = "🔍 Buscar categoria..."
+    funcao = carregarCategorias
+  } else {
+    return
   }
 
   container.innerHTML = `
-    <input 
+    <input
       type="text"
       id="searchAdmin"
       placeholder="${placeholder}"
       class="search-admin"
     />
   `
-
   document.getElementById("searchAdmin").addEventListener("input", (e) => {
     funcao(e.target.value)
   })
@@ -71,6 +73,12 @@ document.getElementById("menuProdutos").onclick = () => {
   carregarProdutos()
 }
 
+document.getElementById("menuCategorias").onclick = () => {
+  mostrarSecao("categorias")
+  atualizarBusca("categorias")
+  carregarCategorias()
+}
+
 document.getElementById("menuClientes").onclick = () => {
   mostrarSecao("clientes")
   atualizarBusca("clientes")
@@ -85,61 +93,74 @@ document.getElementById("menuPedidos").onclick = () => {
 
 document.getElementById("menuBanners").onclick = () => {
   mostrarSecao("banners")
-document.getElementById("headerSearchContainer").innerHTML = ""
-renderBanners()
+  document.getElementById("headerSearchContainer").innerHTML = ""
+  renderBanners()
 }
+
+/* =========================
+   MOSTRAR SEÇÃO
+========================= */
 function mostrarSecao(secao) {
-  const secDashboard = document.getElementById("secDashboard")
-  const secProdutos = document.getElementById("secProdutos")
-  const secClientes = document.getElementById("secClientes")
-  const secPedidos = document.getElementById("secPedidos")
+  const secoes = {
+    dashboard:  document.getElementById("secDashboard"),
+    produtos:   document.getElementById("secProdutos"),
+    categorias: document.getElementById("secCategorias"),
+    clientes:   document.getElementById("secClientes"),
+    pedidos:    document.getElementById("secPedidos"),
+    banners:    document.getElementById("secBanners"),
+  }
+
+  const menus = {
+    dashboard:  document.getElementById("menuDashboard"),
+    produtos:   document.getElementById("menuProdutos"),
+    categorias: document.getElementById("menuCategorias"),
+    clientes:   document.getElementById("menuClientes"),
+    pedidos:    document.getElementById("menuPedidos"),
+    banners:    document.getElementById("menuBanners"),
+  }
+
+  const titulos = {
+    dashboard:  ["Dashboard",           "Dashboard / Início"],
+    produtos:   ["Gerenciar Produtos",  "Dashboard / Produtos"],
+    categorias: ["Gerenciar Categorias","Dashboard / Categorias"],
+    clientes:   ["Clientes",            "Dashboard / Clientes"],
+    pedidos:    ["Pedidos",             "Dashboard / Pedidos"],
+    banners:    ["Banners",             "Dashboard / Banners"],
+  }
+
   const btnNovo = document.getElementById("btnNovo")
-  const secBanners = document.getElementById("secBanners")
 
-  // Remove classe active de todos os itens do menu
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.classList.remove('active')
-  })
+  // Remove active de todos os menus e esconde todas as seções
+  Object.values(menus).forEach(m => m?.classList.remove("active"))
+  Object.values(secoes).forEach(s => { if (s) s.style.display = "none" })
 
-  // Esconde todas as seções primeiro
-  secDashboard.style.display = "none"
-  secProdutos.style.display = "none"
-  secClientes.style.display = "none"
-  secPedidos.style.display = "none"
-  secBanners.style.display = "none"
-  // Mostra apenas a escolhida e adiciona classe active
-  if (secao === "dashboard") {
-    secDashboard.style.display = "block"
-    btnNovo.style.display = "none"
-    document.getElementById("menuDashboard").classList.add('active')
+  // Mostra a seção selecionada
+  if (secoes[secao]) secoes[secao].style.display = "block"
+  if (menus[secao])  menus[secao].classList.add("active")
+
+  // Atualiza título e breadcrumb
+  if (titulos[secao]) {
+    document.getElementById("tituloPagina").textContent = titulos[secao][0]
+    document.getElementById("breadcrumb").textContent   = titulos[secao][1]
   }
 
-  if (secao === "produtos") {
-    secProdutos.style.display = "block"
-    btnNovo.style.display = "inline-block"
-    document.getElementById("menuProdutos").classList.add('active')
-  }
+  // Mostra/esconde botão novo
+  btnNovo.style.display = ["produtos", "categorias"].includes(secao)
+    ? "inline-block"
+    : "none"
 
-  if (secao === "clientes") {
-    secClientes.style.display = "block"
-    btnNovo.style.display = "none"
-    document.getElementById("menuClientes").classList.add('active')
-  }
-
-  if (secao === "pedidos") {
-    secPedidos.style.display = "block"
-    btnNovo.style.display = "none"
-    document.getElementById("menuPedidos").classList.add('active')
-  }
-  if (secao === "banners") {
-    secBanners.style.display = "block"
-    btnNovo.style.display = "none"
-    document.getElementById("menuBanners").classList.add('active')
+  // Troca o label do botão
+  if (secao === "categorias") {
+    btnNovo.textContent = "+ Nova Categoria"
+    btnNovo.onclick = () => window.abrirModalCategoria()
+  } else if (secao === "produtos") {
+    btnNovo.textContent = "+ Novo Produto"
+    btnNovo.onclick = () => window.abrirModalProduto()
   }
 }
 
 /* =========================
-   LOGOUT
+   LOGOUT / IR PARA LOJA
 ========================= */
 document.getElementById("btnLogout").onclick = () => {
   localStorage.clear()
