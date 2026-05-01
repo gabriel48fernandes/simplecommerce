@@ -580,47 +580,117 @@ function mostrarToastCarrinho() {
 
 }
 
-// ============================
-// CATEGORIAS
-// ============================
 async function carregarCategorias() {
-  try {
-    const res = await api("/categorias");
-    const categorias = await res.json();
+    try {
+        const res = await api("/categorias");
+        const categorias = await res.json();
 
-    const categoriasContainer = document.getElementById("categorias");
-    if (!categoriasContainer) return;
+        const categoriasContainer = document.getElementById("categorias");
+        if (!categoriasContainer) return;
 
-    categoriasContainer.innerHTML = "";
-
-    const filtroCategorias = document.getElementById("filtroCategorias");
-    if (filtroCategorias) {
-      let filtrosHtml = "";
-      categorias.forEach(cat => {
-        filtrosHtml += `
-          <label>
-            <input type="checkbox" value="${cat.id}" />
-            ${cat.nome}
-          </label>
+        // Monta estrutura
+        categoriasContainer.innerHTML = `
+            <div class="categorias-scroll-wrapper" id="categoriasScrollWrapper">
+                <div class="categorias-scroll" id="categoriasScroll"></div>
+            </div>
+            <div class="scroll-indicator"></div>
+            <button class="categorias-scroll-btn prev" onclick="scrollCategorias(-1)">←</button>
+            <button class="categorias-scroll-btn next" onclick="scrollCategorias(1)">→</button>
         `;
-      });
-      filtroCategorias.innerHTML = `<h4>Categoria</h4>${filtrosHtml}`;
+
+        const scrollWrapper = document.getElementById("categoriasScrollWrapper");
+        const scrollContainer = document.getElementById("categoriasScroll");
+
+        // Atualizar filtros na sidebar
+        const filtroCategorias = document.getElementById("filtroCategorias");
+        if (filtroCategorias) {
+            let filtrosHtml = '<h4>Categoria</h4>';
+            categorias.forEach(cat => {
+                filtrosHtml += `
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="${cat.id}" data-categoria-nome="${cat.nome}" />
+                        <span>${cat.nome}</span>
+                    </label>
+                `;
+            });
+            filtroCategorias.innerHTML = filtrosHtml;
+            document.querySelectorAll('#filtroCategorias input[type="checkbox"]').forEach(cb => {
+                cb.addEventListener('change', () => aplicarFiltros());
+            });
+        }
+
+        // Criar cards
+        categorias.forEach(cat => {
+            const card = document.createElement("div");
+            card.className = "categoria-card";
+            card.setAttribute("data-categoria-id", cat.id);
+
+            // Verifica se tem imagem válida (não é fallback)
+            const temImagem = cat.imagem_url && 
+                              cat.imagem_url !== window.SEM_IMAGEM_FALLBACK && 
+                              cat.imagem_url.trim() !== '' &&
+                              !cat.imagem_url.includes('sem-imagem') &&
+                              !cat.imagem_url.includes('placeholder') &&
+                              !cat.imagem_url.includes('no-image');
+
+            if (temImagem) {
+                card.classList.add("with-image");
+                // Aplica a imagem de fundo
+                card.style.backgroundImage = `url("${cat.imagem_url}")`;
+                card.style.backgroundSize = "cover";
+                card.style.backgroundPosition = "center";
+                
+                // Fallback: se a imagem falhar, remove com-image e vira no-image
+                const testImg = new Image();
+                testImg.onerror = () => {
+                    if (card.classList.contains('with-image')) {
+                        card.classList.remove('with-image');
+                        card.classList.add('no-image');
+                        card.style.backgroundImage = '';
+                        card.style.backgroundColor = '#e5e7eb';
+                        card.innerHTML = `<span>${cat.nome}</span>`;
+                    }
+                };
+                testImg.src = cat.imagem_url;
+            } else {
+                card.classList.add("no-image");
+            }
+
+            // Só o nome da categoria (sem ícone ou imagem extra)
+            card.innerHTML = `<span>${cat.nome}</span>`;
+
+            card.addEventListener('click', () => {
+                filtrarPorCategoria(cat.id, cat.nome);
+            });
+
+            scrollContainer.appendChild(card);
+        });
+
+        // Ajusta centralização e indicador de scroll
+        function adjustScrollLayout() {
+            if (!scrollWrapper) return;
+            const hasScroll = scrollWrapper.scrollWidth > scrollWrapper.clientWidth;
+            if (hasScroll) {
+                scrollWrapper.classList.add('scrollable');
+                categoriasContainer.classList.add('has-scroll');
+            } else {
+                scrollWrapper.classList.remove('scrollable');
+                categoriasContainer.classList.remove('has-scroll');
+            }
+        }
+
+        adjustScrollLayout();
+        scrollWrapper.addEventListener('scroll', checkScrollButtons);
+        window.addEventListener('resize', () => {
+            adjustScrollLayout();
+            checkScrollButtons();
+        });
+        checkScrollButtons();
+
+        console.log("✅ Categorias carregadas:", categorias.length);
+    } catch (err) {
+        console.error("Erro ao carregar categorias:", err);
     }
-
-    categorias.forEach(cat => {
-      const card = document.createElement("div");
-      card.className = "categoria-card";
-
-      card.innerHTML = `
-        <img src="${cat.imagem_url}">
-        <span>${cat.nome}</span>
-      `;
-
-      categoriasContainer.appendChild(card);
-    });
-  } catch (err) {
-    console.error("Erro ao carregar categorias:", err);
-  }
 }
 
 // ============================
