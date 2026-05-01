@@ -4,6 +4,66 @@ import { autenticarToken, apenasAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
+// ========== DESTAQUES ==========
+async function getDestaques(req, res) {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        p.id,
+        p.nome,
+        p.preco,
+        p.preco_promocional,
+        p.quantidade,
+        p.categoria_id,
+        c.nome AS categoria,
+        (
+          SELECT url FROM imagens_produto 
+          WHERE produto_id = p.id 
+          ORDER BY principal DESC, id ASC
+          LIMIT 1
+        ) AS imagem
+      FROM produtos p
+      JOIN categorias c ON c.id = p.categoria_id
+      WHERE p.destaque = true
+      LIMIT 12
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: err.message });
+  }
+}
+
+// ========== LANÇAMENTOS ==========
+async function getLancamentos(req, res) {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        p.id,
+        p.nome,
+        p.preco,
+        p.preco_promocional,
+        p.quantidade,
+        p.categoria_id,
+        c.nome AS categoria,
+        (
+          SELECT url FROM imagens_produto 
+          WHERE produto_id = p.id 
+          ORDER BY principal DESC, id ASC
+          LIMIT 1
+        ) AS imagem
+      FROM produtos p
+      JOIN categorias c ON c.id = p.categoria_id
+      ORDER BY p.id DESC
+      LIMIT 12
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: err.message });
+  }
+}
+
 /* =========================
    GET /produtos (LISTAR + BUSCA)
 ========================= */
@@ -150,6 +210,10 @@ router.get("/preco-max", async (req, res) => {
     res.status(500).json({ erro: "Erro ao buscar preço máximo" });
   }
 });
+
+router.get("/destaques", getDestaques);
+router.get("/lancamentos", getLancamentos);
+
 /* =========================
    GET /produtos/:id
 ========================= */

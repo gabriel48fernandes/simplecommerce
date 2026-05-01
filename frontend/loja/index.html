@@ -38,10 +38,36 @@
         </div>
     </section>
 
+    <!-- 🔥 DESTAQUES -->
+    <section class="secao-destaques">
+        <div class="secao-header">
+            <h2>🔥 Destaques</h2>
+            <p>Produtos em alta, selecionados especialmente para você</p>
+        </div>
+        <div class="scroll-horizontal-wrapper" id="destaquesWrapper">
+            <div class="scroll-horizontal" id="destaquesContainer"></div>
+            <button class="scroll-btn prev" onclick="scrollHorizontal('destaquesWrapper', -1)">←</button>
+            <button class="scroll-btn next" onclick="scrollHorizontal('destaquesWrapper', 1)">→</button>
+        </div>
+    </section>
+
     <!-- CATEGORIAS -->
-     <h1 class="titulo-categorias">Categorias</h1>
+    <h1 class="titulo-categorias">Categorias</h1>
 
     <div id="categorias" class="categorias-container"></div>
+
+    <!-- 🚀 LANÇAMENTOS -->
+    <section class="secao-lancamentos">
+        <div class="secao-header">
+            <h2>🚀 Lançamentos</h2>
+            <p>Os produtos mais recentes da nossa loja</p>
+        </div>
+        <div class="scroll-horizontal-wrapper" id="lancamentosWrapper">
+            <div class="scroll-horizontal" id="lancamentosContainer"></div>
+            <button class="scroll-btn prev" onclick="scrollHorizontal('lancamentosWrapper', -1)">←</button>
+            <button class="scroll-btn next" onclick="scrollHorizontal('lancamentosWrapper', 1)">→</button>
+        </div>
+    </section>
 
     <!-- LAYOUT PRINCIPAL: FILTROS + PRODUTOS -->
     <div class="main-layout">
@@ -82,7 +108,7 @@
         <div class="conteudo-produtos">
             <!-- BOTÃO FILTRAR (MOBILE) -->
             <button class="btn-filtrar-mobile" onclick="abrirFiltros()">
-                 Filtros
+                Filtros
             </button>
 
             <!-- CONTAINER DE PRODUTOS -->
