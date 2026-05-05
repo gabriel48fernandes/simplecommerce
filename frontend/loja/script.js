@@ -12,15 +12,34 @@ let PRECO_MAXIMO = 0;
 
 // Função auxiliar api (garantir que existe)
 window.api = async function(url, options = {}) {
-  const defaultOptions = {
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  };
-  const finalOptions = { ...defaultOptions, ...options };
-  return fetch(url, finalOptions);
-};
 
+  const auth = JSON.parse(localStorage.getItem("auth"));
+  const token = auth?.token;
+
+  const headers = {
+    "Content-Type": "application/json",
+    ...options.headers
+  };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const fullUrl = url.startsWith("http")
+    ? url
+    : `${API_URL}${url}`;
+
+  const res = await fetch(fullUrl, {
+    ...options,
+    headers
+  });
+
+  if (res.status === 401 || res.status === 403) {
+    localStorage.removeItem("auth");
+  }
+
+  return res;
+};
 // ⚠️ Nota: container pode ser null em páginas que não têm #produtos
 async function carregarPrecoMaximo() {
   try {

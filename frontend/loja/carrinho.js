@@ -50,7 +50,7 @@ async function carregarCarrinho() {
 
   try {
 
-    const res = await api(`/carrinho/${auth.usuario.id}`);
+    const res = await api(`${API_URL}/carrinho/${auth.usuario.id}`);
 
     if (!res.ok) {
       throw new Error("Erro ao buscar carrinho");
@@ -160,7 +160,7 @@ async function calcularFrete() {
 
   const cep = document.getElementById("cep").value;
 
-  const res = await api("/frete/calcular", {
+  const res = await api(`${API_URL}/frete/calcular`, {
     method: "POST",
     body: JSON.stringify({ cepDestino: cep })
   });
@@ -219,7 +219,7 @@ async function alterarQtd(id, delta) {
 
   try {
 
-    await api(`/carrinho/item/${id}/quantidade`, {
+    await api(`${API_URL}/carrinho/item/${id}/quantidade`, {
       method: "PUT",
       body: JSON.stringify({
         delta: delta
@@ -243,7 +243,7 @@ async function removerItem(id) {
 
   try {
 
-    await api(`/carrinho/item/${id}`, {
+    await api(`${API_URL}/carrinho/item/${id}`, {
       method: "DELETE"
     });
 
@@ -342,7 +342,7 @@ initCarrinhoDrawer();
 
 async function confirmarPagamentoPix() {
 
-  const res = await api(`/pedidos/confirmar-pagamento/${pedidoAtual}`, {
+  const res = await api(`${API_URL}/pedidos/confirmar-pagamento/${pedidoAtual}`, {
     method: "PUT"
   });
 
@@ -377,7 +377,7 @@ async function finalizarCompra() {
     return null;
   }
 
-  const res = await api("/pedidos/finalizar", {
+  const res = await api(`${API_URL}/pedidos/finalizar`, {
     method: "POST",
     body: JSON.stringify({
       usuario_id: auth.usuario.id,
@@ -409,7 +409,7 @@ async function finalizarCompra() {
 
 async function gerarPix(pedidoId, valor) {
   try {
-    const res = await api("/pagamento/pix", {
+    const res = await api(`${API_URL}/pagamento/pix`, {
       method: "POST",
       body: JSON.stringify({
         pedido_id: pedidoId,

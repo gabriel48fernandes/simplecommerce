@@ -29,7 +29,7 @@ function atualizarBusca(tipo) {
 
   let placeholder = ""
   let funcao = null
-
+""
   if (tipo === "produtos") {
     placeholder = "🔍 Buscar produto..."
     funcao = carregarProdutos
