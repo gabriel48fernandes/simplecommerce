@@ -790,7 +790,7 @@
 }
 
 .preco-promocional {
-    color: #2ecc71;
+    color: var(--primary);
     font-size: 20px;
     font-weight: 700;
     margin: 0;

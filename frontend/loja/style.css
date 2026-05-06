@@ -8,6 +8,7 @@
     --text: #111827;
     --text-light: #6b7280;
     --border: #e5e7eb;
+    --confirmation: #2ecc71;
 }
 
 * {
@@ -285,7 +286,7 @@ body {
     bottom: 30px;
     right: 30px;
 
-    background: #2ecc71;
+    background: var(--confirmation);
     color: var(--card);
 
     padding: 14px 20px;
@@ -1117,118 +1118,8 @@ body {
 }
 
 /* ==================
-   DESTAQUES (MAIS VENDIDOS, OFERTAS, RECOMENDADOS)
+   DESTAQUES E LANÇAMENTOS (COM SUPORTE A CENTRALIZAÇÃO + SCROLL)
    ================== */
-.destaques-container {
-    max-width: 1400px;
-    margin: 40px auto;
-    padding: 0 20px;
-}
-
-.destaques-header {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.destaques-header h2 {
-    font-size: 32px;
-    color: var(--text);
-    margin-bottom: 8px;
-}
-
-.destaques-header p {
-    color: var(--text-light);
-    font-size: 16px;
-}
-
-.destaques-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
-}
-
-.destaque-card {
-    background: var(--card);
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
-}
-
-.destaque-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 16px 32px rgba(99,102,241,0.15);
-}
-
-.destaque-imagem {
-    height: 200px;
-    background-size: cover;
-    background-position: center;
-    position: relative;
-}
-
-.destaque-tag {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    background: var(--primary);
-    color: white;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: bold;
-}
-
-.destaque-info {
-    padding: 20px;
-}
-
-.destaque-info h3 {
-    font-size: 18px;
-    margin-bottom: 8px;
-    color: var(--text);
-}
-
-.destaque-desc {
-    font-size: 14px;
-    color: var(--text-light);
-    margin-bottom: 12px;
-}
-
-.destaque-preco {
-    font-size: 22px;
-    font-weight: bold;
-    color: var(--primary);
-    margin-bottom: 15px;
-}
-
-.destaque-btn {
-    width: 100%;
-    padding: 12px;
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.destaque-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(99,102,241,0.3);
-}
-
-@media (max-width: 768px) {
-    .destaques-grid {
-        gap: 20px;
-    }
-    .destaque-imagem {
-        height: 160px;
-    }
-}
-/* Seções Destaques e Lançamentos */
 .secao-destaques, .secao-lancamentos {
     max-width: 1400px;
     margin: 40px auto;
@@ -1247,24 +1138,43 @@ body {
     color: var(--text-light);
 }
 
-/* Wrapper com scroll horizontal */
+/* Wrapper que centraliza o conteúdo quando ele não transborda */
 .scroll-horizontal-wrapper {
     position: relative;
+    display: flex;
+    justify-content: center;     /* centraliza o container interno */
+    width: 100%;
+}
+
+/* Container com scroll horizontal (inline-flex permite centralização) */
+.scroll-horizontal {
+    display: inline-flex;         /* muda de flex para inline-flex */
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 20px;
     overflow-x: auto;
     overflow-y: hidden;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
+    padding: 10px 4px 20px;
+    max-width: 100%;             /* garante que não vaze */
     scrollbar-width: thin;
 }
-.scroll-horizontal {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    gap: 20px;
-    padding: 10px 4px 20px;
+
+/* Esconde a barra de scroll em navegadores WebKit (opcional, mas deixa mais limpo) */
+.scroll-horizontal::-webkit-scrollbar {
+    height: 5px;
+}
+.scroll-horizontal::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+.scroll-horizontal::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
 }
 
-/* Card de produto para scroll */
+/* Card individual – largura fixa para o scroll */
 .produto-card-scroll {
     flex: 0 0 auto;
     width: 220px;
@@ -1344,7 +1254,7 @@ body {
     background: var(--primary-dark);
 }
 
-/* Botões de scroll laterais */
+/* Botões de navegação (voltam a funcionar com a nova estrutura) */
 .scroll-btn {
     position: absolute;
     top: 50%;
@@ -1363,18 +1273,26 @@ body {
 .scroll-horizontal-wrapper:hover .scroll-btn {
     opacity: 1;
 }
-.scroll-btn.prev { left: 5px; }
-.scroll-btn.next { right: 5px; }
+.scroll-btn.prev {
+    left: 0;                    /* ajuste conforme necessidade */
+}
+.scroll-btn.next {
+    right: 0;
+}
 .scroll-btn:hover {
     background: var(--primary);
     color: white;
 }
 
+/* Responsivo: reduz largura dos cards em telas pequenas */
 @media (max-width: 768px) {
-    .produto-card-scroll { width: 160px; }
-    .produto-card-scroll img { height: 140px; }
+    .produto-card-scroll {
+        width: 160px;
+    }
+    .produto-card-scroll img {
+        height: 140px;
+    }
 }
-
 /* ==================
    CATEGORIAS
    ================== */
@@ -1684,9 +1602,7 @@ body {
 }
 
 .preco-promocional {
-    color: #2ecc71;
-    font-size: 16px;
-    font-weight: 700;
+    color: var(--primary);
     margin: 0;
 }
 

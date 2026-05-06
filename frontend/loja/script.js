@@ -11,7 +11,7 @@ const API_URL = window.location.hostname.includes("localhost")
 let PRECO_MAXIMO = 0;
 
 // Função auxiliar api (garantir que existe)
-window.api = async function(url, options = {}) {
+window.api = async function (url, options = {}) {
 
   const auth = JSON.parse(localStorage.getItem("auth"));
   const token = auth?.token;
@@ -372,51 +372,51 @@ async function carregarProdutos(search = "") {
 // DESTAQUES E LANÇAMENTOS (COM AS NOVAS ROTAS)
 // ============================
 function renderizarProdutosScroll(containerId, produtos) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
+  const container = document.getElementById(containerId);
+  if (!container) return;
 
-    // Garantir array
-    let produtosArray = produtos;
-    if (!Array.isArray(produtos)) {
-        if (produtos?.rows) produtosArray = produtos.rows;
-        else if (produtos?.data) produtosArray = produtos.data;
-        else {
-            console.error('Formato inválido:', produtos);
-            container.innerHTML = '<div style="padding:20px;text-align:center">Erro nos dados</div>';
-            return;
-        }
+  // Garantir array
+  let produtosArray = produtos;
+  if (!Array.isArray(produtos)) {
+    if (produtos?.rows) produtosArray = produtos.rows;
+    else if (produtos?.data) produtosArray = produtos.data;
+    else {
+      console.error('Formato inválido:', produtos);
+      container.innerHTML = '<div style="padding:20px;text-align:center">Erro nos dados</div>';
+      return;
     }
+  }
 
-    container.innerHTML = '';
-    if (!produtosArray.length) {
-        container.innerHTML = '<div style="padding:20px;text-align:center">Nenhum produto encontrado</div>';
-        return;
-    }
+  container.innerHTML = '';
+  if (!produtosArray.length) {
+    container.innerHTML = '<div style="padding:20px;text-align:center">Nenhum produto encontrado</div>';
+    return;
+  }
 
-    produtosArray.forEach(prod => {
-        const temPromocao = prod.tem_promocao === true || (prod.preco_promocional && prod.preco_promocional < prod.preco);
-        let imagemUrl = window.SEM_IMAGEM_FALLBACK;
-        if (prod.imagens?.length) imagemUrl = prod.imagens[0].url;
-        else if (prod.imagem) imagemUrl = prod.imagem;
+  produtosArray.forEach(prod => {
+    const temPromocao = prod.tem_promocao === true || (prod.preco_promocional && prod.preco_promocional < prod.preco);
+    let imagemUrl = window.SEM_IMAGEM_FALLBACK;
+    if (prod.imagens?.length) imagemUrl = prod.imagens[0].url;
+    else if (prod.imagem) imagemUrl = prod.imagem;
 
-        let precoHTML = '';
-        let badgeHTML = '';
+    let precoHTML = '';
+    let badgeHTML = '';
 
-        if (temPromocao) {
-            const desconto = prod.percentual_desconto || Math.round(((prod.preco - prod.preco_promocional) / prod.preco) * 100);
-            badgeHTML = `<div class="badge-scroll">${desconto}% OFF</div>`;
-            precoHTML = `
+    if (temPromocao) {
+      const desconto = prod.percentual_desconto || Math.round(((prod.preco - prod.preco_promocional) / prod.preco) * 100);
+      badgeHTML = `<div class="badge-scroll">${desconto}% OFF</div>`;
+      precoHTML = `
                 <div class="preco-original-scroll">${Number(prod.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
                 <div class="preco-promocional-scroll">${Number(prod.preco_promocional).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
             `;
-        } else {
-            precoHTML = `<div class="preco-normal-scroll">${Number(prod.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>`;
-        }
+    } else {
+      precoHTML = `<div class="preco-normal-scroll">${Number(prod.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>`;
+    }
 
-        const card = document.createElement('div');
-        card.className = 'produto-card-scroll';
-        card.onclick = () => window.location.href = `produto.html?id=${prod.id}`;
-        card.innerHTML = `
+    const card = document.createElement('div');
+    card.className = 'produto-card-scroll';
+    card.onclick = () => window.location.href = `produto.html?id=${prod.id}`;
+    card.innerHTML = `
             ${badgeHTML}
             <img src="${imagemUrl}" alt="${prod.nome}" onerror="this.onerror=null; this.src='${window.SEM_IMAGEM_FALLBACK}'">
             <div class="info">
@@ -425,30 +425,30 @@ function renderizarProdutosScroll(containerId, produtos) {
                 <button onclick="event.stopPropagation(); adicionarAoCarrinho(${prod.id}, this)">Comprar</button>
             </div>
         `;
-        container.appendChild(card);
-    });
+    container.appendChild(card);
+  });
 }
 
 async function carregarDestaques() {
-    try {
-        const res = await api(`${API_URL}/produtos/destaques`);
-        const data = await res.json();
-        renderizarProdutosScroll('destaquesContainer', data);
-    } catch (err) {
-        console.error('Erro destaques:', err);
-        document.getElementById('destaquesContainer').innerHTML = '<p>Erro ao carregar destaques</p>';
-    }
+  try {
+    const res = await api(`${API_URL}/produtos/destaques`);
+    const data = await res.json();
+    renderizarProdutosScroll('destaquesContainer', data);
+  } catch (err) {
+    console.error('Erro destaques:', err);
+    document.getElementById('destaquesContainer').innerHTML = '<p>Erro ao carregar destaques</p>';
+  }
 }
 
 async function carregarLancamentos() {
-    try {
-        const res = await api(`${API_URL}/produtos/lancamentos`);
-        const data = await res.json();
-        renderizarProdutosScroll('lancamentosContainer', data);
-    } catch (err) {
-        console.error('Erro lançamentos:', err);
-        document.getElementById('lancamentosContainer').innerHTML = '<p>Erro ao carregar lançamentos</p>';
-    }
+  try {
+    const res = await api(`${API_URL}/produtos/lancamentos`);
+    const data = await res.json();
+    renderizarProdutosScroll('lancamentosContainer', data);
+  } catch (err) {
+    console.error('Erro lançamentos:', err);
+    document.getElementById('lancamentosContainer').innerHTML = '<p>Erro ao carregar lançamentos</p>';
+  }
 }
 
 // ============================
@@ -472,7 +472,7 @@ async function adicionarAoCarrinho(produto_id, botao, quantidade = 1) {
     if (!res.ok) throw new Error("Erro ao adicionar no carrinho");
     let imagem = null;
     if (botao) {
-      const card = botao.closest(".card");
+      const card = botao.closest(".card") || botao.closest(".produto-card-scroll");
       if (card) imagem = card.querySelector("img");
     }
     if (!imagem) imagem = document.getElementById("imagemPrincipal");
@@ -561,12 +561,12 @@ async function carregarCategorias() {
       const card = document.createElement("div");
       card.className = "categoria-card";
       card.setAttribute("data-categoria-id", cat.id);
-      const temImagem = cat.imagem_url && 
-                        cat.imagem_url !== window.SEM_IMAGEM_FALLBACK && 
-                        cat.imagem_url.trim() !== '' &&
-                        !cat.imagem_url.includes('sem-imagem') &&
-                        !cat.imagem_url.includes('placeholder') &&
-                        !cat.imagem_url.includes('no-image');
+      const temImagem = cat.imagem_url &&
+        cat.imagem_url !== window.SEM_IMAGEM_FALLBACK &&
+        cat.imagem_url.trim() !== '' &&
+        !cat.imagem_url.includes('sem-imagem') &&
+        !cat.imagem_url.includes('placeholder') &&
+        !cat.imagem_url.includes('no-image');
       if (temImagem) {
         card.classList.add("with-image");
         card.style.backgroundImage = `url("${cat.imagem_url}")`;
