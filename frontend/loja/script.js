@@ -250,7 +250,6 @@ async function carregarBannersHome() {
     });
     aplicarEstiloBanner();
     iniciarCarrossel();
-    console.log("✅ Banners carregados");
   } catch (err) {
     console.error("❌ Erro ao carregar banners:", err);
   }
@@ -610,7 +609,6 @@ async function carregarCategorias() {
       checkScrollButtons();
     });
     checkScrollButtons();
-    console.log("✅ Categorias carregadas:", categorias.length);
   } catch (err) {
     console.error("Erro ao carregar categorias:", err);
   }

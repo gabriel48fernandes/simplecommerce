@@ -160,55 +160,77 @@ async function calcularFrete() {
 
   const cep = document.getElementById("cep").value;
 
-  const res = await api(`${API_URL}/frete/calcular`, {
-    method: "POST",
-    body: JSON.stringify({ cepDestino: cep })
-  });
+  try {
 
-  const opcoes = await res.json();
+    const res = await api(`${API_URL}/frete/calcular`, {
+      method: "POST",
+      body: JSON.stringify({ cepDestino: cep })
+    });
 
-  const div = document.getElementById("opcoes-frete");
+    const opcoes = await res.json();
 
-  if (!div) return;
+    console.log("FRETE RETORNO:", opcoes);
 
-  div.innerHTML = "";
+    const div = document.getElementById("opcoes-frete");
 
-  opcoes.forEach(opcao => {
+    if (!div) return;
 
-    const preco = parseFloat(opcao.preco);
+    div.innerHTML = "";
 
-    const elemento = document.createElement("div");
+    // 🔥 VALIDA ARRAY
+    if (!Array.isArray(opcoes)) {
 
-    elemento.classList.add("frete-opcao");
+      div.innerHTML = `
+        <p>Erro ao calcular frete</p>
+      `;
 
-    elemento.innerHTML = `
-      <strong>${opcao.transportadora}</strong><br>
-      ${opcao.servico}<br>
-      ${preco.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL"
-    })}<br>
-      ${opcao.prazo} dias
-    `;
+      console.error("Frete inválido:", opcoes);
 
-    elemento.onclick = () => {
+      return;
+    }
 
-      freteSelecionado = preco;
-      transportadoraSelecionada = opcao.transportadora;
-      prazoSelecionado = opcao.prazo;
+    opcoes.forEach(opcao => {
 
-      atualizarTotal();
+      const preco = parseFloat(opcao.preco);
 
-      document.querySelectorAll(".frete-opcao")
-        .forEach(el => el.classList.remove("frete-ativo"));
+      const elemento = document.createElement("div");
 
-      elemento.classList.add("frete-ativo");
+      elemento.classList.add("frete-opcao");
 
-    };
+      elemento.innerHTML = `
+        <strong>${opcao.transportadora}</strong><br>
+        ${opcao.servico}<br>
+        ${preco.toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL"
+        })}<br>
+        ${opcao.prazo} dias
+      `;
 
-    div.appendChild(elemento);
+      elemento.onclick = () => {
 
-  });
+        freteSelecionado = preco;
+        transportadoraSelecionada = opcao.transportadora;
+        prazoSelecionado = opcao.prazo;
+
+        atualizarTotal();
+
+        document.querySelectorAll(".frete-opcao")
+          .forEach(el => el.classList.remove("frete-ativo"));
+
+        elemento.classList.add("frete-ativo");
+
+      };
+
+      div.appendChild(elemento);
+
+    });
+
+  } catch (error) {
+
+    console.error("Erro no frete:", error);
+
+  }
 
 }
 
@@ -302,12 +324,19 @@ async function iniciarPagamento() {
     pedidoAtual = pedido.pedido_id;
 
     if (forma === "pix") {
-      if (!pedido.total || Number.isNaN(Number(pedido.total))) {
-        alert("Não foi possível calcular o valor do pedido para gerar o PIX.");
-        return;
-      }
 
-      await gerarPix(pedidoAtual, pedido.total);
+  const valorFinal = Number(
+    (subtotalCarrinho + freteSelecionado).toFixed(2)
+  );
+
+  console.log("VALOR PIX:", valorFinal);
+
+  if (!valorFinal || Number.isNaN(valorFinal)) {
+    alert("Valor inválido para gerar PIX");
+    return;
+  }
+
+  await gerarPix(pedidoAtual, valorFinal);
 
     } else {
       alert("Pedido realizado com sucesso!");

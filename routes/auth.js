@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken";
 import { autenticarToken, apenasAdmin } from "../middleware/auth.js";
 
 if (!process.env.JWT_SECRET) {
-  console.error("JWT_SECRET não definido no .env");
   process.exit(1);
 }
 
