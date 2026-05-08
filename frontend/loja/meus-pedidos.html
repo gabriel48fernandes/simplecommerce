@@ -5,8 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meus Pedidos - SimpleCommerce</title>
+
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="style-responsive.css" />
+
     <style>
         .meus-pedidos-container {
             max-width: 1000px;
@@ -34,12 +36,12 @@
             padding: 25px;
             margin-bottom: 25px;
             background: white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             transition: all 0.3s ease;
         }
 
         .pedido-card:hover {
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
         }
 
         .pedido-header {
@@ -155,23 +157,20 @@
 </head>
 
 <body>
+
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- HEADER já vem do style.css -->
+
     <header class="header">
         <div class="logo-container">
             <span class="logo-icon">🛍️</span>
             <div class="logo">SimpleCommerce</div>
         </div>
-        <div class="logo">SimpleCommerce</div>
-        </div>
 
         <div class="icons" id="area-usuario"></div>
     </header>
 
-    <!-- NAVEGAÇÃO -->
-    <nav class="navbar" id="navbar-pedidos" style="display: none;"></nav>
-
     <div class="meus-pedidos-container">
+
         <h1>
             <i data-lucide="package"></i>
             Meus Pedidos
@@ -183,40 +182,11 @@
                 Carregando pedidos...
             </div>
         </div>
+
     </div>
 
     <script src="utils.js"></script>
     <script src="meus-pedidos.js"></script>
+
 </body>
-
-</html>
-
-</head>
-
-<body>
-    <!-- HEADER -->
-    <header class="header">
-        <div class="logo-container">
-            <span class="logo-icon">🛍️</span>
-            <div class="logo">SimpleCommerce</div>
-        </div>
-
-        <input type="text" id="buscaProduto" placeholder="🔍 Buscar produtos..." class="search" />
-
-        <div class="icons" id="area-usuario">
-        </div>
-    </header>
-
-    <!-- MAIN CONTENT -->
-    <main class="meus-pedidos-container">
-        <h1>Meus Pedidos</h1>
-
-        <div id="listaPedidos"></div>
-    </main>
-
-    <script src="utils.js"></script>
-    <script src="script.js"></script>
-    <script src="meus-pedidos.js"></script>
-</body>
-
 </html>
