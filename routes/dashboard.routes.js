@@ -14,17 +14,17 @@ router.get("/", async (req, res) => {
     `);
 
     const faturamentoTotal = await pool.query(`
-      SELECT COALESCE(SUM(total), 0) 
-      FROM pedidos
-      WHERE status != 'cancelado'
-    `);
+  SELECT COALESCE(SUM(total), 0)
+  FROM pedidos
+  WHERE status_pagamento = 'pago'
+`);
 
     const faturamentoMes = await pool.query(`
-      SELECT COALESCE(SUM(total), 0)
-      FROM pedidos
-      WHERE DATE_TRUNC('month', criado_em) = DATE_TRUNC('month', CURRENT_DATE)
-      AND status != 'cancelado'
-    `);
+  SELECT COALESCE(SUM(total), 0)
+  FROM pedidos
+  WHERE DATE_TRUNC('month', criado_em) = DATE_TRUNC('month', CURRENT_DATE)
+  AND status_pagamento = 'pago'
+`);
 
     const totalClientes = await pool.query(`
       SELECT COUNT(*) 
@@ -41,6 +41,7 @@ router.get("/", async (req, res) => {
     const ticketMedio = await pool.query(`
       SELECT COALESCE(AVG(total), 0)
       FROM pedidos
+      WHERE status_pagamento = 'pago'
     `);
 
     res.json({

@@ -147,15 +147,23 @@ router.post("/finalizar", async (req, res) => {
     const carrinho = carrinhoResult.rows[0];
 
     // 2️⃣ Buscar itens
-    const itensResult = await pool.query(
-      `
-      SELECT ci.*, p.preco
-      FROM carrinho_itens ci
-      JOIN produtos p ON p.id = ci.produto_id
-      WHERE ci.carrinho_id = $1
-      `,
-      [carrinho.id]
-    );
+  const itensResult = await pool.query(
+  `
+  SELECT 
+    ci.*,
+
+    CASE
+      WHEN p.preco_promocional IS NOT NULL
+      THEN p.preco_promocional
+      ELSE p.preco
+    END AS preco
+
+  FROM carrinho_itens ci
+  JOIN produtos p ON p.id = ci.produto_id
+  WHERE ci.carrinho_id = $1
+  `,
+  [carrinho.id]
+);
 
     const itens = itensResult.rows;
 
@@ -360,9 +368,21 @@ router.put("/:id/status", apenasAdmin, async (req, res) => {
 
   try {
 
+    let statusPagamento = "pendente";
+
+    if (status === "pago") {
+      statusPagamento = "pago";
+    }
+
     await pool.query(
-      "UPDATE pedidos SET status = $1 WHERE id = $2",
-      [status, id]
+      `
+      UPDATE pedidos
+      SET 
+        status = $1,
+        status_pagamento = $2
+      WHERE id = $3
+      `,
+      [status, statusPagamento, id]
     );
 
     res.json({
@@ -370,6 +390,8 @@ router.put("/:id/status", apenasAdmin, async (req, res) => {
     });
 
   } catch (err) {
+
+    console.error(err);
 
     res.status(500).json({
       erro: err.message
