@@ -6,8 +6,8 @@
    VARIÁVEIS
    ================== */
 :root {
-    --primary: #223364;
-    --primary-dark: #1f1f5e;
+    --primary: #1b2133;
+    --primary-dark: #1b2133;
     --bg: #f9fafb;
     --card: #ffffff;
     --text: #111827;
@@ -560,6 +560,129 @@ body {
 .cart-footer button:active {
     transform: translateY(0);
 }
+/* ==================== FOOTER COMPLETO ==================== */
+        .footer {
+            background: var(--text);
+            color: var(--card);
+            padding: 60px 20px 20px;
+            margin-top: 80px;
+        }
+
+
+        .footer-payments {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .footer-payments h4 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .payment-icons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 28px;
+        }
+
+        .payment-icons span {
+            background: rgba(255, 255, 255, 0.1);
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            transition: 0.2s;
+        }
+
+        .payment-icons span:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto 30px;
+        }
+
+        .footer-column h4 {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .footer-column ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-column li {
+            margin-bottom: 10px;
+        }
+
+        .footer-column a {
+            color: #ccc;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .footer-column a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .footer-logo span {
+            font-size: 32px;
+        }
+
+        .footer-logo h3 {
+            color: white;
+            font-size: 20px;
+        }
+
+        .footer-desc {
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            color: #bbb;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 15px;
+        }
+
+        .footer-social a {
+            color: #ccc;
+            font-size: 20px;
+            transition: 0.2s;
+        }
+
+        .footer-social a:hover {
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+            color: #aaa;
+        }
 
 /* ==================
    QUANTIDADE (PRODUTO)
